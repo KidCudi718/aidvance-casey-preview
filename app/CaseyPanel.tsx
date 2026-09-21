@@ -39,7 +39,7 @@ const MEET_HREF = `mailto:david.choukroun2@gmail.com?subject=${encodeURIComponen
 
 export default function CaseyPanel() {
   const [state, setState] = useState<State>("idle");
-  const [presence, setPresence] = useState<PresenceMode>("bars");
+  const [presence, setPresence] = useState<PresenceMode>("circle");
   const [caption, setCaption] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [needsUnmute, setNeedsUnmute] = useState(false);
@@ -171,14 +171,19 @@ export default function CaseyPanel() {
 
     if (!activeRef.current) return;
 
-    const ctx = new AudioContext();
+    const ctx = new AudioContext({ latencyHint: "interactive" });
     audioCtxRef.current = ctx;
-    void ctx.resume();
+    try {
+      await ctx.resume();
+    } catch {
+      /* unmute path resumes again */
+    }
     const node = ctx.createAnalyser();
-    node.fftSize = 1024;
-    node.smoothingTimeConstant = 0.05;
-    node.minDecibels = -96;
-    node.maxDecibels = -24;
+    // 512 samples ≈ 10ms at 48kHz — one frame, not a trailing window.
+    node.fftSize = 512;
+    node.smoothingTimeConstant = 0;
+    node.minDecibels = -85;
+    node.maxDecibels = -25;
     setAnalyser(node);
     stopTapRef.current = watchAgentAudio(ctx, node);
 
@@ -321,6 +326,15 @@ export default function CaseyPanel() {
             >
               Line
             </button>
+            <span aria-hidden="true">|</span>
+            <button
+              type="button"
+              className={presence === "circle" ? "is-on" : ""}
+              aria-pressed={presence === "circle"}
+              onClick={() => setPresence("circle")}
+            >
+              Circle
+            </button>
           </div>
           <PresenceVisual state={state} analyser={analyser} mode={presence} />
         </div>
@@ -354,6 +368,10 @@ export default function CaseyPanel() {
               Tap to unmute
             </span>
           </button>
+        ) : state === "done" ? (
+          <a className="book" href={MEET_HREF}>
+            {DAVE_LABEL}
+          </a>
         ) : (
           <button
             type="button"
@@ -368,6 +386,12 @@ export default function CaseyPanel() {
           </button>
         )}
 
+        {state === "done" ? (
+          <button type="button" className="again" onClick={() => void startCall()}>
+            Talk again
+          </button>
+        ) : null}
+
         {needsUnmute ? (
           <button type="button" className="quiet" onClick={() => void startCall()}>
             Stop
@@ -375,12 +399,6 @@ export default function CaseyPanel() {
         ) : null}
 
         <p className="trust">Casey is AI. The mic stays in your browser.</p>
-
-        {state === "done" ? (
-          <a className="after" href={MEET_HREF}>
-            {DAVE_LABEL}
-          </a>
-        ) : null}
       </div>
     </main>
   );

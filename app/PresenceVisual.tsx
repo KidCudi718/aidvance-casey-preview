@@ -3,14 +3,29 @@
 import { useEffect, useRef } from "react";
 import type { CallVisual } from "./lips";
 
-export type PresenceMode = "bars" | "line";
+export type PresenceMode = "bars" | "line" | "circle";
 
 const BAR_COUNT = 34;
-const LINE_POINTS = 128;
+const LINE_POINTS = 96;
 const INK = "#f4f4f2";
 
-function isLive(state: CallVisual) {
-  return state === "listening" || state === "speaking";
+/** Rise is the sample itself. Release only knocks down single-frame sparkle. */
+const ATTACK = 1;
+const RELEASE = 0.4;
+
+function follow(cur: number, target: number) {
+  const k = target > cur ? ATTACK : RELEASE;
+  return cur + (target - cur) * k;
+}
+
+function breathScale(now: number) {
+  const phase = (now / 1000) * ((Math.PI * 2) / 5.4);
+  return 1.03 + 0.03 * Math.sin(phase);
+}
+
+function speechScale(rms: number) {
+  const open = Math.min(1, Math.max(0, (rms - 0.004) * 16));
+  return 1 + open * 0.26;
 }
 
 export default function PresenceVisual({
@@ -39,6 +54,8 @@ export default function PresenceVisual({
     const bars = new Float32Array(BAR_COUNT).fill(0.05);
     const line = new Float32Array(LINE_POINTS).fill(0);
     let freq = new Uint8Array(0);
+    let time = new Uint8Array(0);
+    let disc = 1;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     let reduced = mq.matches;
     const onMQ = () => {
@@ -57,18 +74,40 @@ export default function PresenceVisual({
     const ro = new ResizeObserver(resize);
     ro.observe(canvas);
 
-    const pull = (analyserNode: AnalyserNode, count: number, into: Float32Array, gain: number) => {
-      if (freq.length !== analyserNode.frequencyBinCount) {
-        freq = new Uint8Array(analyserNode.frequencyBinCount);
+    const readRms = (node: AnalyserNode) => {
+      if (time.length !== node.fftSize) time = new Uint8Array(node.fftSize);
+      node.getByteTimeDomainData(time);
+      let sum = 0;
+      for (let i = 0; i < time.length; i++) {
+        const v = ((time[i] ?? 128) - 128) / 128;
+        sum += v * v;
       }
-      analyserNode.getByteFrequencyData(freq);
-      const span = Math.max(1, Math.floor(freq.length * 0.5));
+      return Math.sqrt(sum / time.length);
+    };
+
+    const pullFreq = (node: AnalyserNode, count: number, into: Float32Array) => {
+      if (freq.length !== node.frequencyBinCount) {
+        freq = new Uint8Array(node.frequencyBinCount);
+      }
+      node.getByteFrequencyData(freq);
+      const nyquist = node.context.sampleRate / 2;
+      const binHz = nyquist / freq.length;
+      const i0 = Math.max(0, Math.floor(70 / binHz));
+      const i1 = Math.min(freq.length - 1, Math.ceil(4200 / binHz));
+      const span = Math.max(1, i1 - i0 + 1);
       for (let i = 0; i < count; i++) {
-        const idx = Math.min(span - 1, Math.floor((i / count) * span));
-        const v = (freq[idx] ?? 0) / 255;
-        const target = Math.pow(v, 0.7) * gain;
-        const cur = into[i] ?? 0;
-        into[i] = cur + (target - cur) * (target > cur ? 0.62 : 0.34);
+        const a = i0 + Math.floor((i / count) * span);
+        const b = i0 + Math.floor(((i + 1) / count) * span);
+        const end = Math.min(freq.length, Math.max(a + 1, b));
+        let sum = 0;
+        let n = 0;
+        for (let k = a; k < end; k++) {
+          sum += freq[k] ?? 0;
+          n++;
+        }
+        const v = n ? sum / (n * 255) : 0;
+        const target = Math.min(1, Math.pow(v, 0.8));
+        into[i] = follow(into[i] ?? 0, target);
       }
     };
 
@@ -80,37 +119,30 @@ export default function PresenceVisual({
       const visual = modeRef.current;
       const call = stateRef.current;
       const node = analyserRef.current;
-      const live = isLive(call) && !reduced;
-      const t = now / 1000;
+      const speaking =
+        call === "speaking" && !!node && node.context.state !== "closed";
 
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = INK;
       ctx.strokeStyle = INK;
       ctx.lineCap = "round";
       ctx.lineJoin = "round";
+      ctx.globalAlpha = 1;
 
-      if (visual === "bars") {
-        if (live && call === "speaking" && node && node.context.state !== "closed") {
-          pull(node, BAR_COUNT, bars, 1);
-        } else if (live && call === "listening") {
-          for (let i = 0; i < BAR_COUNT; i++) {
-            const wave = 0.5 + 0.5 * Math.sin(t * 2.15 + i * 0.38);
-            const target = 0.06 + wave * 0.28;
-            const cur = bars[i] ?? 0;
-            bars[i] = cur + (target - cur) * 0.2;
-          }
-        } else {
-          bars.fill(0.05);
-        }
+      if (visual === "circle") {
+        const target = speaking
+          ? speechScale(readRms(node as AnalyserNode))
+          : reduced
+            ? 1
+            : breathScale(now);
+        disc = follow(disc, target);
+        drawCircle(ctx, w, h, disc);
+      } else if (visual === "bars") {
+        if (speaking && node) pullFreq(node, BAR_COUNT, bars);
+        else bars.fill(0.05);
         drawBars(ctx, w, h, bars);
-      } else if (live && call === "speaking" && node && node.context.state !== "closed") {
-        pull(node, LINE_POINTS, line, 1);
-        drawLine(ctx, w, h, line);
-      } else if (live && call === "listening") {
-        for (let i = 0; i < LINE_POINTS; i++) {
-          const n = i / (LINE_POINTS - 1);
-          line[i] = Math.sin(n * Math.PI * 3 + t * 2.4) * 0.22 * Math.sin(Math.PI * n);
-        }
+      } else if (speaking && node) {
+        pullFreq(node, LINE_POINTS, line);
         drawLine(ctx, w, h, line);
       } else {
         line.fill(0);
@@ -133,6 +165,26 @@ export default function PresenceVisual({
       <canvas ref={canvasRef} aria-hidden="true" />
     </div>
   );
+}
+
+function drawCircle(
+  ctx: CanvasRenderingContext2D,
+  w: number,
+  h: number,
+  scale: number
+) {
+  const cx = w * 0.5;
+  const cy = h * 0.5;
+  const r = Math.max(8, Math.min(w, h) * 0.24 * scale);
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.beginPath();
+  ctx.lineWidth = 1.25;
+  ctx.globalAlpha = 0.55;
+  ctx.arc(cx, cy, r * 1.42, 0, Math.PI * 2);
+  ctx.stroke();
+  ctx.globalAlpha = 1;
 }
 
 function drawBars(
@@ -170,7 +222,7 @@ function drawLine(
   ctx.lineWidth = 1.5;
   for (let i = 0; i < n; i++) {
     const x = left + (i / (n - 1)) * (right - left);
-    const amp = Math.max(-1, Math.min(1, levels[i] ?? 0));
+    const amp = Math.max(0, Math.min(1, levels[i] ?? 0));
     const y = mid - amp * h * 0.3;
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);

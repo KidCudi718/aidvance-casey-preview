@@ -363,27 +363,47 @@ export function drawLips(
 }
 
 /**
- * Read levels from the agent audio elements Speko appends to document.body.
- * Taps the MediaStream in parallel — playback stays on the element, so
- * unmute / volume / barge-in are untouched.
+ * Tap Speko/LiveKit agent playback. The client appends
+ * `<audio srcObject=MediaStream>` to document.body. We read that stream in
+ * parallel — the element keeps playing, so unmute / volume stay untouched.
+ * A zero-gain sink keeps the analyser in the render graph (unconnected
+ * analysers stay silent). LiveKit's iOS dummy element is silence and is skipped.
  */
 export function watchAgentAudio(ctx: AudioContext, analyser: AnalyserNode): () => void {
-  const tapped = new WeakSet<HTMLMediaElement>();
+  const tappedEls = new WeakSet<HTMLMediaElement>();
+  const tappedStreams = new WeakSet<MediaStream>();
   const sources: MediaStreamAudioSourceNode[] = [];
+
+  const sink = ctx.createGain();
+  sink.gain.value = 0;
+  try {
+    analyser.connect(sink);
+    sink.connect(ctx.destination);
+  } catch {
+    /* context already closed */
+  }
 
   const scan = () => {
     if (ctx.state === "closed") return;
     document.querySelectorAll("audio").forEach((el) => {
-      if (tapped.has(el)) return;
+      if (tappedEls.has(el)) return;
+      if (el.id === "livekit-dummy-audio-el") return;
       const stream = el.srcObject;
-      if (!(stream instanceof MediaStream) || stream.getAudioTracks().length === 0) return;
+      if (!(stream instanceof MediaStream)) return;
+      const tracks = stream.getAudioTracks().filter((track) => track.readyState === "live");
+      if (tracks.length === 0) return;
+      if (tappedStreams.has(stream)) {
+        tappedEls.add(el);
+        return;
+      }
       try {
         const src = ctx.createMediaStreamSource(stream);
         src.connect(analyser);
         sources.push(src);
-        tapped.add(el);
+        tappedStreams.add(stream);
+        tappedEls.add(el);
       } catch {
-        /* not ready — next scan retries */
+        /* stream not ready — next scan retries */
       }
     });
   };
@@ -391,10 +411,15 @@ export function watchAgentAudio(ctx: AudioContext, analyser: AnalyserNode): () =
   scan();
   const obs = new MutationObserver(scan);
   obs.observe(document.body, { childList: true, subtree: true });
-  const timer = window.setInterval(scan, 400);
+  const onPlay = (event: Event) => {
+    if (event.target instanceof HTMLAudioElement) scan();
+  };
+  document.addEventListener("play", onPlay, true);
+  const timer = window.setInterval(scan, 100);
 
   return () => {
     obs.disconnect();
+    document.removeEventListener("play", onPlay, true);
     window.clearInterval(timer);
     for (const src of sources) {
       try {
@@ -402,6 +427,12 @@ export function watchAgentAudio(ctx: AudioContext, analyser: AnalyserNode): () =
       } catch {
         /* ignore */
       }
+    }
+    try {
+      analyser.disconnect(sink);
+      sink.disconnect();
+    } catch {
+      /* ignore */
     }
   };
 }

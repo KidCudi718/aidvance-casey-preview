@@ -243,23 +243,68 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .quiet:hover { opacity: 1; }
 .quiet:focus-visible { outline: 1px solid var(--paper); outline-offset: 3px; }
 
-.after {
-  margin: 10px 0 0;
-  max-width: 28ch;
-  color: rgba(244, 244, 242, 0.38);
+.book {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: min(100%, 420px);
+  min-height: 56px;
+  padding: 14px 22px;
+  border: 1px solid var(--paper);
+  background: var(--paper);
+  color: var(--ink);
+  text-decoration: none;
+  text-align: center;
+  text-wrap: balance;
   font-family: var(--font-sans), "IBM Plex Sans", system-ui, sans-serif;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.45;
+  font-size: 15px;
+  font-weight: 500;
+  font-style: normal;
+  line-height: 1.35;
   letter-spacing: 0.01em;
   text-transform: none;
-  text-decoration: underline;
-  text-decoration-color: rgba(244, 244, 242, 0.28);
-  text-underline-offset: 3px;
-  transition: color 0.2s var(--ease);
+  cursor: pointer;
+  touch-action: manipulation;
+  animation: fade 0.16s var(--ease) both;
+  transition:
+    background 0.2s var(--ease),
+    color 0.2s var(--ease),
+    transform 0.15s var(--ease),
+    box-shadow 0.2s var(--ease);
 }
-.after:hover { color: var(--paper); }
-.after:focus-visible { outline: 1px solid var(--paper); outline-offset: 3px; }
+.book:hover { background: transparent; color: var(--paper); }
+.book:active {
+  transform: scale(0.97);
+  background: #000;
+  color: var(--paper);
+  box-shadow: 0 0 0 1px var(--paper);
+}
+.book:focus { outline: none; }
+.book:focus-visible { outline: 1px solid var(--paper); outline-offset: 4px; }
+
+.again {
+  appearance: none;
+  border: 1px solid rgba(244, 244, 242, 0.45);
+  background: transparent;
+  color: var(--paper);
+  min-height: 44px;
+  width: min(100%, 280px);
+  padding: 0 22px;
+  cursor: pointer;
+  font-family: var(--font-mono), "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.72;
+  touch-action: manipulation;
+  transition: opacity 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.15s var(--ease);
+}
+.again:hover { opacity: 1; border-color: var(--paper); }
+.again:active { transform: scale(0.97); }
+.again:focus { outline: none; }
+.again:focus-visible { outline: 1px solid var(--paper); outline-offset: 4px; }
 
 .callout {
   display: flex;
