@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@spekoai/client": "^0.0.13",
     "msedge-tts": "^2.0.7",
     "next": "^15.5.7",
     "react": "19.1.1",

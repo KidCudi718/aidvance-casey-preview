@@ -2,40 +2,108 @@ import { NextResponse } from "next/server";
 import {
   CASEY_OPENER,
   CASEY_VOICE_INSTRUCTIONS,
-} from "@/lib/caseyVoicePrompt";
+} from "../../../../lib/caseyVoicePrompt";
 
 export const runtime = "nodejs";
 
+/**
+ * Mint Speko transport for preview Casey with per-session bar overrides.
+ * Production / live Speko agent config is NOT patched — overrides apply to this session only.
+ */
 export async function POST() {
-  const key = process.env.XAI_API_KEY;
-  if (!key) {
+  const apiKey = process.env.SPEKO_API_KEY;
+  const agentId = process.env.SPEKO_AGENT_ID || "agent_881e018fd3a54815";
+  const apiBase = (
+    process.env.SPEKO_API_BASE || "https://api.speko.dev/v1"
+  ).replace(/\/$/, "");
+
+  if (!apiKey) {
     return NextResponse.json(
-      { error: "missing_xai_key", message: "XAI_API_KEY is not set." },
-      { status: 503 }
+      {
+        error: "misconfigured",
+        message: "SPEKO_API_KEY is not set on this preview.",
+      },
+      { status: 500 }
     );
   }
 
-  const r = await fetch("https://api.x.ai/v1/realtime/client_secrets", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${key}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ expires_after: { seconds: 600 } }),
-  });
+  try {
+    const r = await fetch(`${apiBase}/sessions`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        mode: "cascade",
+        agentId,
+        ttlSeconds: 900,
+        overrides: {
+          agent: {
+            prompt: CASEY_VOICE_INSTRUCTIONS,
+            firstMessage: CASEY_OPENER,
+          },
+        },
+      }),
+      cache: "no-store",
+    });
 
-  const data = await r.json().catch(() => ({}));
-  if (!r.ok || !data?.value) {
-    console.error("xai client_secrets", r.status, data);
-    return NextResponse.json({ error: "token_failed" }, { status: 502 });
+    const text = await r.text();
+    let data: Record<string, unknown> = {};
+    try {
+      data = text ? JSON.parse(text) : {};
+    } catch {
+      /* ignore */
+    }
+
+    if (!r.ok) {
+      console.error("speko session mint failed", r.status, text.slice(0, 300));
+      return NextResponse.json(
+        {
+          error: r.status === 429 ? "busy" : "unavailable",
+          message:
+            r.status === 429
+              ? "Casey is busy right now. Try again in a minute."
+              : "Could not start Casey right now.",
+        },
+        { status: r.status === 429 ? 429 : 502 }
+      );
+    }
+
+    const transportToken = (data.transportToken || data.conversationToken) as
+      | string
+      | undefined;
+    const transportUrl = (data.transportUrl || data.livekitUrl) as
+      | string
+      | undefined;
+
+    if (!transportToken || !transportUrl) {
+      return NextResponse.json(
+        {
+          error: "bad_session",
+          message: "Speko returned an incomplete session.",
+        },
+        { status: 502 }
+      );
+    }
+
+    return NextResponse.json({
+      transportToken,
+      transportUrl,
+      conversationToken: transportToken,
+      livekitUrl: transportUrl,
+      provider: "speko",
+      agentId,
+      sessionId: data.sessionId ?? null,
+      opener: CASEY_OPENER,
+      note: "Preview bar overrides on session only — live Speko agent / aidvance.xyz untouched.",
+    });
+  } catch (e) {
+    console.error("speko session mint error", e);
+    return NextResponse.json(
+      { error: "unavailable", message: "Could not reach Speko." },
+      { status: 502 }
+    );
   }
-
-  return NextResponse.json({
-    token: data.value,
-    expires_at: data.expires_at,
-    model: "grok-voice-latest",
-    voice: "luna",
-    instructions: CASEY_VOICE_INSTRUCTIONS,
-    opener: CASEY_OPENER,
-  });
 }
