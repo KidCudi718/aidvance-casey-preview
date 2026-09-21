@@ -200,3 +200,12 @@ body { font-family: var(--font-sans), "IBM Plex Sans", system-ui, sans-serif; }
 .casey h1, .lede, .transcript, .side h2, .section h2, .cell .t, .memo li, .memo .empty, .cta h2 {
   font-family: var(--font-serif), "Newsreader", Georgia, serif;
 }
+
+.hero--solo {
+  grid-template-columns: 1fr;
+  max-width: 720px;
+  margin-inline: auto;
+}
+.hero--solo .casey {
+  width: 100%;
+}

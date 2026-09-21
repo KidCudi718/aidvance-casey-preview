@@ -14,11 +14,11 @@ const BARS = 28;
 const SAMPLE_RATE = 24000;
 
 const LABELS: Record<State, string> = {
-  idle: "Press once. Talk normally.",
+  idle: "Press once. Talk like a person.",
   connecting: "Connecting Casey…",
-  listening: "Listening… go ahead.",
-  thinking: "Casey is thinking…",
-  speaking: "Casey is talking",
+  listening: "Listening…",
+  thinking: "…",
+  speaking: "Casey is talking — interrupt anytime",
   error: "Something went sideways.",
 };
 
@@ -57,15 +57,16 @@ function base64ToInt16(b64: string): Int16Array {
   return new Int16Array(bytes.buffer);
 }
 
-export default function CaseyPanel({ pains }: { pains: string[] }) {
+export default function CaseyPanel() {
   const [state, setState] = useState<State>("idle");
-  const [transcript, setTranscript] = useState("Casey is ready when you are.");
+  const [transcript, setTranscript] = useState(
+    "Casey is ready. Interrupt her anytime."
+  );
   const [levels, setLevels] = useState<number[]>(() => Array(BARS).fill(0.18));
   const [offerMeet, setOfferMeet] = useState(false);
   const [errMsg, setErrMsg] = useState("");
 
   const stateRef = useRef<State>("idle");
-  const painsRef = useRef(pains);
   const activeRef = useRef(false);
   const wsRef = useRef<WebSocket | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -76,8 +77,9 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
   const rafRef = useRef(0);
   const nextPlayRef = useRef(0);
   const caseyTextRef = useRef("");
+  const assistantTurnsRef = useRef(0);
+  const playingSourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
 
-  painsRef.current = pains;
   stateRef.current = state;
 
   const stopWave = useCallback(() => {
@@ -85,9 +87,23 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
     setLevels(Array(BARS).fill(0.18));
   }, []);
 
+  const flushPlayback = useCallback(() => {
+    for (const src of playingSourcesRef.current) {
+      try {
+        src.stop();
+      } catch {
+        /* already stopped */
+      }
+    }
+    playingSourcesRef.current.clear();
+    nextPlayRef.current = 0;
+    stopWave();
+  }, [stopWave]);
+
   const hangup = useCallback(() => {
     activeRef.current = false;
     cancelAnimationFrame(rafRef.current);
+    flushPlayback();
     try {
       wsRef.current?.close();
     } catch {
@@ -107,9 +123,7 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
     void playCtxRef.current?.close();
     playCtxRef.current = null;
     analyserRef.current = null;
-    nextPlayRef.current = 0;
-    stopWave();
-  }, [stopWave]);
+  }, [flushPlayback]);
 
   useEffect(() => () => hangup(), [hangup]);
 
@@ -139,6 +153,19 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
       const startAt = Math.max(now, nextPlayRef.current);
       src.start(startAt);
       nextPlayRef.current = startAt + buffer.duration;
+      playingSourcesRef.current.add(src);
+      src.onended = () => {
+        playingSourcesRef.current.delete(src);
+        if (
+          playCtxRef.current &&
+          playCtxRef.current.currentTime >= nextPlayRef.current - 0.08
+        ) {
+          if (stateRef.current === "speaking") {
+            setState("listening");
+            stopWave();
+          }
+        }
+      };
 
       if (stateRef.current !== "speaking") setState("speaking");
 
@@ -156,22 +183,23 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
         rafRef.current = requestAnimationFrame(tick);
       };
       rafRef.current = requestAnimationFrame(tick);
-
-      src.onended = () => {
-        if (
-          playCtxRef.current &&
-          playCtxRef.current.currentTime >= nextPlayRef.current - 0.08
-        ) {
-          if (stateRef.current === "speaking") {
-            setState("listening");
-            setOfferMeet(true);
-            stopWave();
-          }
-        }
-      };
     },
     [stopWave]
   );
+
+  const bargeIn = useCallback(() => {
+    flushPlayback();
+    const ws = wsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      try {
+        ws.send(JSON.stringify({ type: "response.cancel" }));
+      } catch {
+        /* ignore */
+      }
+    }
+    setState("listening");
+    setTranscript("Listening…");
+  }, [flushPlayback]);
 
   const onServerEvent = useCallback(
     (event: Record<string, unknown>) => {
@@ -186,13 +214,17 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
         return;
       }
 
+      // User started talking — stop Casey mid-sentence
       if (type === "input_audio_buffer.speech_started") {
-        setState("listening");
-        setTranscript("Listening…");
+        if (stateRef.current === "speaking" || stateRef.current === "thinking") {
+          bargeIn();
+        } else {
+          setState("listening");
+          setTranscript("Listening…");
+        }
       }
       if (type === "input_audio_buffer.speech_stopped") {
         setState("thinking");
-        setTranscript("Casey is thinking…");
         caseyTextRef.current = "";
       }
 
@@ -231,10 +263,12 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
       }
 
       if (type === "response.done") {
-        setOfferMeet(true);
+        assistantTurnsRef.current += 1;
+        // Meet CTA only after a real exchange — not the opener
+        if (assistantTurnsRef.current >= 3) setOfferMeet(true);
       }
     },
-    [playPcmChunk]
+    [bargeIn, playPcmChunk]
   );
 
   const startCall = useCallback(async () => {
@@ -248,16 +282,13 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
     setErrMsg("");
     setOfferMeet(false);
     caseyTextRef.current = "";
+    assistantTurnsRef.current = 0;
     setState("connecting");
     setTranscript("Connecting Casey…");
     activeRef.current = true;
 
     try {
-      const sessionRes = await fetch("/api/voice/session", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pains: painsRef.current }),
-      });
+      const sessionRes = await fetch("/api/voice/session", { method: "POST" });
       if (!sessionRes.ok) throw new Error("Could not start voice session");
       const session = await sessionRes.json();
       const token = session.token as string;
@@ -311,13 +342,19 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
         return;
       }
 
+      // Longer silence = room for a beat before she jumps in
       ws.send(
         JSON.stringify({
           type: "session.update",
           session: {
             voice: "eve",
             instructions,
-            turn_detection: { type: "server_vad" },
+            turn_detection: {
+              type: "server_vad",
+              threshold: 0.55,
+              prefix_padding_ms: 280,
+              silence_duration_ms: 950,
+            },
             audio: {
               input: { format: { type: "audio/pcm", rate: SAMPLE_RATE } },
               output: { format: { type: "audio/pcm", rate: SAMPLE_RATE } },
@@ -326,6 +363,7 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
         })
       );
 
+      // Soft bar opener — interruptible
       ws.send(
         JSON.stringify({
           type: "conversation.item.create",
@@ -336,7 +374,7 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
             content: [
               {
                 type: "output_text",
-                text: "Hey — I'm Casey, Aidvance's AI guide. What's eating your week?",
+                text: "Hey — I'm Casey, Aidvance's AI. What's been eating your week?",
               },
             ],
           },
@@ -433,11 +471,11 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
       </button>
       {offerMeet ? (
         <a className="meet" href="#meet">
-          Book a short working meeting with Dave →
+          If that helped — book Dave →
         </a>
       ) : null}
       <p className="hint">
-        Real Grok Voice · eve · mic stays in your browser · preview only
+        Grok Voice · eve · interrupt her · silence is fine · preview only
       </p>
     </div>
   );

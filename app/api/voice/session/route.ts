@@ -3,7 +3,7 @@ import { CASEY_VOICE_INSTRUCTIONS } from "@/lib/caseyVoicePrompt";
 
 export const runtime = "nodejs";
 
-export async function POST(req: Request) {
+export async function POST() {
   const key = process.env.XAI_API_KEY;
   if (!key) {
     return NextResponse.json(
@@ -12,30 +12,13 @@ export async function POST(req: Request) {
     );
   }
 
-  let pains: string[] = [];
-  try {
-    const body = await req.json();
-    pains = Array.isArray(body?.pains)
-      ? body.pains
-          .filter((p: unknown) => typeof p === "string" && (p as string).trim())
-          .slice(0, 9)
-      : [];
-  } catch {
-    /* empty ok */
-  }
-
-  const painNote =
-    pains.length > 0
-      ? `\n\n# Context\nVisitor already tapped these week-eaters: ${pains.join("; ")}. Use them.`
-      : "";
-
   const r = await fetch("https://api.x.ai/v1/realtime/client_secrets", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${key}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ expires_after: { seconds: 300 } }),
+    body: JSON.stringify({ expires_after: { seconds: 600 } }),
   });
 
   const data = await r.json().catch(() => ({}));
@@ -49,6 +32,6 @@ export async function POST(req: Request) {
     expires_at: data.expires_at,
     model: "grok-voice-latest",
     voice: "eve",
-    instructions: CASEY_VOICE_INSTRUCTIONS + painNote,
+    instructions: CASEY_VOICE_INSTRUCTIONS,
   });
 }
