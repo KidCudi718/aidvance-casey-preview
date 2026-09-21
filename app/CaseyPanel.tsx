@@ -7,8 +7,17 @@ import { watchAgentAudio, type CallVisual } from "./lips";
 
 type State = CallVisual;
 
+const STATUS: Record<State, string> = {
+  idle: "",
+  connecting: "Connecting",
+  listening: "Listening",
+  thinking: "One moment",
+  speaking: "Speak to interrupt",
+  error: "Something went sideways.",
+};
+
 const BTN: Record<State, string> = {
-  idle: "Talk",
+  idle: "Talk to Casey",
   connecting: "Connecting",
   listening: "End",
   thinking: "End",
@@ -18,8 +27,13 @@ const BTN: Record<State, string> = {
 
 type Turn = { role: "user" | "assistant"; text: string; at: number };
 
+const MEET_HREF =
+  "mailto:david.choukroun2@gmail.com?subject=Aidvance%20meeting%20from%20Casey%20preview";
+
 export default function CaseyPanel() {
   const [state, setState] = useState<State>("idle");
+  const [caption, setCaption] = useState("");
+  const [offerMeet, setOfferMeet] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [needsUnmute, setNeedsUnmute] = useState(false);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
@@ -106,12 +120,16 @@ export default function CaseyPanel() {
       if (stateRef.current === "connecting") return;
       await hangup();
       setState("idle");
+      setCaption("");
       setErrMsg("");
+      setOfferMeet(false);
       return;
     }
 
     setErrMsg("");
+    setOfferMeet(false);
     setNeedsUnmute(false);
+    setCaption("");
     turnsRef.current = [];
     pendingReplyRef.current = false;
     window.clearTimeout(thinkTimerRef.current);
@@ -153,6 +171,8 @@ export default function CaseyPanel() {
           if (!activeRef.current) return;
           void hangup().then(() => {
             setState("idle");
+            setCaption("");
+            setOfferMeet(false);
           });
         },
         onModeChange: (mode) => {
@@ -172,6 +192,13 @@ export default function CaseyPanel() {
           const isUser = last.source === "user";
           if (last.isFinal) {
             pushTurn(isUser ? "user" : "assistant", last.text);
+            if (!isUser) setCaption(last.text);
+            if (
+              !isUser &&
+              messages.filter((m) => m.source === "agent" && m.isFinal).length >= 3
+            ) {
+              setOfferMeet(true);
+            }
             if (isUser) {
               pendingReplyRef.current = true;
               window.clearTimeout(thinkTimerRef.current);
@@ -200,6 +227,7 @@ export default function CaseyPanel() {
         onError: (err) => {
           const message = err instanceof Error ? err.message : "Speko voice error";
           setErrMsg(message);
+          setCaption("");
           setState("error");
           activeRef.current = false;
           void hangup();
@@ -238,6 +266,8 @@ export default function CaseyPanel() {
     }
   }, []);
 
+  const status =
+    state === "error" ? errMsg || STATUS.error : STATUS[state];
   const busy = state === "connecting";
 
   return (
@@ -255,9 +285,15 @@ export default function CaseyPanel() {
       </div>
 
       <div className="dock">
-        {state === "error" && errMsg ? (
-          <p className="err" role="status">
-            {errMsg}
+        {immersed ? (
+          <p className="status" role="status" aria-live="polite">
+            {status}
+          </p>
+        ) : null}
+
+        {immersed && caption ? (
+          <p className="caption" aria-live="polite">
+            {caption}
           </p>
         ) : null}
 
@@ -281,6 +317,12 @@ export default function CaseyPanel() {
           <button type="button" className="quiet" onClick={() => void startCall()}>
             End
           </button>
+        ) : null}
+
+        {offerMeet ? (
+          <a className="meet" href={MEET_HREF}>
+            If that helped — meet Dave
+          </a>
         ) : null}
       </div>
     </main>
