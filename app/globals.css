@@ -232,6 +232,15 @@ button, a { -webkit-tap-highlight-color: transparent; }
   cursor: progress;
   transform: none;
 }
+.room[data-state="listening"] .talk,
+.room[data-state="thinking"] .talk,
+.room[data-state="speaking"] .talk {
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+}
 .room[data-state="listening"] .talk {
   box-shadow: 0 0 0 5px rgba(244, 244, 242, 0.16);
 }
