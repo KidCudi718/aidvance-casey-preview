@@ -1,9 +1,10 @@
 export type CallVisual =
   | "idle"
-  | "connecting"
+  | "requesting_mic"
   | "listening"
   | "thinking"
   | "speaking"
+  | "done"
   | "error";
 
 export type MouthPose = {
@@ -116,26 +117,21 @@ export function stepMouth(
     roundT = jawT < 0.06 ? 0.12 : clamp((lowR - 0.32) * 2.5, 0, 1);
     attack = 0.72;
     release = 0.34;
-  } else if (state === "thinking") {
-    jawT = 0.028;
-    spreadT = 0.02;
-    roundT = reduced ? 0.4 : 0.36 + Math.sin(t * 1.15) * 0.05;
-    attack = reduced ? 1 : 0.12;
-    release = reduced ? 1 : 0.1;
-  } else if (state === "error") {
-    jawT = 0.04;
-    spreadT = 0.03;
+  } else if (state === "listening") {
+    // Distinct from speech and from the still idle mouth.
+    const pulse = reduced ? 0.09 : 0.05 + (0.5 + 0.5 * Math.sin(t * 2.1)) * 0.18;
+    jawT = pulse;
+    spreadT = 0.08;
     roundT = 0.16;
-    attack = 0.2;
-    release = 0.16;
+    attack = reduced ? 1 : 0.22;
+    release = reduced ? 1 : 0.16;
   } else {
-    const breath = reduced ? 0.45 : Math.sin(t * 0.72) * 0.5 + 0.5;
-    const amp = state === "connecting" ? 0.022 : 0.045;
-    jawT = 0.04 + breath * amp;
-    spreadT = 0.05;
-    roundT = 0.1 + breath * 0.06;
-    attack = reduced ? 1 : 0.08;
-    release = reduced ? 1 : 0.07;
+    // Idle, mic prompt, thinking, done, error: held still. No false "she's live" motion.
+    jawT = state === "thinking" ? 0.02 : 0.045;
+    spreadT = 0.04;
+    roundT = 0.1;
+    attack = 1;
+    release = 1;
   }
 
   env.jaw = follow(env.jaw, jawT, attack, release);

@@ -11,26 +11,28 @@ const BARS = 27;
 
 const STATUS: Record<State, string> = {
   idle: "",
-  connecting: "Connecting",
-  listening: "Listening",
-  thinking: "One moment",
-  speaking: "Speak to interrupt",
-  error: "Something went sideways.",
+  requesting_mic: "Allow microphone…",
+  listening: "Listening…",
+  thinking: "One second…",
+  speaking: "Casey is talking…",
+  done: "That’s the conversation.",
+  error: "",
 };
 
 const BTN: Record<State, string> = {
   idle: "Talk to Casey",
-  connecting: "Connecting",
-  listening: "End",
-  thinking: "End",
-  speaking: "End",
+  requesting_mic: "Allow microphone…",
+  listening: "Stop",
+  thinking: "Stop",
+  speaking: "Stop",
+  done: "Talk again",
   error: "Try again",
 };
 
 type Turn = { role: "user" | "assistant"; text: string; at: number };
 
 const MEET_HREF =
-  "mailto:david.choukroun2@gmail.com?subject=Aidvance%20meeting%20from%20Casey%20preview";
+  "mailto:david.choukroun2@gmail.com?subject=15%20minutes%20with%20Dave%20from%20Casey%20preview";
 
 function PresenceWave({
   state,
@@ -39,7 +41,7 @@ function PresenceWave({
   state: State;
   analyser: AnalyserNode | null;
 }) {
-  const [levels, setLevels] = useState<number[]>(() => Array(BARS).fill(0.22));
+  const [levels, setLevels] = useState<number[]>(() => Array(BARS).fill(0.18));
   const speaking = state === "speaking" && analyser;
 
   useEffect(() => {
@@ -62,8 +64,11 @@ function PresenceWave({
     return () => cancelAnimationFrame(raf);
   }, [speaking, analyser]);
 
+  const mode =
+    state === "speaking" ? "wave wave--speak" : state === "listening" ? "wave wave--listen" : "wave";
+
   return (
-    <div className={speaking ? "wave wave--live" : "wave"} aria-hidden>
+    <div className={mode} aria-hidden>
       {Array.from({ length: BARS }, (_, i) => (
         <span
           key={i}
@@ -94,9 +99,15 @@ export default function CaseyPanel() {
   const pendingReplyRef = useRef(false);
   const thinkTimerRef = useRef(0);
   const holdTimerRef = useRef(0);
+  const offerMeetRef = useRef(false);
 
   stateRef.current = state;
-  const immersed = state !== "idle";
+
+  const live =
+    state === "requesting_mic" ||
+    state === "listening" ||
+    state === "thinking" ||
+    state === "speaking";
 
   const stopAudioTap = useCallback(() => {
     stopTapRef.current?.();
@@ -162,27 +173,55 @@ export default function CaseyPanel() {
     [hangup]
   );
 
+  const markEarned = useCallback((earned: boolean) => {
+    offerMeetRef.current = earned;
+    setOfferMeet(earned);
+  }, []);
+
   const startCall = useCallback(async () => {
     if (activeRef.current) {
-      if (stateRef.current === "connecting") return;
+      if (stateRef.current === "requesting_mic") return;
       await hangup();
-      setState("idle");
-      setCaption("");
-      setErrMsg("");
-      setOfferMeet(false);
+      setState("done");
       return;
     }
 
     setErrMsg("");
-    setOfferMeet(false);
+    markEarned(false);
     setNeedsUnmute(false);
     setCaption("");
     turnsRef.current = [];
     pendingReplyRef.current = false;
     window.clearTimeout(thinkTimerRef.current);
     window.clearTimeout(holdTimerRef.current);
-    setState("connecting");
+    setState("requesting_mic");
     activeRef.current = true;
+
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw Object.assign(new Error("This browser can’t use the microphone."), {
+          noMic: true,
+        });
+      }
+      const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mic.getTracks().forEach((track) => track.stop());
+    } catch (e) {
+      const noMic =
+        e instanceof DOMException ||
+        (e instanceof Error && "noMic" in e && Boolean((e as { noMic?: boolean }).noMic));
+      setErrMsg(
+        noMic
+          ? "Casey needs the microphone."
+          : e instanceof Error
+            ? e.message
+            : "Casey needs the microphone."
+      );
+      activeRef.current = false;
+      setState("error");
+      return;
+    }
+
+    if (!activeRef.current) return;
 
     const ctx = new AudioContext();
     audioCtxRef.current = ctx;
@@ -212,14 +251,12 @@ export default function CaseyPanel() {
         transportToken,
         transportUrl,
         onConnect: () => {
-          setState((s) => (s === "connecting" ? "listening" : s));
+          setState((s) => (s === "requesting_mic" ? "listening" : s));
         },
         onDisconnect: () => {
           if (!activeRef.current) return;
           void hangup().then(() => {
-            setState("idle");
-            setCaption("");
-            setOfferMeet(false);
+            setState("done");
           });
         },
         onModeChange: (mode) => {
@@ -244,16 +281,13 @@ export default function CaseyPanel() {
               !isUser &&
               messages.filter((m) => m.source === "agent" && m.isFinal).length >= 3
             ) {
-              setOfferMeet(true);
+              markEarned(true);
             }
             if (isUser) {
               pendingReplyRef.current = true;
               window.clearTimeout(thinkTimerRef.current);
               thinkTimerRef.current = window.setTimeout(() => {
-                if (
-                  pendingReplyRef.current &&
-                  (stateRef.current === "listening" || stateRef.current === "connecting")
-                ) {
+                if (pendingReplyRef.current && stateRef.current === "listening") {
                   setState("thinking");
                 }
               }, 280);
@@ -293,7 +327,7 @@ export default function CaseyPanel() {
         return;
       }
       convRef.current = conv;
-      setState((s) => (s === "connecting" ? "listening" : s));
+      setState((s) => (s === "requesting_mic" ? "listening" : s));
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Could not start Casey";
       setErrMsg(msg);
@@ -301,7 +335,7 @@ export default function CaseyPanel() {
       await hangup();
       setState("error");
     }
-  }, [hangup, pushTurn]);
+  }, [hangup, markEarned, pushTurn]);
 
   const unmute = useCallback(async () => {
     try {
@@ -313,11 +347,11 @@ export default function CaseyPanel() {
     }
   }, []);
 
-  const status = state === "error" ? errMsg || STATUS.error : STATUS[state];
-  const busy = state === "connecting";
+  const showDoor = state === "done" && offerMeet;
+  const busy = state === "requesting_mic";
 
   return (
-    <main className={immersed ? "room room--live" : "room"} data-state={state}>
+    <main className={live ? "room room--live" : "room"} data-state={state}>
       <header className="top">
         <div className="brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -328,53 +362,69 @@ export default function CaseyPanel() {
 
       <div className="stage">
         <div className="presence">
-          <div className="halo" aria-hidden />
           <div className="ring" aria-hidden />
-          <LipPresence state={state} analyser={analyser} />
+          <LipPresence state={state} analyser={state === "speaking" ? analyser : null} />
           <PresenceWave state={state} analyser={analyser} />
         </div>
       </div>
 
       <div className="dock">
-        {immersed ? (
+        {state === "idle" ? <p className="hey">Hey.</p> : null}
+
+        {STATUS[state] ? (
           <p className="status" role="status" aria-live="polite" key={state}>
-            {status}
+            {STATUS[state]}
           </p>
         ) : null}
 
-        {immersed && caption ? (
+        {caption && state !== "idle" && state !== "error" ? (
           <p className="caption" aria-live="polite">
             {caption}
           </p>
         ) : null}
 
-        {needsUnmute ? (
+        {state === "error" ? (
+          <div className="callout" role="alert">
+            <p>{errMsg || "Something went sideways."}</p>
+            <button type="button" className="talk" onClick={() => void startCall()}>
+              <span className="talk-label" key="try">
+                Try again
+              </span>
+            </button>
+          </div>
+        ) : needsUnmute ? (
           <button type="button" className="talk" onClick={() => void unmute()}>
-            Tap to unmute
+            <span className="talk-label" key="unmute">
+              Tap to unmute
+            </span>
           </button>
         ) : (
           <button
             type="button"
-            className={busy ? "talk is-wait" : "talk"}
+            className="talk"
             onClick={() => void startCall()}
             disabled={busy}
-            aria-pressed={immersed && state !== "error"}
+            aria-pressed={live}
           >
-            {BTN[state]}
+            <span className="talk-label" key={BTN[state]}>
+              {BTN[state]}
+            </span>
           </button>
         )}
 
         {needsUnmute ? (
           <button type="button" className="quiet" onClick={() => void startCall()}>
-            End
+            Stop
           </button>
         ) : null}
 
-        {!immersed ? <p className="whisper">Press once. Just talk.</p> : null}
+        {state === "idle" ? (
+          <p className="whisper">Tell her what your week looks like.</p>
+        ) : null}
 
-        {offerMeet ? (
+        {showDoor ? (
           <a className="meet" href={MEET_HREF}>
-            If that helped — meet Dave
+            15 minutes with Dave, if you want it
           </a>
         ) : null}
       </div>
