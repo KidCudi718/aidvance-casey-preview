@@ -89,6 +89,21 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .room--live .presence { width: min(96vw, 820px); }
 
+.heart {
+  margin: 0 auto 14px;
+  max-width: 12ch;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2.55rem, 7.2vw, 4.75rem);
+  letter-spacing: -0.035em;
+  line-height: 0.96;
+  color: var(--paper);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.room--idle .viz { height: min(30dvh, 280px); }
+
 .viz-switch {
   display: flex;
   align-items: center;
@@ -332,14 +347,18 @@ button, a { -webkit-tap-highlight-color: transparent; }
 @media (max-width: 640px) {
   .brand img { height: 84px; }
   .mark { margin-top: 0; }
+  .heart { font-size: clamp(2.15rem, 10.5vw, 2.85rem); margin-bottom: 8px; }
   .talk { width: min(100%, 280px); }
   .viz { height: min(34dvh, 280px); }
+  .room--idle .viz { height: min(24dvh, 200px); }
   .room--live .viz { height: min(40dvh, 340px); }
 }
 
 @media (max-height: 740px) {
   .brand img { height: 76px; }
+  .heart { font-size: clamp(1.85rem, 8vw, 2.4rem); margin-bottom: 6px; }
   .viz { height: min(28dvh, 220px); }
+  .room--idle .viz { height: min(20dvh, 160px); }
   .room--live .viz { height: min(34dvh, 280px); }
   .dock { gap: 8px; }
 }

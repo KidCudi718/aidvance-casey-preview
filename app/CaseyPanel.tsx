@@ -39,7 +39,7 @@ const MEET_HREF = `mailto:david.choukroun2@gmail.com?subject=${encodeURIComponen
 
 export default function CaseyPanel() {
   const [state, setState] = useState<State>("idle");
-  const [presence, setPresence] = useState<PresenceMode>("bars");
+  const [presence, setPresence] = useState<PresenceMode>("circle");
   const [caption, setCaption] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [needsUnmute, setNeedsUnmute] = useState(false);
@@ -297,7 +297,10 @@ export default function CaseyPanel() {
   const busy = state === "requesting_mic";
 
   return (
-    <main className={live ? "room room--live" : "room"} data-state={state}>
+    <main
+      className={live ? "room room--live" : state === "idle" ? "room room--idle" : "room"}
+      data-state={state}
+    >
       <header className="top">
         <div className="brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -308,6 +311,9 @@ export default function CaseyPanel() {
 
       <div className="stage">
         <div className="presence">
+          {state === "idle" ? (
+            <h1 className="heart">Is AI right for your business?</h1>
+          ) : null}
           <div className="viz-switch" role="group" aria-label="Presence style">
             <button
               type="button"
