@@ -39,7 +39,7 @@ const MEET_HREF = `mailto:david.choukroun2@gmail.com?subject=${encodeURIComponen
 
 export default function CaseyPanel() {
   const [state, setState] = useState<State>("idle");
-  const [presence, setPresence] = useState<PresenceMode>("circle");
+  const [presence, setPresence] = useState<PresenceMode>("bars");
   const [caption, setCaption] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [needsUnmute, setNeedsUnmute] = useState(false);
