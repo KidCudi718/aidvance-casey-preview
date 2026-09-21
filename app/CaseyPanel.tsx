@@ -15,7 +15,7 @@ type Turn = { role: "user" | "assistant"; text: string; at: number };
 const BARS = 28;
 const SAMPLE_RATE = 24000;
 /** RMS above this while she is talking = you barged in (client-side, faster than server VAD) */
-const BARGE_RMS = 0.08;
+const BARGE_RMS = 0.035;
 
 const LABELS: Record<State, string> = {
   idle: "Press once. Talk like a person.",
@@ -239,29 +239,31 @@ export default function CaseyPanel() {
 
   const bargeIn = useCallback(() => {
     const now = Date.now();
-    if (now - bargeLockRef.current < 250) return;
+    if (now - bargeLockRef.current < 120) return;
     bargeLockRef.current = now;
 
+    // Kill local audio immediately — don't wait for the server
     flushPlayback();
+    setState("listening");
+    setTranscript("Listening…");
+
     const ws = wsRef.current;
     if (ws && ws.readyState === WebSocket.OPEN) {
-      try {
-        ws.send(JSON.stringify({ type: "response.cancel" }));
-      } catch {
-        /* ignore */
-      }
-      try {
-        ws.send(JSON.stringify({ type: "output_audio_buffer.clear" }));
-      } catch {
-        /* ignore */
+      for (const msg of [
+        { type: "response.cancel" },
+        { type: "output_audio_buffer.clear" },
+      ]) {
+        try {
+          ws.send(JSON.stringify(msg));
+        } catch {
+          /* ignore */
+        }
       }
     }
     if (caseyTextRef.current) {
       pushTurn("assistant", caseyTextRef.current + " —");
       caseyTextRef.current = "";
     }
-    setState("listening");
-    setTranscript("Listening…");
   }, [flushPlayback, pushTurn]);
 
   const onServerEvent = useCallback(
@@ -278,7 +280,12 @@ export default function CaseyPanel() {
       }
 
       if (type === "input_audio_buffer.speech_started") {
-        if (stateRef.current === "speaking" || stateRef.current === "thinking") {
+        // You started talking — she stops. No exceptions while audio is up.
+        if (
+          stateRef.current === "speaking" ||
+          stateRef.current === "thinking" ||
+          playingSourcesRef.current.size > 0
+        ) {
           bargeIn();
         } else {
           setState("listening");
@@ -330,8 +337,8 @@ export default function CaseyPanel() {
       ) {
         const delta = String(event.delta || event.audio || "");
         if (!delta) return;
-        // Drop only if user just barged in — never because we marked listening early
-        if (Date.now() - bargeLockRef.current < 400) return;
+        // After barge-in, ignore leftover assistant audio for a full second
+        if (Date.now() - bargeLockRef.current < 1000) return;
         playPcmChunk(base64ToInt16(delta));
       }
 
@@ -431,13 +438,13 @@ export default function CaseyPanel() {
         JSON.stringify({
           type: "session.update",
           session: {
-            voice: (session.voice as string) || "ara",
+            voice: (session.voice as string) || "carina",
             instructions,
             turn_detection: {
               type: "server_vad",
-              threshold: 0.5,
-              prefix_padding_ms: 200,
-              silence_duration_ms: 700,
+              threshold: 0.4,
+              prefix_padding_ms: 350,
+              silence_duration_ms: 1200,
             },
             input_audio_transcription: { model: "whisper-1" },
             audio: {
@@ -501,8 +508,13 @@ export default function CaseyPanel() {
         // Hold mic off during opener so server VAD doesn't cancel her first line
         if (!gateOpen) return;
 
-        // Client barge-in only after opener window, while she is talking
-        if (stateRef.current === "speaking" && rms(input) > BARGE_RMS) {
+        // Instant local interrupt as soon as your voice rises over hers
+        if (
+          (stateRef.current === "speaking" ||
+            stateRef.current === "thinking" ||
+            playingSourcesRef.current.size > 0) &&
+          rms(input) > BARGE_RMS
+        ) {
           bargeIn();
         }
 
@@ -530,7 +542,7 @@ export default function CaseyPanel() {
       // was dropping her first audio deltas.
       setState("thinking");
       setTranscript("Casey is about to talk…");
-      openerGateRef.current = Date.now() + 2500;
+      openerGateRef.current = Date.now() + 4000;
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Could not start Casey";
       setErrMsg(msg);
@@ -568,7 +580,7 @@ export default function CaseyPanel() {
         </a>
       ) : null}
       <p className="hint">
-        Grok Voice · ara · cut her off · we keep a private transcript for tuning
+        Grok Voice · carina · cut her off · we keep a private transcript for tuning
       </p>
     </div>
   );

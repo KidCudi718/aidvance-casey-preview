@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <>
       <div className="banner">
-        <strong>PREVIEW · BAR CONVO v1</strong> — Grok Voice · ara · not production · not live aidvance.xyz
+        <strong>PREVIEW · BAR CONVO v1</strong> — Grok Voice · carina · not production · not live aidvance.xyz
       </div>
       <header>
         <a href="#top" aria-label="Aidvance home">
