@@ -2,12 +2,10 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VoiceConversation } from "@spekoai/client";
-import LipPresence from "./LipPresence";
+import PresenceVisual, { type PresenceMode } from "./PresenceVisual";
 import { watchAgentAudio, type CallVisual } from "./lips";
 
 type State = CallVisual;
-
-const BARS = 27;
 
 const STATUS: Record<State, string> = {
   idle: "",
@@ -37,56 +35,9 @@ const MEET_HREF = `mailto:david.choukroun2@gmail.com?subject=${encodeURIComponen
   "Hi Dave,\n\nI'd like the free 15 minutes. A time that works for me:\n\n"
 )}`;
 
-function PresenceWave({
-  state,
-  analyser,
-}: {
-  state: State;
-  analyser: AnalyserNode | null;
-}) {
-  const [levels, setLevels] = useState<number[]>(() => Array(BARS).fill(0.18));
-  const speaking = state === "speaking" && analyser;
-
-  useEffect(() => {
-    if (!speaking || !analyser) return;
-    let raf = 0;
-    const data = new Uint8Array(analyser.frequencyBinCount);
-    const tick = () => {
-      if (analyser.context.state === "closed") return;
-      analyser.getByteFrequencyData(data);
-      const span = Math.floor(data.length * 0.42);
-      setLevels(
-        Array.from({ length: BARS }, (_, i) => {
-          const v = data[Math.floor((i / BARS) * span)] ?? 0;
-          return 0.14 + (v / 255) * 0.86;
-        })
-      );
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [speaking, analyser]);
-
-  const mode =
-    state === "speaking" ? "wave wave--speak" : state === "listening" ? "wave wave--listen" : "wave";
-
-  return (
-    <div className={mode} aria-hidden>
-      {Array.from({ length: BARS }, (_, i) => (
-        <span
-          key={i}
-          style={{
-            ["--i" as string]: i,
-            ["--h" as string]: speaking ? levels[i] : undefined,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 export default function CaseyPanel() {
   const [state, setState] = useState<State>("idle");
+  const [presence, setPresence] = useState<PresenceMode>("bars");
   const [caption, setCaption] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [needsUnmute, setNeedsUnmute] = useState(false);
@@ -350,9 +301,26 @@ export default function CaseyPanel() {
 
       <div className="stage">
         <div className="presence">
-          <div className="ring" aria-hidden />
-          <LipPresence state={state} analyser={state === "speaking" ? analyser : null} />
-          <PresenceWave state={state} analyser={analyser} />
+          <div className="viz-switch" role="group" aria-label="Presence style">
+            <button
+              type="button"
+              className={presence === "bars" ? "is-on" : ""}
+              aria-pressed={presence === "bars"}
+              onClick={() => setPresence("bars")}
+            >
+              Bars
+            </button>
+            <span aria-hidden="true">|</span>
+            <button
+              type="button"
+              className={presence === "line" ? "is-on" : ""}
+              aria-pressed={presence === "line"}
+              onClick={() => setPresence("line")}
+            >
+              Line
+            </button>
+          </div>
+          <PresenceVisual state={state} analyser={analyser} mode={presence} />
         </div>
       </div>
 
