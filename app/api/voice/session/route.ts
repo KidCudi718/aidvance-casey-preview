@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
-import { CASEY_VOICE_INSTRUCTIONS } from "@/lib/caseyVoicePrompt";
+import {
+  CASEY_OPENER,
+  CASEY_VOICE_INSTRUCTIONS,
+} from "@/lib/caseyVoicePrompt";
 
 export const runtime = "nodejs";
 
@@ -31,7 +34,8 @@ export async function POST() {
     token: data.value,
     expires_at: data.expires_at,
     model: "grok-voice-latest",
-    voice: "eve",
+    voice: "ara",
     instructions: CASEY_VOICE_INSTRUCTIONS,
+    opener: CASEY_OPENER,
   });
 }

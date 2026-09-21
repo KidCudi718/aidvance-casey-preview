@@ -10,15 +10,19 @@ type State =
   | "speaking"
   | "error";
 
+type Turn = { role: "user" | "assistant"; text: string; at: number };
+
 const BARS = 28;
 const SAMPLE_RATE = 24000;
+/** RMS above this while she is talking = you barged in (client-side, faster than server VAD) */
+const BARGE_RMS = 0.045;
 
 const LABELS: Record<State, string> = {
   idle: "Press once. Talk like a person.",
   connecting: "Connecting Casey…",
   listening: "Listening…",
   thinking: "…",
-  speaking: "Casey is talking — interrupt anytime",
+  speaking: "Talk over her anytime",
   error: "Something went sideways.",
 };
 
@@ -57,10 +61,16 @@ function base64ToInt16(b64: string): Int16Array {
   return new Int16Array(bytes.buffer);
 }
 
+function rms(input: Float32Array): number {
+  let sum = 0;
+  for (let i = 0; i < input.length; i++) sum += input[i]! * input[i]!;
+  return Math.sqrt(sum / Math.max(1, input.length));
+}
+
 export default function CaseyPanel() {
   const [state, setState] = useState<State>("idle");
   const [transcript, setTranscript] = useState(
-    "Casey is ready. Interrupt her anytime."
+    "Casey is ready. Cut her off anytime."
   );
   const [levels, setLevels] = useState<number[]>(() => Array(BARS).fill(0.18));
   const [offerMeet, setOfferMeet] = useState(false);
@@ -77,10 +87,47 @@ export default function CaseyPanel() {
   const rafRef = useRef(0);
   const nextPlayRef = useRef(0);
   const caseyTextRef = useRef("");
+  const userTextRef = useRef("");
   const assistantTurnsRef = useRef(0);
   const playingSourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
+  const turnsRef = useRef<Turn[]>([]);
+  const bargeLockRef = useRef(0);
+  const startedAtRef = useRef(0);
 
   stateRef.current = state;
+
+  const pushTurn = useCallback((role: "user" | "assistant", text: string) => {
+    const t = text.trim();
+    if (!t) return;
+    const last = turnsRef.current[turnsRef.current.length - 1];
+    if (last && last.role === role) {
+      last.text = t;
+      last.at = Date.now();
+      return;
+    }
+    turnsRef.current.push({ role, text: t, at: Date.now() });
+  }, []);
+
+  const flushLog = useCallback(async () => {
+    const turns = turnsRef.current.slice();
+    if (!turns.length) return;
+    try {
+      await fetch("/api/voice/log", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          turns,
+          meta: {
+            ms: Date.now() - (startedAtRef.current || Date.now()),
+            assistant_turns: assistantTurnsRef.current,
+          },
+        }),
+        keepalive: true,
+      });
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   const stopWave = useCallback(() => {
     cancelAnimationFrame(rafRef.current);
@@ -101,6 +148,7 @@ export default function CaseyPanel() {
   }, [stopWave]);
 
   const hangup = useCallback(() => {
+    const wasActive = activeRef.current;
     activeRef.current = false;
     cancelAnimationFrame(rafRef.current);
     flushPlayback();
@@ -123,7 +171,8 @@ export default function CaseyPanel() {
     void playCtxRef.current?.close();
     playCtxRef.current = null;
     analyserRef.current = null;
-  }, [flushPlayback]);
+    if (wasActive) void flushLog();
+  }, [flushPlayback, flushLog]);
 
   useEffect(() => () => hangup(), [hangup]);
 
@@ -188,6 +237,10 @@ export default function CaseyPanel() {
   );
 
   const bargeIn = useCallback(() => {
+    const now = Date.now();
+    if (now - bargeLockRef.current < 250) return;
+    bargeLockRef.current = now;
+
     flushPlayback();
     const ws = wsRef.current;
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -196,10 +249,19 @@ export default function CaseyPanel() {
       } catch {
         /* ignore */
       }
+      try {
+        ws.send(JSON.stringify({ type: "output_audio_buffer.clear" }));
+      } catch {
+        /* ignore */
+      }
+    }
+    if (caseyTextRef.current) {
+      pushTurn("assistant", caseyTextRef.current + " —");
+      caseyTextRef.current = "";
     }
     setState("listening");
     setTranscript("Listening…");
-  }, [flushPlayback]);
+  }, [flushPlayback, pushTurn]);
 
   const onServerEvent = useCallback(
     (event: Record<string, unknown>) => {
@@ -214,7 +276,6 @@ export default function CaseyPanel() {
         return;
       }
 
-      // User started talking — stop Casey mid-sentence
       if (type === "input_audio_buffer.speech_started") {
         if (stateRef.current === "speaking" || stateRef.current === "thinking") {
           bargeIn();
@@ -233,7 +294,11 @@ export default function CaseyPanel() {
         type === "conversation.item.input_audio_transcription.updated"
       ) {
         const t = String(event.transcript || "");
-        if (t) setTranscript(`You: ${t}`);
+        if (t) {
+          userTextRef.current = t;
+          pushTurn("user", t);
+          setTranscript(`You: ${t}`);
+        }
       }
 
       if (
@@ -251,7 +316,11 @@ export default function CaseyPanel() {
         type === "response.audio_transcript.done"
       ) {
         const t = String(event.transcript || caseyTextRef.current || "");
-        if (t) setTranscript(`Casey: ${t}`);
+        if (t) {
+          caseyTextRef.current = t;
+          pushTurn("assistant", t);
+          setTranscript(`Casey: ${t}`);
+        }
       }
 
       if (
@@ -259,16 +328,20 @@ export default function CaseyPanel() {
         type === "response.audio.delta"
       ) {
         const delta = String(event.delta || event.audio || "");
-        if (delta) playPcmChunk(base64ToInt16(delta));
+        if (delta && stateRef.current !== "listening") {
+          // If we already barged in locally, ignore leftover audio
+          if (Date.now() - bargeLockRef.current < 300) return;
+          playPcmChunk(base64ToInt16(delta));
+        }
       }
 
       if (type === "response.done") {
         assistantTurnsRef.current += 1;
-        // Meet CTA only after a real exchange — not the opener
+        if (caseyTextRef.current) pushTurn("assistant", caseyTextRef.current);
         if (assistantTurnsRef.current >= 3) setOfferMeet(true);
       }
     },
-    [bargeIn, playPcmChunk]
+    [bargeIn, playPcmChunk, pushTurn]
   );
 
   const startCall = useCallback(async () => {
@@ -282,7 +355,10 @@ export default function CaseyPanel() {
     setErrMsg("");
     setOfferMeet(false);
     caseyTextRef.current = "";
+    userTextRef.current = "";
     assistantTurnsRef.current = 0;
+    turnsRef.current = [];
+    startedAtRef.current = Date.now();
     setState("connecting");
     setTranscript("Connecting Casey…");
     activeRef.current = true;
@@ -293,6 +369,9 @@ export default function CaseyPanel() {
       const session = await sessionRes.json();
       const token = session.token as string;
       const instructions = session.instructions as string;
+      const opener =
+        (session.opener as string) ||
+        "Hey — Casey. I'm AI, just so you know. What's going on with the business lately?";
 
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -342,19 +421,19 @@ export default function CaseyPanel() {
         return;
       }
 
-      // Longer silence = room for a beat before she jumps in
       ws.send(
         JSON.stringify({
           type: "session.update",
           session: {
-            voice: "eve",
+            voice: (session.voice as string) || "ara",
             instructions,
             turn_detection: {
               type: "server_vad",
-              threshold: 0.55,
-              prefix_padding_ms: 280,
-              silence_duration_ms: 950,
+              threshold: 0.5,
+              prefix_padding_ms: 200,
+              silence_duration_ms: 700,
             },
+            input_audio_transcription: { model: "whisper-1" },
             audio: {
               input: { format: { type: "audio/pcm", rate: SAMPLE_RATE } },
               output: { format: { type: "audio/pcm", rate: SAMPLE_RATE } },
@@ -363,7 +442,6 @@ export default function CaseyPanel() {
         })
       );
 
-      // Soft bar opener — interruptible
       ws.send(
         JSON.stringify({
           type: "conversation.item.create",
@@ -371,15 +449,11 @@ export default function CaseyPanel() {
             type: "force_message",
             role: "assistant",
             interruptible: true,
-            content: [
-              {
-                type: "output_text",
-                text: "Hey — I'm Casey, Aidvance's AI. What's been eating your week?",
-              },
-            ],
+            content: [{ type: "output_text", text: opener }],
           },
         })
       );
+      pushTurn("assistant", opener);
 
       ws.onmessage = (ev) => {
         if (typeof ev.data !== "string") return;
@@ -405,7 +479,7 @@ export default function CaseyPanel() {
       source.connect(analyser);
       analyserRef.current = analyser;
 
-      const processor = micCtx.createScriptProcessor(4096, 1, 1);
+      const processor = micCtx.createScriptProcessor(2048, 1, 1);
       processorRef.current = processor;
       source.connect(processor);
       const mute = micCtx.createGain();
@@ -416,6 +490,15 @@ export default function CaseyPanel() {
       processor.onaudioprocess = (e) => {
         if (!activeRef.current || ws.readyState !== WebSocket.OPEN) return;
         const input = e.inputBuffer.getChannelData(0);
+
+        // Client-side barge-in: don't wait for server VAD
+        if (
+          (stateRef.current === "speaking" || stateRef.current === "thinking") &&
+          rms(input) > BARGE_RMS
+        ) {
+          bargeIn();
+        }
+
         const pcm = floatTo16BitPCM(input);
         ws.send(
           JSON.stringify({
@@ -446,7 +529,7 @@ export default function CaseyPanel() {
       hangup();
       setState("error");
     }
-  }, [hangup, onServerEvent]);
+  }, [bargeIn, hangup, onServerEvent, pushTurn]);
 
   const busy = state === "connecting";
 
@@ -475,7 +558,7 @@ export default function CaseyPanel() {
         </a>
       ) : null}
       <p className="hint">
-        Grok Voice · eve · interrupt her · silence is fine · preview only
+        Grok Voice · ara · cut her off · we keep a private transcript for tuning
       </p>
     </div>
   );
