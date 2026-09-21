@@ -438,7 +438,7 @@ export default function CaseyPanel() {
         JSON.stringify({
           type: "session.update",
           session: {
-            voice: (session.voice as string) || "carina",
+            voice: (session.voice as string) || "lux",
             instructions,
             turn_detection: {
               type: "server_vad",
@@ -580,7 +580,7 @@ export default function CaseyPanel() {
         </a>
       ) : null}
       <p className="hint">
-        Grok Voice · carina · cut her off · we keep a private transcript for tuning
+        Grok Voice · lux · cut her off · we keep a private transcript for tuning
       </p>
     </div>
   );
