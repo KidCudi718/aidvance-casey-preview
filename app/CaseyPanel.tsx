@@ -339,14 +339,6 @@ export default function CaseyPanel() {
           </p>
         ) : null}
 
-        <a className="meet" href={MEET_HREF}>
-          {DAVE_LABEL}
-        </a>
-
-        {state === "idle" || state === "done" ? (
-          <p className="onramp">Not sure if AI fits? Talk it through with Casey.</p>
-        ) : null}
-
         {state === "error" ? (
           <div className="callout" role="alert">
             <p>{errMsg || "Something went sideways."}</p>
@@ -383,6 +375,12 @@ export default function CaseyPanel() {
         ) : null}
 
         <p className="trust">Casey is AI. The mic stays in your browser.</p>
+
+        {state === "done" ? (
+          <a className="after" href={MEET_HREF}>
+            {DAVE_LABEL}
+          </a>
+        ) : null}
       </div>
     </main>
   );
