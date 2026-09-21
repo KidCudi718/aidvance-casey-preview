@@ -258,19 +258,21 @@ button, a { -webkit-tap-highlight-color: transparent; }
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: min(100%, 280px);
+  width: min(100%, 420px);
   min-height: 46px;
-  padding: 0 16px;
+  padding: 10px 16px;
   border: 1px solid rgba(244, 244, 242, 0.45);
   background: transparent;
   color: var(--paper);
   text-decoration: none;
+  text-align: center;
   font-family: var(--font-mono), "IBM Plex Mono", monospace;
-  font-size: 11px;
+  font-size: 12px;
   font-style: normal;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  opacity: 0.82;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  text-transform: none;
+  opacity: 0.92;
   touch-action: manipulation;
   transition:
     background 0.2s var(--ease),

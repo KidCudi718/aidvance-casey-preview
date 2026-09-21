@@ -29,10 +29,12 @@ const BTN: Record<State, string> = {
 
 type Turn = { role: "user" | "assistant"; text: string; at: number };
 
+const DAVE_LABEL = "Book a FREE 15 Minute Chat with Dave";
+
 const MEET_HREF = `mailto:david.choukroun2@gmail.com?subject=${encodeURIComponent(
-  "Aidvance — free 15 min"
+  DAVE_LABEL
 )}&body=${encodeURIComponent(
-  "Hi Dave,\n\nI'd like the free 15 minutes. A time that works for me:\n\n"
+  "Hi Dave,\n\nI'd like to book a FREE 15 minute chat. A time that works for me:\n\n"
 )}`;
 
 export default function CaseyPanel() {
@@ -375,7 +377,7 @@ export default function CaseyPanel() {
         ) : null}
 
         <a className="meet" href={MEET_HREF}>
-          Meet Dave · free 15 min
+          {DAVE_LABEL}
         </a>
 
         <p className="trust">Casey is AI. The mic stays in your browser.</p>
