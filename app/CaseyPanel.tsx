@@ -327,8 +327,6 @@ export default function CaseyPanel() {
       </div>
 
       <div className="dock">
-        {state === "idle" ? <p className="hey">Hey.</p> : null}
-
         {STATUS[state] ? (
           <p className="status" role="status" aria-live="polite" key={state}>
             {STATUS[state]}
@@ -339,6 +337,14 @@ export default function CaseyPanel() {
           <p className="caption" aria-live="polite">
             {caption}
           </p>
+        ) : null}
+
+        <a className="meet" href={MEET_HREF}>
+          {DAVE_LABEL}
+        </a>
+
+        {state === "idle" || state === "done" ? (
+          <p className="onramp">Not sure if AI fits? Talk it through with Casey.</p>
         ) : null}
 
         {state === "error" ? (
@@ -375,10 +381,6 @@ export default function CaseyPanel() {
             Stop
           </button>
         ) : null}
-
-        <a className="meet" href={MEET_HREF}>
-          {DAVE_LABEL}
-        </a>
 
         <p className="trust">Casey is AI. The mic stays in your browser.</p>
       </div>
