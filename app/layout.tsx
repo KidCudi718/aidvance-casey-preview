@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from "next/font/google";
 import "./globals.css";
 
@@ -19,9 +19,16 @@ const serif = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "Aidvance · Casey preview (not live)",
-  description: "Talkable Casey mock — temporary preview, not production.",
+  title: "Casey · Aidvance",
+  description: "A quiet conversation with Casey. Preview — not production.",
   robots: { index: false, follow: false },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#050505",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
