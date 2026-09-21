@@ -15,7 +15,7 @@ type Turn = { role: "user" | "assistant"; text: string; at: number };
 const BARS = 28;
 const SAMPLE_RATE = 24000;
 /** RMS above this while she is talking = you barged in (client-side, faster than server VAD) */
-const BARGE_RMS = 0.045;
+const BARGE_RMS = 0.08;
 
 const LABELS: Record<State, string> = {
   idle: "Press once. Talk like a person.",
@@ -92,6 +92,7 @@ export default function CaseyPanel() {
   const playingSourcesRef = useRef<Set<AudioBufferSourceNode>>(new Set());
   const turnsRef = useRef<Turn[]>([]);
   const bargeLockRef = useRef(0);
+  const openerGateRef = useRef(0);
   const startedAtRef = useRef(0);
 
   stateRef.current = state;
@@ -328,16 +329,21 @@ export default function CaseyPanel() {
         type === "response.audio.delta"
       ) {
         const delta = String(event.delta || event.audio || "");
-        if (delta && stateRef.current !== "listening") {
-          // If we already barged in locally, ignore leftover audio
-          if (Date.now() - bargeLockRef.current < 300) return;
-          playPcmChunk(base64ToInt16(delta));
-        }
+        if (!delta) return;
+        // Drop only if user just barged in — never because we marked listening early
+        if (Date.now() - bargeLockRef.current < 400) return;
+        playPcmChunk(base64ToInt16(delta));
       }
 
       if (type === "response.done") {
         assistantTurnsRef.current += 1;
         if (caseyTextRef.current) pushTurn("assistant", caseyTextRef.current);
+        // Opener finished — now accept mic + barge-in
+        openerGateRef.current = Date.now();
+        if (stateRef.current !== "error") {
+          setState("listening");
+          if (!caseyTextRef.current) setTranscript("Listening… go ahead.");
+        }
         if (assistantTurnsRef.current >= 3) setOfferMeet(true);
       }
     },
@@ -490,12 +496,13 @@ export default function CaseyPanel() {
       processor.onaudioprocess = (e) => {
         if (!activeRef.current || ws.readyState !== WebSocket.OPEN) return;
         const input = e.inputBuffer.getChannelData(0);
+        const gateOpen = Date.now() >= openerGateRef.current;
 
-        // Client-side barge-in: don't wait for server VAD
-        if (
-          (stateRef.current === "speaking" || stateRef.current === "thinking") &&
-          rms(input) > BARGE_RMS
-        ) {
+        // Hold mic off during opener so server VAD doesn't cancel her first line
+        if (!gateOpen) return;
+
+        // Client barge-in only after opener window, while she is talking
+        if (stateRef.current === "speaking" && rms(input) > BARGE_RMS) {
           bargeIn();
         }
 
@@ -519,8 +526,11 @@ export default function CaseyPanel() {
         }
       };
 
-      setState("listening");
-      setTranscript("Listening… go ahead.");
+      // Stay quiet until Casey's opener starts — flipping to "listening" early
+      // was dropping her first audio deltas.
+      setState("thinking");
+      setTranscript("Casey is about to talk…");
+      openerGateRef.current = Date.now() + 2500;
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Could not start Casey";
       setErrMsg(msg);
