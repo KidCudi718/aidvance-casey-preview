@@ -31,8 +31,11 @@ const BTN: Record<State, string> = {
 
 type Turn = { role: "user" | "assistant"; text: string; at: number };
 
-const MEET_HREF =
-  "mailto:david.choukroun2@gmail.com?subject=15%20minutes%20with%20Dave%20from%20Casey%20preview";
+const MEET_HREF = `mailto:david.choukroun2@gmail.com?subject=${encodeURIComponent(
+  "Aidvance — free 15 min"
+)}&body=${encodeURIComponent(
+  "Hi Dave,\n\nI'd like the free 15 minutes. A time that works for me:\n\n"
+)}`;
 
 function PresenceWave({
   state,
@@ -85,7 +88,6 @@ function PresenceWave({
 export default function CaseyPanel() {
   const [state, setState] = useState<State>("idle");
   const [caption, setCaption] = useState("");
-  const [offerMeet, setOfferMeet] = useState(false);
   const [errMsg, setErrMsg] = useState("");
   const [needsUnmute, setNeedsUnmute] = useState(false);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
@@ -99,7 +101,6 @@ export default function CaseyPanel() {
   const pendingReplyRef = useRef(false);
   const thinkTimerRef = useRef(0);
   const holdTimerRef = useRef(0);
-  const offerMeetRef = useRef(false);
 
   stateRef.current = state;
 
@@ -173,11 +174,6 @@ export default function CaseyPanel() {
     [hangup]
   );
 
-  const markEarned = useCallback((earned: boolean) => {
-    offerMeetRef.current = earned;
-    setOfferMeet(earned);
-  }, []);
-
   const startCall = useCallback(async () => {
     if (activeRef.current) {
       if (stateRef.current === "requesting_mic") return;
@@ -187,7 +183,6 @@ export default function CaseyPanel() {
     }
 
     setErrMsg("");
-    markEarned(false);
     setNeedsUnmute(false);
     setCaption("");
     turnsRef.current = [];
@@ -277,12 +272,6 @@ export default function CaseyPanel() {
           if (last.isFinal) {
             pushTurn(isUser ? "user" : "assistant", last.text);
             if (!isUser) setCaption(last.text);
-            if (
-              !isUser &&
-              messages.filter((m) => m.source === "agent" && m.isFinal).length >= 3
-            ) {
-              markEarned(true);
-            }
             if (isUser) {
               pendingReplyRef.current = true;
               window.clearTimeout(thinkTimerRef.current);
@@ -335,7 +324,7 @@ export default function CaseyPanel() {
       await hangup();
       setState("error");
     }
-  }, [hangup, markEarned, pushTurn]);
+  }, [hangup, pushTurn]);
 
   const unmute = useCallback(async () => {
     try {
@@ -347,7 +336,6 @@ export default function CaseyPanel() {
     }
   }, []);
 
-  const showDoor = state === "done" && offerMeet;
   const busy = state === "requesting_mic";
 
   return (
@@ -418,15 +406,11 @@ export default function CaseyPanel() {
           </button>
         ) : null}
 
-        {state === "idle" ? (
-          <p className="whisper">Tell her what your week looks like.</p>
-        ) : null}
+        <a className="meet" href={MEET_HREF}>
+          Meet Dave · free 15 min
+        </a>
 
-        {showDoor ? (
-          <a className="meet" href={MEET_HREF}>
-            15 minutes with Dave, if you want it
-          </a>
-        ) : null}
+        <p className="trust">Casey is AI. The mic stays in your browser.</p>
       </div>
     </main>
   );

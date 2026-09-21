@@ -245,13 +245,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
   box-shadow: 0 0 0 5px rgba(244, 244, 242, 0.16);
 }
 
-.whisper {
-  margin: 0;
-  font-family: var(--font-mono), "IBM Plex Mono", monospace;
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  opacity: 0.4;
+.trust {
+  margin: 2px 0 0;
+  max-width: 36ch;
+  font-family: var(--font-sans), "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  letter-spacing: 0.01em;
+  color: rgba(244, 244, 242, 0.48);
 }
 
 .quiet {
@@ -273,17 +274,35 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .quiet:focus-visible { outline: 1px solid var(--paper); outline-offset: 3px; }
 
 .meet {
-  color: inherit;
-  font-family: var(--font-serif), "Newsreader", Georgia, serif;
-  font-style: italic;
-  font-size: 1rem;
-  opacity: 0.72;
-  text-underline-offset: 4px;
-  animation: fade 0.2s var(--ease) both;
-  transition: opacity 0.2s var(--ease);
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: min(100%, 280px);
+  min-height: 46px;
+  padding: 0 16px;
+  border: 1px solid rgba(244, 244, 242, 0.45);
+  background: transparent;
+  color: var(--paper);
+  text-decoration: none;
+  font-family: var(--font-mono), "IBM Plex Mono", monospace;
+  font-size: 11px;
+  font-style: normal;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.82;
+  touch-action: manipulation;
+  transition:
+    background 0.2s var(--ease),
+    color 0.2s var(--ease),
+    opacity 0.2s var(--ease),
+    transform 0.15s var(--ease);
 }
-.meet:hover { opacity: 1; }
-.meet:focus-visible { outline: 1px solid var(--paper); outline-offset: 3px; }
+.talk { width: min(100%, 280px); }
+.meet:hover { opacity: 1; background: var(--paper); color: var(--ink); }
+.meet:active { transform: scale(0.97); }
+.meet:focus-visible { outline: 1px solid var(--paper); outline-offset: 4px; }
 
 .callout {
   display: flex;
@@ -326,7 +345,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .mouth { height: min(34dvh, 280px); }
   .room--live .mouth { height: min(42dvh, 340px); }
   .dock { gap: 8px; }
-  .whisper { display: none; }
+  .hey { font-size: 1.35rem; }
 }
 
 @media (max-width: 640px) and (max-height: 740px) {
