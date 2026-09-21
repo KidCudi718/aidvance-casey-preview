@@ -285,11 +285,6 @@ export default function CaseyPanel() {
       </div>
 
       <div className="dock">
-        <div className="idle-copy">
-          <h1>Tell her your week.</h1>
-          <p>No survey. No script.</p>
-        </div>
-
         {immersed ? (
           <p className="status" role="status" aria-live="polite">
             {status}
@@ -329,8 +324,6 @@ export default function CaseyPanel() {
             If that helped — meet Dave
           </a>
         ) : null}
-
-        <p className="fine">You can interrupt. Silence is allowed. The mic stays here.</p>
       </div>
     </main>
   );

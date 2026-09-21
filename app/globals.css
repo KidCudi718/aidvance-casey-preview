@@ -48,7 +48,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .brand img {
-  height: 30px;
+  /* The file has built-in margin, so the rendered height has to be large
+     for the wordmark itself to read as a header, not a crumb. */
+  height: 168px;
   width: auto;
   display: block;
   filter: invert(1);
@@ -56,20 +58,13 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .mark {
   margin: 0;
+  flex: none;
   font-family: var(--font-mono), "IBM Plex Mono", monospace;
   font-size: 10px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
   opacity: 0.42;
 }
-
-.room--live .brand img {
-  height: 24px;
-  opacity: 0.75;
-  transition: height 0.45s var(--ease), opacity 0.45s var(--ease);
-}
-
-.room--live .mark { opacity: 0.32; }
 
 .stage {
   min-height: 0;
@@ -102,35 +97,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
   gap: 14px;
   z-index: 1;
   text-align: center;
-}
-
-.idle-copy {
-  max-height: 180px;
-  overflow: hidden;
-  opacity: 1;
-  transition: opacity 0.4s var(--ease), max-height 0.45s var(--ease), margin 0.45s var(--ease);
-}
-
-.room--live .idle-copy {
-  max-height: 0;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.idle-copy h1 {
-  margin: 0;
-  font-family: var(--font-serif), "Newsreader", Georgia, serif;
-  font-weight: 600;
-  font-size: clamp(2.15rem, 5.4vw, 3.5rem);
-  line-height: 1.02;
-  letter-spacing: -0.025em;
-}
-
-.idle-copy p {
-  margin: 10px 0 0;
-  font-family: var(--font-serif), "Newsreader", Georgia, serif;
-  font-size: clamp(1.05rem, 2vw, 1.25rem);
-  opacity: 0.66;
 }
 
 .status {
@@ -215,37 +181,22 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .meet:hover { opacity: 1; }
 .meet:focus-visible { outline: 1px solid var(--paper); outline-offset: 3px; }
 
-.fine {
-  margin: 2px 0 0;
-  max-width: 42ch;
-  font-family: var(--font-mono), "IBM Plex Mono", monospace;
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  line-height: 1.5;
-  opacity: 0.38;
-  transition: opacity 0.4s var(--ease), max-height 0.4s var(--ease);
-  max-height: 4em;
-  overflow: hidden;
-}
-
-.room--live .fine {
-  opacity: 0;
-  max-height: 0;
-}
-
 @media (max-width: 640px) {
+  .brand img { height: 104px; }
   .talk { width: min(100%, 280px); }
   .mouth { height: min(40dvh, 380px); }
   .room--live .mouth { height: min(52dvh, 480px); }
 }
 
 @media (max-height: 740px) {
-  .idle-copy h1 { font-size: 1.85rem; }
+  .brand img { height: 120px; }
   .mouth { height: min(34dvh, 300px); }
   .room--live .mouth { height: min(46dvh, 380px); }
-  .fine { display: none; }
   .dock { gap: 10px; }
+}
+
+@media (max-width: 640px) and (max-height: 740px) {
+  .brand img { height: 88px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
