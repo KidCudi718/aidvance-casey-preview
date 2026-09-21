@@ -63,52 +63,84 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
     setLevels(Array(BARS).fill(0.18));
   }, []);
 
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+
+  const stopSpeech = useCallback(() => {
+    cancelAnimationFrame(rafRef.current);
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = "";
+      audioRef.current = null;
+    }
+    setLevels(Array(BARS).fill(0.18));
+  }, []);
+
   const speak = useCallback(
-    (text: string) => {
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(text);
-      u.rate = 1.02;
-      u.pitch = 1.05;
-      const voices = window.speechSynthesis.getVoices();
-      const pick =
-        voices.find((v) => /en-US/i.test(v.lang) && /female|samantha|google us/i.test(v.name)) ||
-        voices.find((v) => /en-US/i.test(v.lang)) ||
-        voices[0];
-      if (pick) u.voice = pick;
+    async (text: string) => {
+      stopSpeech();
+      setState("speaking");
+      try {
+        const r = await fetch("/api/casey/speak", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+        if (!r.ok) throw new Error("tts");
+        const blob = await r.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audioRef.current = audio;
 
-      // Synthetic speaking pulse (speechSynthesis has no audio graph)
-      let t0 = performance.now();
-      const pulse = () => {
-        if (stateRef.current !== "speaking") return;
-        const t = (performance.now() - t0) / 1000;
-        setLevels(
-          Array.from({ length: BARS }, (_, i) => {
-            const w = 0.35 + 0.55 * Math.abs(Math.sin(t * 6 + i * 0.35));
-            return Math.min(0.95, w);
-          })
-        );
-        rafRef.current = requestAnimationFrame(pulse);
-      };
+        // Honest waveform from real audio
+        const ctx = audioCtxRef.current || new AudioContext();
+        audioCtxRef.current = ctx;
+        if (ctx.state === "suspended") await ctx.resume();
+        const src = ctx.createMediaElementSource(audio);
+        const analyser = ctx.createAnalyser();
+        analyser.fftSize = 128;
+        src.connect(analyser);
+        analyser.connect(ctx.destination);
+        const data = new Uint8Array(analyser.frequencyBinCount);
+        const tick = () => {
+          if (stateRef.current !== "speaking") return;
+          analyser.getByteFrequencyData(data);
+          setLevels(
+            Array.from({ length: BARS }, (_, i) => {
+              const v = data[Math.floor((i / BARS) * data.length)] ?? 0;
+              return 0.12 + (v / 255) * 0.88;
+            })
+          );
+          rafRef.current = requestAnimationFrame(tick);
+        };
+        rafRef.current = requestAnimationFrame(tick);
 
-      u.onstart = () => {
+        audio.onended = () => {
+          URL.revokeObjectURL(url);
+          stopSpeech();
+          setState("idle");
+          setOfferMeet(true);
+        };
+        audio.onerror = () => {
+          URL.revokeObjectURL(url);
+          stopSpeech();
+          setState("idle");
+          setOfferMeet(true);
+        };
+        await audio.play();
+      } catch {
+        // Last-resort browser voice only if neural TTS fails
+        stopSpeech();
+        const u = new SpeechSynthesisUtterance(text);
+        u.onend = () => {
+          setState("idle");
+          setOfferMeet(true);
+        };
         setState("speaking");
-        t0 = performance.now();
-        rafRef.current = requestAnimationFrame(pulse);
-      };
-      u.onend = () => {
-        cancelAnimationFrame(rafRef.current);
-        setLevels(Array(BARS).fill(0.18));
-        setState("idle");
-        setOfferMeet(true);
-      };
-      u.onerror = () => {
-        cancelAnimationFrame(rafRef.current);
-        setLevels(Array(BARS).fill(0.18));
-        setState("idle");
-      };
-      window.speechSynthesis.speak(u);
+        window.speechSynthesis.speak(u);
+      }
     },
-    []
+    [stopSpeech]
   );
 
   const askCasey = useCallback(
@@ -229,8 +261,7 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
     else if (state === "listening") stopListening();
     else if (state === "speaking") {
       window.speechSynthesis.cancel();
-      cancelAnimationFrame(rafRef.current);
-      setLevels(Array(BARS).fill(0.18));
+      stopSpeech();
       setState("idle");
     }
   };
@@ -248,12 +279,13 @@ export default function CaseyPanel({ pains }: { pains: string[] }) {
     window.speechSynthesis?.getVoices();
     return () => {
       window.speechSynthesis?.cancel();
+      stopSpeech();
       stopMic();
       try {
         recogRef.current?.stop();
       } catch {}
     };
-  }, [stopMic]);
+  }, [stopMic, stopSpeech]);
 
   const active = state !== "idle" && state !== "error";
 
