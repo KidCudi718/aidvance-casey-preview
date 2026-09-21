@@ -272,7 +272,7 @@ export default function CaseyPanel() {
 
       if (type === "error") {
         const err = event.error as { message?: string } | undefined;
-        const msg = err?.message || "Voice error";
+        const msg = err?.message || "lux";
         setErrMsg(msg);
         setTranscript(msg);
         setState("error");
@@ -383,8 +383,7 @@ export default function CaseyPanel() {
       const token = session.token as string;
       const instructions = session.instructions as string;
       const opener =
-        (session.opener as string) ||
-        "Hey — Casey. I'm AI, just so you know. What's going on with the business lately?";
+        (session.opener as string) || "lux";
 
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
