@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { VoiceConversation } from "@spekoai/client";
 import {
   CASEY_OPENER,
-  CASEY_VOICE_INSTRUCTIONS,
 } from "../lib/caseyVoicePrompt";
 
 type State =
@@ -160,7 +159,7 @@ export default function CaseyPanel() {
     setNeedsUnmute(false);
     turnsRef.current = [];
     setState("connecting");
-    setTranscript("Connecting bar Casey (Speko + session overrides)…");
+    setTranscript("Connecting bar Casey (Speko, live voice)…");
     activeRef.current = true;
 
     try {
@@ -182,12 +181,6 @@ export default function CaseyPanel() {
       const conv = await VoiceConversation.create({
         transportToken,
         transportUrl,
-        overrides: {
-          agent: {
-            prompt: CASEY_VOICE_INSTRUCTIONS,
-            firstMessage: CASEY_OPENER,
-          },
-        },
         onConnect: () => {
           setState("listening");
           setTranscript('Connected — she should open with "Hey."');

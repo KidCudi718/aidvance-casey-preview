@@ -1,18 +1,17 @@
 import { NextResponse } from "next/server";
-import {
-  CASEY_OPENER,
-  CASEY_VOICE_INSTRUCTIONS,
-} from "../../../../lib/caseyVoicePrompt";
+import { CASEY_OPENER } from "../../../../lib/caseyVoicePrompt";
 
 export const runtime = "nodejs";
 
 /**
- * Mint Speko transport for preview Casey with per-session bar overrides.
- * Production / live Speko agent config is NOT patched — overrides apply to this session only.
+ * Mint Speko transport for preview Casey.
+ * Uses a dedicated bar-preview Speko agent (s2s + marin) — NOT the live aidvance.xyz agent.
+ * Speko client "overrides" are a documented no-op; personality lives on the bar agent itself.
  */
 export async function POST() {
   const apiKey = process.env.SPEKO_API_KEY;
-  const agentId = process.env.SPEKO_AGENT_ID || "agent_881e018fd3a54815";
+  // Default is the bar-preview agent (marin s2s). Never fall back to the live web agent.
+  const agentId = process.env.SPEKO_AGENT_ID || "agent_5809b0a36bb74006";
   const apiBase = (
     process.env.SPEKO_API_BASE || "https://api.speko.dev/v1"
   ).replace(/\/$/, "");
@@ -36,15 +35,10 @@ export async function POST() {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        mode: "cascade",
+        // Must be s2s to match live Speko Casey voice (marin). Cascade = different voice.
+        mode: "s2s",
         agentId,
         ttlSeconds: 900,
-        overrides: {
-          agent: {
-            prompt: CASEY_VOICE_INSTRUCTIONS,
-            firstMessage: CASEY_OPENER,
-          },
-        },
       }),
       cache: "no-store",
     });
@@ -97,7 +91,7 @@ export async function POST() {
       agentId,
       sessionId: data.sessionId ?? null,
       opener: CASEY_OPENER,
-      note: "Preview bar overrides on session only — live Speko agent / aidvance.xyz untouched.",
+      note: "Bar-preview Speko agent (s2s marin) — live aidvance.xyz Speko agent untouched.",
     });
   } catch (e) {
     console.error("speko session mint error", e);
