@@ -272,7 +272,7 @@ export default function CaseyPanel() {
 
       if (type === "error") {
         const err = event.error as { message?: string } | undefined;
-        const msg = err?.message || "lux";
+        const msg = err?.message || "luna";
         setErrMsg(msg);
         setTranscript(msg);
         setState("error");
@@ -383,7 +383,7 @@ export default function CaseyPanel() {
       const token = session.token as string;
       const instructions = session.instructions as string;
       const opener =
-        (session.opener as string) || "lux";
+        (session.opener as string) || "luna";
 
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
@@ -437,7 +437,7 @@ export default function CaseyPanel() {
         JSON.stringify({
           type: "session.update",
           session: {
-            voice: (session.voice as string) || "lux",
+            voice: (session.voice as string) || "luna",
             instructions,
             turn_detection: {
               type: "server_vad",
@@ -579,7 +579,7 @@ export default function CaseyPanel() {
         </a>
       ) : null}
       <p className="hint">
-        Grok Voice · lux · cut her off · we keep a private transcript for tuning
+        Grok Voice · luna · cut her off · we keep a private transcript for tuning
       </p>
     </div>
   );
