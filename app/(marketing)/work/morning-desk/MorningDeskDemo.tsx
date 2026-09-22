@@ -93,23 +93,21 @@ export default function MorningDeskDemo() {
           Work
         </Link>
       </p>
-      <p className="m-kicker">Morning Desk · sample data</p>
-      <h1 className="m-title">Your inbox already knows what needs attention.</h1>
-      <p className="m-lead">
+      <p className="m-kicker">Sample data</p>
+      <h1 className="m-title">Morning Desk</h1>
+      <p className="m-headline">Your inbox already knows what needs attention.</p>
+      <p className="m-copy">
         A sales dashboard built on the inbox. Replies waiting, promises made, conversations gone
         quiet, and new business already sitting there. Nothing on this page is live, and nothing
         sends.
       </p>
-      <p className="desk-notice" role="status" aria-live="polite">
+      <p className={notice ? "m-aside desk-status" : "desk-status"} role="status" aria-live="polite">
         {notice}
       </p>
 
       <div className="desk-grid">
         <section className="m-card desk-panel" aria-labelledby="waiting-heading">
-          <header className="desk-head">
-            <h2 id="waiting-heading">Waiting on you</h2>
-            <span className="m-index">{WAITING.length}</span>
-          </header>
+          <h2 id="waiting-heading">Waiting on you</h2>
           <ul className="desk-list">
             {WAITING.map((item) => {
               const open = item.id === selectedId;
@@ -134,7 +132,7 @@ export default function MorningDeskDemo() {
             {selected ? (
               <>
                 <p className="m-index">Thread</p>
-                <h3>{selected.subject}</h3>
+                <p className="desk-who">{selected.subject}</p>
                 <p className="desk-meta">
                   {selected.who} · {selected.age} with no reply
                 </p>
@@ -156,10 +154,7 @@ export default function MorningDeskDemo() {
 
         <div className="desk-side">
           <section className="m-card desk-panel" aria-labelledby="promises-heading">
-            <header className="desk-head">
-              <h2 id="promises-heading">Promises you made</h2>
-              <span className="m-index">{PROMISES.length}</span>
-            </header>
+            <h2 id="promises-heading">Promises you made</h2>
             <ul className="desk-static">
               {PROMISES.map((item) => (
                 <li key={item.id}>
@@ -171,10 +166,7 @@ export default function MorningDeskDemo() {
           </section>
 
           <section className="m-card desk-panel" aria-labelledby="quiet-heading">
-            <header className="desk-head">
-              <h2 id="quiet-heading">Gone quiet</h2>
-              <span className="m-index">{QUIET.length}</span>
-            </header>
+            <h2 id="quiet-heading">Gone quiet</h2>
             <ul className="desk-static">
               {QUIET.map((item) => (
                 <li key={item.id}>
@@ -186,10 +178,7 @@ export default function MorningDeskDemo() {
           </section>
 
           <section className="m-card desk-panel" aria-labelledby="new-heading">
-            <header className="desk-head">
-              <h2 id="new-heading">New business</h2>
-              <span className="m-index">{opportunities.length}</span>
-            </header>
+            <h2 id="new-heading">New business</h2>
             <ul className="desk-static">
               {opportunities.map((item) => (
                 <li key={item.id}>
@@ -198,16 +187,14 @@ export default function MorningDeskDemo() {
                 </li>
               ))}
             </ul>
-            <button type="button" className="desk-btn" onClick={findMore} disabled={foundMore}>
+            <button type="button" className="again desk-again" onClick={findMore} disabled={foundMore}>
               {foundMore ? "That’s the inbox" : "Find me more"}
             </button>
           </section>
         </div>
 
         <section className="m-card desk-panel desk-ask" aria-labelledby="ask-heading">
-          <header className="desk-head">
-            <h2 id="ask-heading">Ask my inbox</h2>
-          </header>
+          <h2 id="ask-heading">Ask my inbox</h2>
           <p className="desk-meta">One read of this sample mailbox. No live model behind it.</p>
           <form className="desk-ask-form" onSubmit={askInbox}>
             <label className="desk-sr" htmlFor="ask-inbox">
@@ -219,7 +206,7 @@ export default function MorningDeskDemo() {
               onChange={(event) => setAskText(event.target.value)}
               placeholder="What should I answer first?"
             />
-            <button type="submit" className="desk-btn desk-btn-solid">
+            <button type="submit" className="talk m-talk">
               Ask
             </button>
           </form>
@@ -231,25 +218,17 @@ export default function MorningDeskDemo() {
         </section>
 
         <section className="m-card desk-panel desk-drafts" aria-labelledby="drafts-heading">
-          <header className="desk-head">
-            <h2 id="drafts-heading">Draft</h2>
-            <span className="m-index">{drafts.length}</span>
-          </header>
+          <h2 id="drafts-heading">Draft</h2>
           <p className="desk-meta">
             {selected
               ? `A reply to ${selected.who}. You still send it yourself.`
               : "Starts from the oldest reply waiting. You still send it yourself."}
           </p>
           <div className="desk-actions">
-            <button type="button" className="desk-btn desk-btn-solid" onClick={startDraft}>
+            <button type="button" className="talk m-talk" onClick={startDraft}>
               Start a draft
             </button>
-            <button
-              type="button"
-              className="desk-btn"
-              onClick={shortenLatest}
-              disabled={drafts.length === 0}
-            >
+            <button type="button" className="again desk-again" onClick={shortenLatest} disabled={drafts.length === 0}>
               Make it shorter
             </button>
           </div>
