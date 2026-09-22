@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VoiceConversation } from "@spekoai/client";
-import BookDave from "./BookDave";
+import BookDave, { preloadDaveCalendly } from "./BookDave";
 import PresenceVisual, { type PresenceMode } from "./PresenceVisual";
 import SiteHeader from "./SiteHeader";
 import { watchAgentAudio, type CallVisual } from "./lips";
@@ -113,6 +113,10 @@ export default function CaseyPanel() {
     }
     if (turns.length) void flushLog(turns);
   }, [flushLog, stopAudioTap]);
+
+  useEffect(() => {
+    preloadDaveCalendly();
+  }, []);
 
   useEffect(
     () => () => {

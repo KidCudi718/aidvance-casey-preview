@@ -276,6 +276,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .book {
   appearance: none;
   display: flex;
+  font: inherit;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;

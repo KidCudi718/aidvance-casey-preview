@@ -18,11 +18,11 @@ declare global {
 const WIDGET_SRC = "https://assets.calendly.com/assets/external/widget.js";
 const WIDGET_CSS = "https://assets.calendly.com/assets/external/widget.css";
 
-let widgetLoad: Promise<void> | null = null;
+let widgetLoad: Promise<boolean> | null = null;
 
-function loadCalendly(): Promise<void> {
-  if (typeof window === "undefined") return Promise.resolve();
-  if (window.Calendly?.initPopupWidget) return Promise.resolve();
+function loadCalendly(): Promise<boolean> {
+  if (typeof window === "undefined") return Promise.resolve(false);
+  if (window.Calendly?.initPopupWidget) return Promise.resolve(true);
   if (widgetLoad) return widgetLoad;
 
   widgetLoad = new Promise((resolve) => {
@@ -34,11 +34,26 @@ function loadCalendly(): Promise<void> {
       document.head.appendChild(css);
     }
 
+    const finish = (ok: boolean) => resolve(ok);
+    const watch = (script: HTMLScriptElement) => {
+      if (window.Calendly?.initPopupWidget || script.dataset.ready === "true") {
+        finish(Boolean(window.Calendly?.initPopupWidget));
+        return;
+      }
+      script.addEventListener(
+        "load",
+        () => {
+          script.dataset.ready = "true";
+          finish(Boolean(window.Calendly?.initPopupWidget));
+        },
+        { once: true },
+      );
+      script.addEventListener("error", () => finish(false), { once: true });
+    };
+
     const existing = document.querySelector<HTMLScriptElement>("script[data-calendly]");
-    const finish = () => resolve();
     if (existing) {
-      existing.addEventListener("load", finish, { once: true });
-      existing.addEventListener("error", finish, { once: true });
+      watch(existing);
       return;
     }
 
@@ -46,33 +61,59 @@ function loadCalendly(): Promise<void> {
     script.src = WIDGET_SRC;
     script.async = true;
     script.dataset.calendly = "true";
-    script.onload = finish;
-    script.onerror = finish;
+    script.onload = () => {
+      script.dataset.ready = "true";
+      finish(Boolean(window.Calendly?.initPopupWidget));
+    };
+    script.onerror = () => finish(false);
     document.body.appendChild(script);
   });
 
   return widgetLoad;
 }
 
-function openCalendly(event: MouseEvent<HTMLAnchorElement>) {
+/** Calendly pins document.body on iPhone. That can suspend the call's audio element. */
+function releaseBodyPin() {
+  const body = document.body;
+  if (body.style.position !== "fixed") return;
+  const top = body.style.top;
+  const y = top ? -parseInt(top, 10) : window.scrollY;
+  body.style.position = "";
+  body.style.top = "";
+  body.style.left = "";
+  body.style.overflow = "";
+  body.style.paddingRight = "";
+  if (Number.isFinite(y)) window.scrollTo(0, y);
+}
+
+export function preloadDaveCalendly() {
+  void loadCalendly();
+}
+
+function openCalendly(event: MouseEvent<HTMLButtonElement>) {
   event.preventDefault();
-  void loadCalendly().then(() => {
-    if (window.Calendly?.initPopupWidget) {
-      window.Calendly.initPopupWidget({ url: DAVE_CALENDLY_URL });
-      return;
-    }
-    window.open(DAVE_CALENDLY_URL, "_blank", "noopener,noreferrer");
+  event.stopPropagation();
+  void loadCalendly().then((ready) => {
+    if (!ready || !window.Calendly?.initPopupWidget) return;
+    window.Calendly.initPopupWidget({ url: DAVE_CALENDLY_URL });
+    releaseBodyPin();
+    window.setTimeout(releaseBodyPin, 0);
+    window.setTimeout(releaseBodyPin, 400);
   });
 }
 
 export default function BookDave({ live = false }: { live?: boolean }) {
   useEffect(() => {
-    void loadCalendly();
+    preloadDaveCalendly();
   }, []);
 
   return (
-    <a className={live ? "book book--live" : "book"} href={DAVE_CALENDLY_URL} onClick={openCalendly}>
+    <button
+      type="button"
+      className={live ? "book book--live" : "book"}
+      onClick={openCalendly}
+    >
       {DAVE_LABEL}
-    </a>
+    </button>
   );
 }
