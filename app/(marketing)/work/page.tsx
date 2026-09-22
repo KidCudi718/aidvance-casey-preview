@@ -5,41 +5,35 @@ import BookDave from "../../BookDave";
 export const metadata: Metadata = {
   title: "Work · Aidvance",
   description:
-    "Morning Desk, a sales dashboard built on the inbox, and a freight brokerage assessment that recommended not building an expensive integration.",
+    "Proof after we listen, judge, and recommend: Morning Desk, a sales dashboard built on the inbox, and a freight assessment that recommended not building.",
 };
-
-const LABELS = ["Waiting on you", "Promises you made", "Gone quiet", "New business"] as const;
 
 export default function WorkPage() {
   return (
     <main className="m-wrap">
       <p className="m-kicker">Work</p>
-      <h1 className="m-title">Two examples.</h1>
-      <p className="m-lead">One we built. One we recommended not building.</p>
+      <h1 className="m-title">Here is the proof.</h1>
+      <p className="m-lead">
+        After we listen, judge, and recommend, this is what that looks like. One thing we built. One
+        thing we told them not to build.
+      </p>
 
       <article className="m-case">
         <header className="m-case-head">
           <p className="m-index">01</p>
           <div>
+            <p className="m-kicker">Something we built</p>
             <h2>Morning Desk</h2>
-            <p className="m-for">A sales dashboard built on the inbox.</p>
+            <p className="m-for">A sales dashboard built on your email inbox</p>
           </div>
         </header>
-
-        <p className="m-headline">Your inbox already knows what needs attention.</p>
         <p className="m-copy">
-          It turns email into a simple sales view: replies waiting, promises made, conversations
-          going quiet, and new opportunities already sitting there.
+          For a sales desk. Waiting replies, promises made, conversations gone quiet, and new
+          business already sitting in the mail.
         </p>
-        <ul className="m-labels">
-          {LABELS.map((label) => (
-            <li key={label}>{label}</li>
-          ))}
-        </ul>
-        <p className="m-copy">The interactive desk is being moved onto this site.</p>
         <p className="m-demo">
-          <Link className="m-textlink" href="/work/morning-desk">
-            Morning Desk
+          <Link className="talk m-talk" href="/work/morning-desk">
+            Open Morning Desk
           </Link>
         </p>
       </article>
@@ -48,25 +42,16 @@ export default function WorkPage() {
         <header className="m-case-head">
           <p className="m-index">02</p>
           <div>
+            <p className="m-kicker">Something we told them not to build</p>
             <h2>Freight Brokerage Assessment</h2>
-            <p className="m-for">A recommendation not to build.</p>
+            <p className="m-for">Diagnose first. Skip the expensive build.</p>
           </div>
         </header>
-
-        <div className="m-card m-story">
-          <h3>What we found</h3>
-          <p>
-            They assumed one workflow was the obvious automation target. After mapping the business,
-            the bigger opportunity was elsewhere.
-          </p>
-          <h3>What we recommended</h3>
-          <p>
-            We recommended against the expensive integration they thought they needed. Simpler
-            changes came first, using tools they already had.
-          </p>
-          <h3>Why it matters</h3>
-          <p>We diagnose before we prescribe.</p>
-        </div>
+        <p className="m-copy">
+          They assumed one workflow was the thing to automate. After mapping the business, the
+          bigger opportunity was elsewhere. We recommended against the expensive integration and
+          started with simpler changes, using tools they already had.
+        </p>
       </article>
 
       <div className="m-cta">

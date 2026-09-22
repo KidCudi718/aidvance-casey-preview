@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Morning Desk — Aidvance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Newsreader:opsz,wght@6..72,300;6..72,400;6..72,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* ==========================================================================
+   Morning Desk — Aidvance Consultancy edition
+   Same dashboard, Aidvance design system: paper & ink, deep petrol accent.
+   Newsreader (editorial) / Jost (interface) / IBM Plex Mono (labels).
+   ========================================================================== */
+:root{
+  color-scheme:light;
+  --paper:#F4F3F0; --surface:#FBFAF8; --surface-2:#EAE8E3;
+  --ink:#0D100F; --ink-soft:#2C3230; --muted:#6C736F; --faint:#9AA09C;
+  --line:#D9D6CF; --line-strong:#C3BFB6;
+  --accent:#0B4F4A; --accent-hi:#0F6F67; --accent-ink:#F4F3F0; --accent-soft:#E4EDEB;
+  --sand:#E3DDD2;
+  --good:#2F6B47; --warn:#8A6320; --crit:#8C3A2E;
+  --good-soft:#DEE8E1; --warn-soft:#EFE5D2; --crit-soft:#F0DFDB;
+  --shadow:0 1px 2px rgba(13,16,15,.05), 0 8px 24px rgba(13,16,15,.045);
+  --r:6px;
+  --serif:"Newsreader",Georgia,"Times New Roman",serif;
+  --sans:"Jost",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --paper:#0C0F0E; --surface:#141918; --surface-2:#090B0B;
+    --ink:#ECEAE4; --ink-soft:#C8CCC9; --muted:#939A96; --faint:#6A716D;
+    --line:#262C2A; --line-strong:#3A423F;
+    --accent:#6FC4B5; --accent-hi:#8FD6C9; --accent-ink:#06100E; --accent-soft:#14211F;
+    --sand:#1E2422;
+    --good:#6DBF8F; --warn:#D9AC5B; --crit:#E08573;
+    --good-soft:#16241E; --warn-soft:#2A2213; --crit-soft:#2B1B18;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px rgba(0,0,0,.28);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --paper:#0C0F0E; --surface:#141918; --surface-2:#090B0B;
+  --ink:#ECEAE4; --ink-soft:#C8CCC9; --muted:#939A96; --faint:#6A716D;
+  --line:#262C2A; --line-strong:#3A423F;
+  --accent:#6FC4B5; --accent-hi:#8FD6C9; --accent-ink:#06100E; --accent-soft:#14211F;
+  --sand:#1E2422;
+  --good:#6DBF8F; --warn:#D9AC5B; --crit:#E08573;
+  --good-soft:#16241E; --warn-soft:#2A2213; --crit-soft:#2B1B18;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 24px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px; line-height:1.55;
+  padding-inline:16px; padding-block:0 40px;
+  -webkit-font-smoothing:antialiased;
+  padding-top:env(safe-area-inset-top,0px);
+}
+img{max-width:100%}
+[hidden]{display:none!important}
+.wrap{max-width:1180px; margin:0 auto}
+h1,h2,h3{font-family:var(--serif); font-weight:400; margin:0; text-wrap:balance; letter-spacing:-.012em}
+.mono{font-family:var(--mono); font-variant-numeric:tabular-nums}
+
+/* header */
+header{padding-block:26px 10px}
+.brandrow{display:flex; flex-wrap:wrap; gap:14px; align-items:center; justify-content:space-between}
+.brandmark{display:flex; align-items:center; gap:14px; min-width:0}
+.brandmark .logo{width:126px; height:auto; display:block; color:var(--ink); flex:none}
+.brandmark .divider{width:1px; height:26px; background:var(--line-strong); flex:none}
+.brand{font-family:var(--serif); font-weight:400; font-size:20px; letter-spacing:-.015em; white-space:nowrap}
+.brandsub{margin:2px 0 0; font-family:var(--sans); font-weight:300; font-size:13px; line-height:1.35; color:var(--muted); letter-spacing:0; white-space:normal}
+.demo-flag{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; font-weight:400;
+  color:var(--warn); background:var(--warn-soft); border-radius:999px; padding:5px 11px;
+}
+.datestamp{font-family:var(--mono); font-size:11.5px; color:var(--faint); letter-spacing:.09em; text-transform:uppercase; margin-top:14px}
+.headline{
+  margin-top:14px; padding:20px 22px; background:var(--surface); border:1px solid var(--line);
+  border-left:2px solid var(--accent); border-radius:var(--r); box-shadow:var(--shadow);
+}
+.headline p{margin:0; font-family:var(--serif); font-weight:400; font-size:clamp(18px,2.5vw,25px); line-height:1.3; letter-spacing:-.018em}
+.headline .sub{margin-top:8px; font-family:var(--sans); font-weight:300; font-size:13.5px; color:var(--muted); letter-spacing:0}
+.headline b{color:var(--accent); font-weight:500}
+
+/* layout */
+.grid{display:grid; grid-template-columns:1.6fr 1fr; gap:18px; margin-top:18px; align-items:start}
+@media (max-width:860px){ .grid{grid-template-columns:1fr} }
+.col{display:flex; flex-direction:column; gap:18px; min-width:0}
+
+.panel{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden}
+.phead{display:flex; align-items:center; gap:10px; justify-content:space-between; padding:15px 18px 13px; border-bottom:1px solid var(--line)}
+.phead h2{font-family:var(--mono); font-size:11px; letter-spacing:.15em; text-transform:uppercase; font-weight:400; color:var(--ink-soft)}
+.count{font-family:var(--mono); font-size:10.5px; letter-spacing:.09em; text-transform:uppercase; color:var(--faint)}
+.pbody{padding:6px 18px 14px}
+.pnote{padding:0 18px 15px; font-size:12.5px; color:var(--muted); font-weight:300}
+
+/* rows */
+.row{display:flex; gap:12px; align-items:flex-start; padding:13px 0; border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.row .main{flex:1; min-width:0}
+.who{font-weight:500; font-size:14.5px}
+.what{color:var(--muted); font-size:13.5px; margin-top:3px; overflow-wrap:anywhere; font-weight:300}
+.metaline{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:9px}
+.pill{font-family:var(--mono); font-size:10px; font-weight:400; letter-spacing:.1em; text-transform:uppercase; padding:4px 9px; border-radius:999px; background:var(--surface-2); color:var(--muted); border:1px solid var(--line)}
+.pill.crit{background:var(--crit-soft); color:var(--crit); border-color:transparent}
+.pill.warn{background:var(--warn-soft); color:var(--warn); border-color:transparent}
+.pill.good{background:var(--good-soft); color:var(--good); border-color:transparent}
+.age{font-size:12px; color:var(--muted)}
+.stripe{width:2px; align-self:stretch; border-radius:2px; background:var(--line-strong); flex:none}
+.stripe.crit{background:var(--crit)} .stripe.warn{background:var(--warn)} .stripe.good{background:var(--good)}
+
+button{font:inherit; cursor:pointer}
+.btn{
+  font-family:var(--sans); font-size:12.5px; font-weight:500; letter-spacing:.02em; padding:7px 13px; border-radius:3px;
+  border:1px solid var(--line-strong); background:transparent; color:var(--ink);
+  transition:border-color .14s ease, color .14s ease, background .14s ease;
+}
+.btn:hover{border-color:var(--accent); color:var(--accent); background:var(--accent-soft)}
+.btn.primary{background:var(--accent); border-color:var(--accent); color:var(--accent-ink)}
+.btn.primary:hover{background:var(--accent-hi); border-color:var(--accent-hi); color:var(--accent-ink)}
+.btn.ghost{background:transparent; border-color:var(--line)}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:2px}
+
+/* tabs */
+.tabs{display:flex; gap:4px; background:var(--surface-2); padding:3px; border-radius:4px; border:1px solid var(--line)}
+.tab{border:none; background:transparent; font-family:var(--sans); font-size:12px; font-weight:500; padding:5px 11px; border-radius:3px; color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--ink); color:var(--paper)}
+
+/* ask box */
+.ask{padding:18px}
+.askform{display:flex; gap:8px; flex-wrap:wrap}
+.askform input{
+  flex:1 1 220px; min-width:0; font-family:var(--sans); font-size:14.5px; padding:12px 14px; border-radius:3px;
+  border:1px solid var(--line-strong); background:var(--paper); color:var(--ink);
+}
+.askform input::placeholder{color:var(--faint)}
+.chips{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.chip{font-family:var(--sans); font-size:12px; font-weight:300; padding:6px 12px; border-radius:999px; border:1px solid var(--line); background:transparent; color:var(--muted)}
+.chip:hover{border-color:var(--accent); color:var(--accent); background:var(--accent-soft)}
+.answer{margin-top:16px; padding:16px 18px; border-radius:var(--r); background:var(--accent-soft); border-left:2px solid var(--accent)}
+.answer p{margin:0 0 8px; font-size:14.5px; line-height:1.6; font-weight:300; color:var(--ink-soft)}
+.answer .src{font-family:var(--mono); font-size:11px; letter-spacing:.04em; color:var(--muted); border-top:1px solid color-mix(in srgb, var(--ink) 12%, transparent); padding-top:10px; margin-top:12px; line-height:1.8}
+.answer .src b{color:var(--ink); font-weight:500; letter-spacing:.1em; text-transform:uppercase; font-size:10px}
+
+/* checklist */
+.check{display:flex; gap:11px; align-items:flex-start; padding:12px 0; border-bottom:1px solid var(--line)}
+.check:last-child{border-bottom:none}
+.check input{margin-top:3px; accent-color:var(--accent); width:16px; height:16px; flex:none}
+.check.done .who,.check.done .what{text-decoration:line-through; opacity:.42}
+
+/* scoreboard */
+.stats{display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--line)}
+.stat{background:var(--surface); padding:16px 18px}
+.stat .n{font-family:var(--serif); font-weight:400; font-size:30px; line-height:1; letter-spacing:-.03em; font-variant-numeric:tabular-nums}
+.stat .l{font-family:var(--mono); font-size:10px; color:var(--faint); letter-spacing:.13em; text-transform:uppercase; margin-top:7px}
+.stat .d{font-size:12px; margin-top:5px; font-weight:300; color:var(--muted)}
+.up{color:var(--good)} .down{color:var(--crit)}
+
+/* schedule */
+.slot{display:flex; gap:14px; padding:12px 0; border-bottom:1px solid var(--line); align-items:flex-start}
+.slot:last-child{border-bottom:none}
+.time{font-family:var(--mono); font-size:11.5px; color:var(--faint); letter-spacing:.06em; width:58px; flex:none; padding-top:3px}
+
+/* gabe */
+.gabe{border-top:2px solid var(--accent)}
+.countdown{display:flex; align-items:baseline; gap:12px; padding:16px 18px 4px}
+.countdown .n{font-family:var(--serif); font-weight:400; font-size:48px; line-height:1; letter-spacing:-.04em; color:var(--accent); font-variant-numeric:tabular-nums}
+.countdown .t{font-size:13.5px; color:var(--muted); font-weight:300}
+.classlist{padding:6px 18px 0}
+.cls{display:flex; justify-content:space-between; gap:10px; font-size:13.5px; padding:8px 0; border-bottom:1px solid var(--line)}
+.cls:last-child{border-bottom:none}
+.cls .t{font-family:var(--mono); color:var(--faint); font-size:11px; letter-spacing:.05em; white-space:nowrap; padding-top:3px}
+.joke{margin:14px 18px 16px; padding:14px 16px; border-radius:var(--r); background:var(--sand); font-family:var(--serif); font-size:15px; font-style:italic; font-weight:300; line-height:1.5; color:var(--ink-soft)}
+.gactions{display:flex; gap:8px; flex-wrap:wrap; padding:0 18px 18px}
+
+/* insight desk */
+.insight{margin-top:18px; background:var(--surface); border:1px solid var(--line); border-radius:var(--r); box-shadow:var(--shadow); overflow:hidden}
+.iread{padding:18px 20px; background:var(--accent-soft); border-bottom:1px solid var(--line)}
+.iread .lab{font-family:var(--mono); font-size:10px; font-weight:400; letter-spacing:.17em; text-transform:uppercase; color:var(--accent); margin-bottom:8px}
+.iread p{margin:0; font-family:var(--serif); font-weight:400; font-size:18px; line-height:1.38; letter-spacing:-.015em; color:var(--ink)}
+.icols{display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line)}
+@media (max-width:760px){ .icols{grid-template-columns:1fr} }
+.icol{background:var(--surface); padding:18px 20px}
+.icol h3{font-family:var(--mono); font-size:11px; letter-spacing:.13em; text-transform:uppercase; font-weight:400; display:flex; align-items:center; gap:9px; color:var(--ink-soft)}
+.dot{width:6px; height:6px; border-radius:50%; flex:none}
+.dot.win{background:var(--good)} .dot.loss{background:var(--crit)}
+.ilist{list-style:none; margin:14px 0 0; padding:0; display:flex; flex-direction:column; gap:14px}
+.ilist li{font-size:14px; line-height:1.5; color:var(--muted); font-weight:300}
+.ilist .fig{display:block; font-family:var(--sans); font-weight:500; font-size:14.5px; letter-spacing:0; margin-bottom:3px}
+.ilist .fig.win{color:var(--good)} .ilist .fig.loss{color:var(--crit)}
+.ifoot{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; padding:13px 20px; border-top:1px solid var(--line)}
+.ifoot .hint{font-family:var(--mono); font-size:10.5px; letter-spacing:.07em; color:var(--faint); text-transform:uppercase}
+.drafts{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:16px 18px}
+@media (max-width:420px){ .drafts{grid-template-columns:1fr} }
+
+/* drawer */
+.scrim{position:fixed; inset:0; background:rgba(13,16,15,.46); opacity:0; pointer-events:none; transition:opacity .18s; z-index:40}
+.scrim.open{opacity:1; pointer-events:auto}
+.drawer{
+  position:fixed; top:0; right:0; height:100%; width:min(460px,100%); z-index:50;
+  background:var(--surface); border-left:1px solid var(--line); transform:translateX(102%);
+  transition:transform .22s cubic-bezier(.22,.61,.36,1); display:flex; flex-direction:column;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.drawer.open{transform:translateX(0)}
+.dhead{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:17px 18px; border-bottom:1px solid var(--line)}
+.dhead h3{font-family:var(--mono); font-size:11px; letter-spacing:.15em; text-transform:uppercase; font-weight:400}
+.dbody{padding:18px; overflow:auto; flex:1}
+.mailmeta{font-size:13px; color:var(--muted); border-bottom:1px solid var(--line); padding-bottom:12px; margin-bottom:14px; font-weight:300}
+.mailmeta div{padding:3px 0}
+.mailmeta b{font-family:var(--mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); font-weight:400}
+.mailbody{white-space:pre-wrap; font-size:14.5px; line-height:1.7; font-weight:300; color:var(--ink-soft)}
+.dfoot{padding:15px 18px; border-top:1px solid var(--line); display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.hint{font-size:12px; color:var(--faint); font-weight:300}
+@media (prefers-reduced-motion:reduce){ .drawer,.scrim{transition:none} }
+
+/* toast */
+.toast{
+  position:fixed; left:50%; bottom:22px; transform:translateX(-50%) translateY(16px);
+  background:var(--ink); color:var(--paper); font-size:13.5px; font-weight:400;
+  padding:11px 18px; border-radius:999px; opacity:0; pointer-events:none; transition:.2s; z-index:60;
+  margin-bottom:env(safe-area-inset-bottom,0px);
+}
+.toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+footer{margin-top:30px; padding-top:20px; border-top:1px solid var(--line); font-size:12px; color:var(--faint); text-align:center; font-weight:300; line-height:1.6}
+footer .fmark{display:block; margin:0 auto 12px; width:112px; color:var(--faint)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+<header>
+  <div class="brandrow">
+    <div class="brandmark">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2381 431" role="img" aria-label="Aidvance Consultancy" fill="currentColor" class="logo"><g transform="translate(0.000000,431.000000) scale(0.500000,-0.500000)"><path d="M3896 860 c-170 -15 -269 -134 -250 -298 12 -101 81 -176 188 -202
+111 -28 242 -6 307 51 16 14 23 21 23 23 0 1 -20 17 -47 37 l-11 8 -6 -5
+c-112 -89 -304 -65 -356 46 -37 81 -12 182 59 230 61 42 170 50 240 18 5 -2
+10 -4 11 -4 3 0 37 -22 43 -28 8 -8 9 -8 26 6 9 7 22 16 29 22 13 9 14 12 8
+17 -2 1 -7 6 -12 9 -56 53 -151 79 -252 70z M262 810 c-16 -27 -31 -51 -33 -55 -2 -3 -13 -23 -25 -43 -13 -20
+-29 -48 -37 -61 -7 -13 -19 -32 -24 -42 -21 -34 -57 -96 -62 -105 -3 -5 -14
+-24 -25 -42 -26 -45 -56 -96 -56 -97 0 -1 21 -1 48 -1 l47 0 20 36 c11 19 29
+52 41 73 12 21 29 52 39 70 10 18 21 37 25 44 4 7 9 16 12 21 15 29 59 104 60
+104 1 0 36 -57 36 -59 0 -1 6 -11 13 -23 7 -11 18 -31 25 -43 25 -43 36 -62
+46 -80 6 -10 13 -22 15 -26 2 -4 13 -23 24 -42 20 -34 32 -56 38 -68 l4 -7 46
+0 c26 0 47 1 47 1 0 4 -91 158 -182 308 -25 42 -59 98 -93 156 -9 16 -18 29
+-19 29 0 0 -14 -22 -30 -48z M2544 836 c-20 -34 -34 -57 -54 -90 -10 -17 -21 -35 -24 -40 -3 -5
+-10 -17 -15 -26 -6 -9 -12 -19 -14 -23 -2 -3 -18 -30 -36 -60 -17 -30 -36 -61
+-40 -69 -8 -14 -18 -32 -34 -57 -5 -9 -27 -47 -51 -89 -6 -9 -10 -17 -10 -17
+0 -1 21 -1 47 -1 l47 0 4 6 c1 4 12 21 22 40 11 18 34 58 51 89 17 31 34 60
+37 65 3 5 12 21 21 36 32 59 53 95 59 105 l5 9 24 -40 c12 -22 23 -41 23 -41
+0 -1 3 -6 7 -12 3 -5 13 -21 20 -35 8 -14 24 -42 36 -62 12 -20 24 -42 28 -48
+3 -6 17 -31 31 -55 13 -24 26 -47 27 -50 l3 -7 48 0 48 0 -2 5 c-2 2 -13 21
+-25 41 -12 20 -32 54 -44 75 -12 21 -25 42 -27 46 -5 10 -104 174 -126 210 -9
+14 -19 31 -23 38 -4 7 -11 20 -17 29 -6 9 -15 24 -20 33 -11 19 -11 19 -26 -5z M3018 610 l0 -246 40 0 39 1 1 163 1 162 41 -39 c65 -62 184 -179
+247 -241 l57 -57 14 0 13 0 0 247 0 247 -39 0 -39 0 -1 -166 c0 -95 -1 -165
+-2 -165 -1 1 -48 46 -209 204 -22 22 -62 61 -90 88 l-50 48 -11 0 -12 0 0
+-246z M781 847 c0 -1 -1 -110 -1 -242 l0 -241 40 0 40 0 0 242 -1 241 -38
+1 c-21 0 -39 -1 -40 -1z M1071 847 c0 -1 -1 -110 -1 -242 l0 -241 140 0 c162 0 172 1 219 20
+101 40 143 132 127 270 -14 114 -86 177 -216 192 -22 2 -266 3 -269 1z m251
+-71 c108 -12 153 -63 153 -173 0 -80 -21 -121 -73 -148 -39 -20 -65 -23 -178
+-23 l-74 0 0 172 c0 94 1 172 1 173 3 2 150 1 171 -1z M1671 847 c0 -1 1 -4 3 -8 2 -3 6 -10 8 -14 2 -4 19 -34 37 -66 43
+-75 42 -72 49 -85 8 -15 14 -27 31 -57 8 -14 15 -26 15 -26 0 -1 3 -7 7 -13 4
+-6 8 -14 10 -18 3 -4 10 -17 17 -29 7 -12 16 -29 21 -37 4 -8 17 -29 27 -47
+18 -31 34 -58 48 -83 9 -15 15 -18 20 -7 2 4 19 32 74 125 31 52 53 90 85 147
+7 12 17 30 23 41 10 17 53 93 66 116 6 11 12 22 23 43 5 8 8 16 8 17 -2 4 -90
+2 -93 -1 -3 -4 -23 -40 -40 -72 -3 -5 -14 -25 -24 -44 -16 -30 -26 -47 -50
+-92 -4 -7 -9 -16 -11 -20 -3 -4 -9 -16 -13 -25 -5 -9 -18 -33 -28 -52 -11 -19
+-21 -38 -23 -43 -5 -9 -3 -11 -29 39 -25 48 -63 119 -86 161 -10 18 -23 43
+-30 56 -7 13 -18 34 -25 47 -7 12 -13 23 -13 23 0 0 -3 6 -7 13 l-7 12 -46 0
+c-25 0 -46 -1 -47 -1z M4339 847 c0 -1 -1 -110 -1 -242 l0 -241 212 0 212 0 0 34 -1 33
+-172 1 -172 1 0 73 0 73 139 1 139 1 1 32 c0 21 -1 32 -2 34 -2 3 -25 3 -140
+3 l-138 0 0 64 1 63 172 1 171 0 0 35 -1 34 -209 1 c-115 0 -210 -1 -211 -1z M926 135 c-60 -16 -70 -96 -16 -125 26 -14 60 -11 83 7 8 6 9 9 2 15
+-6 5 -5 5 -16 -3 -34 -26 -80 -5 -83 37 -3 44 46 69 83 44 l9 -6 6 6 7 5 -6 6
+c-16 15 -44 21 -69 14z M1208 135 c-77 -20 -67 -129 12 -133 40 -2 67 18 75 53 12 51 -35 94
+-87 80z m44 -21 c16 -8 26 -29 23 -51 -7 -63 -99 -57 -99 6 0 39 39 62 76 45z M1794 135 c-20 -5 -29 -14 -31 -31 -3 -22 10 -35 42 -42 36 -8 41
+-11 41 -24 0 -22 -39 -27 -66 -9 l-11 7 -4 -4 c-18 -17 34 -38 70 -28 18 5 29
+16 31 32 1 22 -10 34 -42 41 -34 8 -41 12 -41 25 1 19 41 25 62 8 l6 -4 5 5
+c15 15 -31 33 -62 24z M3511 136 c-62 -15 -73 -99 -15 -128 24 -12 69 -5 85 12 7 8 -6 20
+-14 13 -28 -26 -75 -15 -86 21 -14 49 40 85 83 55 l8 -6 6 6 6 6 -5 5 c-13 14
+-45 21 -68 16z M1465 131 c-2 -6 0 -124 2 -127 0 0 4 -1 9 0 l8 0 0 49 c0 28 1 49 2
+49 1 -1 8 -9 15 -18 65 -81 63 -79 72 -80 14 -2 13 -5 13 66 l-1 65 -9 0 -9 0
+-1 -48 c0 -27 -1 -49 -2 -49 -2 0 -34 39 -49 59 -22 30 -31 39 -40 39 -8 0 -9
+-1 -10 -5z M2041 133 c-4 -9 0 -94 4 -102 12 -21 25 -28 55 -28 26 0 33 3 46 15
+12 13 13 20 13 71 l0 46 -9 1 -9 0 -2 -12 c0 -7 -1 -28 -1 -47 0 -49 -13 -65
+-49 -57 -25 6 -28 12 -29 71 l0 45 -9 0 c-6 0 -9 -1 -10 -3z M2337 135 c-2 -3 -1 -131 1 -131 1 -1 22 -1 47 0 l45 0 0 8 -1 7 -35
+1 -35 1 -1 57 -1 57 -9 1 c-5 0 -10 0 -11 -1z M2588 127 l0 -9 23 0 22 -1 1 -57 0 -56 10 0 10 0 0 56 1 57 22 1
+c23 0 25 1 24 10 0 3 -1 6 -1 7 0 0 -25 1 -56 1 l-56 0 0 -9z M2912 134 c-3 -5 -60 -126 -60 -129 0 -1 5 -1 10 -1 l10 0 8 16 7 15
+35 1 34 0 7 -15 c9 -19 6 -16 18 -18 14 -2 13 0 -8 44 -10 22 -19 40 -19 41 0
+0 -5 11 -11 24 l-12 24 -8 0 c-5 0 -9 -1 -11 -2z m27 -59 c5 -9 9 -18 9 -19 0
+-2 -49 -3 -50 -1 -2 2 20 50 23 54 1 1 4 -3 6 -7 2 -5 8 -17 12 -27z M3165 135 c0 -1 -1 -31 -1 -66 l0 -65 10 0 10 0 0 48 c0 37 1 48 3
+48 1 0 13 -14 27 -31 14 -17 31 -39 39 -48 l13 -17 10 0 10 0 0 66 0 66 -9 0
+-10 -1 -1 -50 -1 -49 -4 4 c-3 3 -8 10 -12 15 -5 6 -21 26 -37 46 l-29 35 -8
+0 c-5 0 -9 -1 -10 -1z M3745 134 c0 -1 11 -19 26 -41 l27 -39 0 -24 1 -25 10 0 10 0 1 25 1
+26 11 14 c20 29 44 63 44 65 0 0 -5 1 -11 1 -12 0 -8 5 -38 -39 -9 -12 -17
+-23 -18 -23 -1 0 -10 13 -21 28 -10 16 -20 29 -21 31 -3 3 -20 4 -22 1z"/></g></svg>
+      <span class="divider"></span>
+      <div>
+        <div class="brand">Morning Desk</div>
+        <p class="brandsub">A sales dashboard built on your email inbox</p>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <span class="demo-flag">Demo &middot; sample data</span>
+      <button class="btn ghost" id="themeBtn" type="button">Dark</button>
+    </div>
+  </div>
+  <div class="datestamp" id="datestamp">&nbsp;</div>
+
+  <div class="headline">
+    <p id="hl">&nbsp;</p>
+    <p class="sub" id="hlsub">&nbsp;</p>
+  </div>
+</header>
+
+<div class="grid">
+  <!-- LEFT -->
+  <div class="col">
+
+    <section class="panel">
+      <div class="phead">
+        <h2>Waiting on you</h2>
+        <div class="tabs" role="tablist">
+          <button class="tab" role="tab" aria-selected="true" data-filter="all">All</button>
+          <button class="tab" role="tab" aria-selected="false" data-filter="buyer">Buyers</button>
+          <button class="tab" role="tab" aria-selected="false" data-filter="inside">Inside</button>
+        </div>
+      </div>
+      <div class="pbody" id="waiting"></div>
+      <div class="pnote">They wrote last. You haven&rsquo;t answered. Oldest first.</div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Ask my inbox</h2><span class="count">answers come with the emails they came from</span></div>
+      <div class="ask">
+        <form class="askform" id="askform">
+          <input id="askinput" placeholder="What did I tell Burlington about the spring delivery?" aria-label="Ask a question about your email">
+          <button class="btn primary" type="submit">Ask</button>
+        </form>
+        <div class="chips" id="chips"></div>
+        <div class="answer" id="answer" hidden></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>You said you&rsquo;d do this</h2><span class="count" id="promiseCount"></span></div>
+      <div class="pbody" id="promises"></div>
+      <div class="pnote">Pulled from your own sent mail. Check one off and it&rsquo;s gone.</div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Gone quiet</h2><span class="count">no contact in 45+ days</span></div>
+      <div class="pbody" id="quiet"></div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>New business</h2><span class="count" id="newCount"></span></div>
+      <div class="pbody" id="newbiz"></div>
+      <div class="ifoot">
+        <span class="hint">Most of these were already in your mailbox. Nobody is contacted without you.</span>
+        <button class="btn" id="moreLeads" type="button">Find me more</button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="col">
+
+    <section class="panel">
+      <div class="phead"><h2>Today</h2><span class="count" id="todayCount"></span></div>
+      <div class="pbody" id="today"></div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Your week</h2><span class="count">vs. last week</span></div>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <section class="panel gabe">
+      <div class="phead"><h2>Gabe at school</h2><span class="count">sophomore &middot; Econ</span></div>
+      <div class="countdown"><span class="n" id="gdays">3</span><span class="t" id="gnext">days until Gabe&rsquo;s Econ 210 midterm</span></div>
+      <div class="classlist" id="classes"></div>
+      <div class="joke" id="joke">&nbsp;</div>
+      <div class="gactions">
+        <button class="btn primary" id="textGabe" type="button">Write Gabe a text</button>
+        <button class="btn" id="newJoke" type="button">Another joke</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="phead"><h2>Start a draft</h2><span class="count">you still hit send</span></div>
+      <div class="drafts" id="drafts"></div>
+    </section>
+
+  </div>
+</div>
+
+<section class="insight">
+  <div class="iread">
+    <div class="lab">Today&rsquo;s read</div>
+    <p id="iread">&nbsp;</p>
+  </div>
+  <div class="icols">
+    <div class="icol">
+      <h3><span class="dot win"></span> What your closed orders have in common</h3>
+      <ul class="ilist" id="iwin"></ul>
+    </div>
+    <div class="icol">
+      <h3><span class="dot loss"></span> What your lost ones have in common</h3>
+      <ul class="ilist" id="iloss"></ul>
+    </div>
+  </div>
+  <div class="ifoot">
+    <span class="hint" id="ibasis">&nbsp;</span>
+    <button class="btn" id="moreInsight" type="button">Show me another pattern</button>
+  </div>
+</section>
+
+<footer>
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2381 431" role="img" aria-label="Aidvance Consultancy" fill="currentColor" class="fmark"><g transform="translate(0.000000,431.000000) scale(0.500000,-0.500000)"><path d="M3896 860 c-170 -15 -269 -134 -250 -298 12 -101 81 -176 188 -202
+111 -28 242 -6 307 51 16 14 23 21 23 23 0 1 -20 17 -47 37 l-11 8 -6 -5
+c-112 -89 -304 -65 -356 46 -37 81 -12 182 59 230 61 42 170 50 240 18 5 -2
+10 -4 11 -4 3 0 37 -22 43 -28 8 -8 9 -8 26 6 9 7 22 16 29 22 13 9 14 12 8
+17 -2 1 -7 6 -12 9 -56 53 -151 79 -252 70z M262 810 c-16 -27 -31 -51 -33 -55 -2 -3 -13 -23 -25 -43 -13 -20
+-29 -48 -37 -61 -7 -13 -19 -32 -24 -42 -21 -34 -57 -96 -62 -105 -3 -5 -14
+-24 -25 -42 -26 -45 -56 -96 -56 -97 0 -1 21 -1 48 -1 l47 0 20 36 c11 19 29
+52 41 73 12 21 29 52 39 70 10 18 21 37 25 44 4 7 9 16 12 21 15 29 59 104 60
+104 1 0 36 -57 36 -59 0 -1 6 -11 13 -23 7 -11 18 -31 25 -43 25 -43 36 -62
+46 -80 6 -10 13 -22 15 -26 2 -4 13 -23 24 -42 20 -34 32 -56 38 -68 l4 -7 46
+0 c26 0 47 1 47 1 0 4 -91 158 -182 308 -25 42 -59 98 -93 156 -9 16 -18 29
+-19 29 0 0 -14 -22 -30 -48z M2544 836 c-20 -34 -34 -57 -54 -90 -10 -17 -21 -35 -24 -40 -3 -5
+-10 -17 -15 -26 -6 -9 -12 -19 -14 -23 -2 -3 -18 -30 -36 -60 -17 -30 -36 -61
+-40 -69 -8 -14 -18 -32 -34 -57 -5 -9 -27 -47 -51 -89 -6 -9 -10 -17 -10 -17
+0 -1 21 -1 47 -1 l47 0 4 6 c1 4 12 21 22 40 11 18 34 58 51 89 17 31 34 60
+37 65 3 5 12 21 21 36 32 59 53 95 59 105 l5 9 24 -40 c12 -22 23 -41 23 -41
+0 -1 3 -6 7 -12 3 -5 13 -21 20 -35 8 -14 24 -42 36 -62 12 -20 24 -42 28 -48
+3 -6 17 -31 31 -55 13 -24 26 -47 27 -50 l3 -7 48 0 48 0 -2 5 c-2 2 -13 21
+-25 41 -12 20 -32 54 -44 75 -12 21 -25 42 -27 46 -5 10 -104 174 -126 210 -9
+14 -19 31 -23 38 -4 7 -11 20 -17 29 -6 9 -15 24 -20 33 -11 19 -11 19 -26 -5z M3018 610 l0 -246 40 0 39 1 1 163 1 162 41 -39 c65 -62 184 -179
+247 -241 l57 -57 14 0 13 0 0 247 0 247 -39 0 -39 0 -1 -166 c0 -95 -1 -165
+-2 -165 -1 1 -48 46 -209 204 -22 22 -62 61 -90 88 l-50 48 -11 0 -12 0 0
+-246z M781 847 c0 -1 -1 -110 -1 -242 l0 -241 40 0 40 0 0 242 -1 241 -38
+1 c-21 0 -39 -1 -40 -1z M1071 847 c0 -1 -1 -110 -1 -242 l0 -241 140 0 c162 0 172 1 219 20
+101 40 143 132 127 270 -14 114 -86 177 -216 192 -22 2 -266 3 -269 1z m251
+-71 c108 -12 153 -63 153 -173 0 -80 -21 -121 -73 -148 -39 -20 -65 -23 -178
+-23 l-74 0 0 172 c0 94 1 172 1 173 3 2 150 1 171 -1z M1671 847 c0 -1 1 -4 3 -8 2 -3 6 -10 8 -14 2 -4 19 -34 37 -66 43
+-75 42 -72 49 -85 8 -15 14 -27 31 -57 8 -14 15 -26 15 -26 0 -1 3 -7 7 -13 4
+-6 8 -14 10 -18 3 -4 10 -17 17 -29 7 -12 16 -29 21 -37 4 -8 17 -29 27 -47
+18 -31 34 -58 48 -83 9 -15 15 -18 20 -7 2 4 19 32 74 125 31 52 53 90 85 147
+7 12 17 30 23 41 10 17 53 93 66 116 6 11 12 22 23 43 5 8 8 16 8 17 -2 4 -90
+2 -93 -1 -3 -4 -23 -40 -40 -72 -3 -5 -14 -25 -24 -44 -16 -30 -26 -47 -50
+-92 -4 -7 -9 -16 -11 -20 -3 -4 -9 -16 -13 -25 -5 -9 -18 -33 -28 -52 -11 -19
+-21 -38 -23 -43 -5 -9 -3 -11 -29 39 -25 48 -63 119 -86 161 -10 18 -23 43
+-30 56 -7 13 -18 34 -25 47 -7 12 -13 23 -13 23 0 0 -3 6 -7 13 l-7 12 -46 0
+c-25 0 -46 -1 -47 -1z M4339 847 c0 -1 -1 -110 -1 -242 l0 -241 212 0 212 0 0 34 -1 33
+-172 1 -172 1 0 73 0 73 139 1 139 1 1 32 c0 21 -1 32 -2 34 -2 3 -25 3 -140
+3 l-138 0 0 64 1 63 172 1 171 0 0 35 -1 34 -209 1 c-115 0 -210 -1 -211 -1z M926 135 c-60 -16 -70 -96 -16 -125 26 -14 60 -11 83 7 8 6 9 9 2 15
+-6 5 -5 5 -16 -3 -34 -26 -80 -5 -83 37 -3 44 46 69 83 44 l9 -6 6 6 7 5 -6 6
+c-16 15 -44 21 -69 14z M1208 135 c-77 -20 -67 -129 12 -133 40 -2 67 18 75 53 12 51 -35 94
+-87 80z m44 -21 c16 -8 26 -29 23 -51 -7 -63 -99 -57 -99 6 0 39 39 62 76 45z M1794 135 c-20 -5 -29 -14 -31 -31 -3 -22 10 -35 42 -42 36 -8 41
+-11 41 -24 0 -22 -39 -27 -66 -9 l-11 7 -4 -4 c-18 -17 34 -38 70 -28 18 5 29
+16 31 32 1 22 -10 34 -42 41 -34 8 -41 12 -41 25 1 19 41 25 62 8 l6 -4 5 5
+c15 15 -31 33 -62 24z M3511 136 c-62 -15 -73 -99 -15 -128 24 -12 69 -5 85 12 7 8 -6 20
+-14 13 -28 -26 -75 -15 -86 21 -14 49 40 85 83 55 l8 -6 6 6 6 6 -5 5 c-13 14
+-45 21 -68 16z M1465 131 c-2 -6 0 -124 2 -127 0 0 4 -1 9 0 l8 0 0 49 c0 28 1 49 2
+49 1 -1 8 -9 15 -18 65 -81 63 -79 72 -80 14 -2 13 -5 13 66 l-1 65 -9 0 -9 0
+-1 -48 c0 -27 -1 -49 -2 -49 -2 0 -34 39 -49 59 -22 30 -31 39 -40 39 -8 0 -9
+-1 -10 -5z M2041 133 c-4 -9 0 -94 4 -102 12 -21 25 -28 55 -28 26 0 33 3 46 15
+12 13 13 20 13 71 l0 46 -9 1 -9 0 -2 -12 c0 -7 -1 -28 -1 -47 0 -49 -13 -65
+-49 -57 -25 6 -28 12 -29 71 l0 45 -9 0 c-6 0 -9 -1 -10 -3z M2337 135 c-2 -3 -1 -131 1 -131 1 -1 22 -1 47 0 l45 0 0 8 -1 7 -35
+1 -35 1 -1 57 -1 57 -9 1 c-5 0 -10 0 -11 -1z M2588 127 l0 -9 23 0 22 -1 1 -57 0 -56 10 0 10 0 0 56 1 57 22 1
+c23 0 25 1 24 10 0 3 -1 6 -1 7 0 0 -25 1 -56 1 l-56 0 0 -9z M2912 134 c-3 -5 -60 -126 -60 -129 0 -1 5 -1 10 -1 l10 0 8 16 7 15
+35 1 34 0 7 -15 c9 -19 6 -16 18 -18 14 -2 13 0 -8 44 -10 22 -19 40 -19 41 0
+0 -5 11 -11 24 l-12 24 -8 0 c-5 0 -9 -1 -11 -2z m27 -59 c5 -9 9 -18 9 -19 0
+-2 -49 -3 -50 -1 -2 2 20 50 23 54 1 1 4 -3 6 -7 2 -5 8 -17 12 -27z M3165 135 c0 -1 -1 -31 -1 -66 l0 -65 10 0 10 0 0 48 c0 37 1 48 3
+48 1 0 13 -14 27 -31 14 -17 31 -39 39 -48 l13 -17 10 0 10 0 0 66 0 66 -9 0
+-10 -1 -1 -50 -1 -49 -4 4 c-3 3 -8 10 -12 15 -5 6 -21 26 -37 46 l-29 35 -8
+0 c-5 0 -9 -1 -10 -1z M3745 134 c0 -1 11 -19 26 -41 l27 -39 0 -24 1 -25 10 0 10 0 1 25 1
+26 11 14 c20 29 44 63 44 65 0 0 -5 1 -11 1 -12 0 -8 5 -38 -39 -9 -12 -17
+-23 -18 -23 -1 0 -10 13 -21 28 -10 16 -20 29 -21 31 -3 3 -20 4 -22 1z"/></g></svg>
+  Sample data for demonstration. Retailer names are used only to make the example familiar &mdash; every person, order, price and message on this page is invented.
+</footer>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="Draft">
+  <div class="dhead"><h3 id="dtitle">Draft</h3><button class="btn ghost" id="closeDrawer" type="button">Close</button></div>
+  <div class="dbody">
+    <div class="mailmeta" id="dmeta"></div>
+    <div class="mailbody" id="dbodytext"></div>
+  </div>
+  <div class="dfoot">
+    <button class="btn primary" id="sendBtn" type="button">Send</button>
+    <button class="btn" id="tweakBtn" type="button">Make it shorter</button>
+    <span class="hint">Nothing sends in this demo.</span>
+  </div>
+</aside>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var $ = function(s){ return document.querySelector(s); };
+  var now = new Date();
+  var dayNames=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  var monNames=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  $("#datestamp").textContent = dayNames[now.getDay()]+", "+monNames[now.getMonth()]+" "+now.getDate()+"  ·  last refreshed "+
+    now.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+
+  /* ---------- data (sample) ---------- */
+  var waiting = [
+    {id:1, who:"Dana Reyes — Burlington", what:"“Can you confirm the March 14 ship window before we cut the PO?”", days:9, type:"buyer", sev:"crit",
+     draft:{to:"Dana Reyes <dreyes@burlington.example>", subj:"Re: Spring legwear — ship window", body:"Dana,\n\nApologies for the slow turn on this. March 14 works on our side for the full spring legwear order, and I've asked our warehouse to hold the window.\n\nOne thing to flag: the 6-pack crew sock in charcoal runs two weeks behind the rest of the assortment. I can ship the balance on the 14th and follow with charcoal, or hold everything and ship complete on the 28th. Your call.\n\nIf you want to cut the PO today I'll get it in the system this afternoon.\n\nSammy"}},
+    {id:2, who:"Marcus Hale — Walmart", what:"“Send over pricing on the cold weather program and I&rsquo;ll walk it upstairs.”", days:6, type:"buyer", sev:"crit",
+     draft:{to:"Marcus Hale <mhale@walmart.example>", subj:"Cold weather program — pricing", body:"Marcus,\n\nHere's the cold weather program pricing, good through the end of the quarter:\n\n— Knit beanie, 3 colorways: $4.25 landed\n— Fleece-lined glove: $5.80 landed\n— Scarf and beanie gift set: $9.40 landed\n\nAt 2,500 units across the program I can take another 4% off the set.\n\nI'll hold these numbers while you take it upstairs. Anything you need from me for that conversation, say the word and I'll put it together.\n\nSammy"}},
+    {id:3, who:"Priya Nandan — Five Below", what:"“What&rsquo;s the minimum on the pet line? Our buyer wants to test two doors.”", days:4, type:"buyer", sev:"warn",
+     draft:{to:"Priya Nandan <pnandan@fivebelow.example>", subj:"Re: Pet line — test in two doors", body:"Priya,\n\nFor a two-door test we can go as low as 144 units per SKU, which is well under our usual minimum. I'd suggest starting with the rope toy and the reversible bandana — those two move fastest at this price point.\n\nHappy to send samples this week so the buyer can put hands on them before committing.\n\nSammy"}},
+    {id:4, who:"Warehouse — East Brunswick", what:"“Two cartons short on the TJ Maxx shipment. How do you want it billed?”", days:3, type:"inside", sev:"warn",
+     draft:{to:"EB Warehouse <eb.ship@internal.example>", subj:"Re: TJ Maxx short ship", body:"Bill what shipped and flag the two cartons as a backorder, not a cancel. I'll let the buyer know today so it doesn't come back at us as a chargeback.\n\nCan you send me the carton numbers so I have them in writing?\n\nThanks,\nSammy"}},
+    {id:5, who:"Design — Lauren", what:"“Do you want the TJ Maxx print in the fall palette or the core one?”", days:2, type:"inside", sev:"good",
+     draft:{to:"Lauren Ortiz <lortiz@internal.example>", subj:"Re: TJ Maxx print palette", body:"Fall palette. Their buyer has gone warm two seasons running and the core blues sat last year.\n\nIf you can get me a strike-off by Friday I'll put it in front of her on Monday.\n\nSammy"}},
+    {id:6, who:"Tom Beckett — Macy&rsquo;s", what:"“Any chance you&rsquo;re at the January show? Want to walk the line.”", days:2, type:"buyer", sev:"good",
+     draft:{to:"Tom Beckett <tbeckett@macys.example>", subj:"Re: January show", body:"Tom,\n\nI'll be there all three days. Let's put something on the calendar now before the schedule fills up — Tuesday or Wednesday morning both work on my end.\n\nI'll have the full spring line plus two things we haven't shown anyone yet. Worth the walk-through.\n\nSammy"}}
+  ];
+
+  var promises = [
+    {who:"Dana Reyes — Burlington", what:"“I&rsquo;ll get you the revised spec sheet by Friday.”", days:12, sev:"crit"},
+    {who:"Marcus Hale — Walmart", what:"“I&rsquo;ll check on the closeout units and come back to you.”", days:8, sev:"warn"},
+    {who:"Angela Cruz — TJ Maxx", what:"“I&rsquo;ll send samples of the reversible tote this week.”", days:5, sev:"warn"},
+    {who:"Tom Beckett — Macy&rsquo;s", what:"“I&rsquo;ll find out if we can do a private label version.”", days:3, sev:"good"}
+  ];
+
+  var quiet = [
+    {who:"Angela Cruz — TJ Maxx", what:"Last order was the fall beanie program. No contact since.", days:52},
+    {who:"Ken Whitaker — Dollar General", what:"Asked about the pet line in the spring, then went dark.", days:71},
+    {who:"Rosa Lemay — Kohl&rsquo;s", what:"Three straight seasons, then nothing.", days:96}
+  ];
+
+  var today = [
+    {t:"9:30", who:"Call — Dana Reyes, Burlington", note:"She&rsquo;s waiting on the ship window. Lead with that."},
+    {t:"11:00", who:"Internal — line review with Design", note:"Bring the TJ Maxx palette question."},
+    {t:"2:00", who:"Showroom — Five Below", note:"Priya is bringing her buyer. Pet line samples are at the front."},
+    {t:"4:30", who:"Hold — follow-ups", note:"Four of the six above clear in this block."}
+  ];
+
+  var stats = [
+    {n:"38", l:"Accounts touched", d:"+6 from last week", c:"up"},
+    {n:"64%", l:"Replies received", d:"+9 points", c:"up"},
+    {n:"11h", l:"Avg. time to reply", d:"2h slower", c:"down"},
+    {n:"3", l:"Days at inbox zero", d:"personal best: 5", c:""}
+  ];
+
+  var classes = [
+    {c:"Econ 210 — Midterm", t:"Thursday, 9:00 AM"},
+    {c:"Stats 140 — Problem set due", t:"Friday, midnight"},
+    {c:"History 101 — Lecture", t:"Mon / Wed, 11:00 AM"},
+    {c:"Intramural soccer", t:"Sunday, 4:00 PM"}
+  ];
+
+  var jokes = [
+    "Why did the economics student bring a ladder to the midterm? He heard the curve was steep.",
+    "Gabe&rsquo;s laundry has now been in the dryer longer than some of my accounts have been open.",
+    "Supply and demand: he demands money, I supply it. We&rsquo;ve found equilibrium.",
+    "Told Gabe I majored in the school of hard knocks. He asked if that was pass/fail.",
+    "Statistically speaking, there is a 100% chance he calls the day before tuition is due."
+  ];
+
+  var texts = [
+    "Midterm Thursday. You&rsquo;ve got this. If the curve is steep, remember: so was your rent this month, and I handled it.",
+    "Econ midterm in 3 days. Study hard, call your mother, and eat something that isn&rsquo;t from a vending machine.",
+    "Just checking: is the problem set done, or are we in the &lsquo;it&rsquo;s basically done&rsquo; phase again? Love you. Go study.",
+    "Sent you a little something for finals week. Share it with your roommate or don&rsquo;t, I&rsquo;m not the food police."
+  ];
+
+  var answers = {
+    burlington:{a:"On August 29 you told Dana the spring legwear order would ship the week of March 14, and that the charcoal 6-pack could run two weeks behind the rest of the assortment. You have not confirmed the date since she asked again nine days ago.", s:["Dana Reyes — &ldquo;Spring legwear — timing&rdquo; — Aug 29","Dana Reyes — &ldquo;Re: cutting the PO&rdquo; — Sep 9"]},
+    pricing:{a:"Your last quoted cold weather program pricing was $4.25 on the beanie, $5.80 on the fleece-lined glove and $9.40 on the gift set, landed, with a 4% break at 2,500 units. That was quoted to Walmart in July and hasn&rsquo;t been sent to Marcus in writing since.", s:["Marcus Hale — &ldquo;Cold weather pricing&rdquo; — Jul 18","Internal — &ldquo;Q4 program sheet&rdquo; — Jul 16"]},
+    promise:{a:"You have four open promises. The oldest is to Dana Reyes on September 6: a revised spec sheet you said would go out by Friday. It never went.", s:["Sent — &ldquo;Re: spec sheet&rdquo; — Sep 6","Sent — &ldquo;Closeout units&rdquo; — Sep 10"]},
+    tjmaxx:{a:"Angela Cruz at TJ Maxx last ordered the fall beanie program in April. You promised samples of the reversible tote five days ago and there has been no contact from her in 52 days.", s:["Angela Cruz — &ldquo;Fall beanie reorder&rdquo; — Apr 2","Sent — &ldquo;Tote samples&rdquo; — Sep 13"]},
+    quiet:{a:"Three accounts have gone quiet: TJ Maxx (52 days), Dollar General (71 days) and Kohl&rsquo;s (96 days). Kohl&rsquo;s bought three straight seasons before it stopped, which makes it the one worth a call first.", s:["Account activity — last 120 days"]}
+  };
+
+  /* ---------- render ---------- */
+  var insightSets = [
+    {
+      read:"Three of the six threads waiting on you are already past 48 hours &mdash; and 48 hours is the line where your own win rate falls off a cliff.",
+      win:[
+        {f:"You answered within 24 hours", t:"true in 83% of the orders you closed this year, versus 41% of the ones you lost."},
+        {f:"You named a specific ship date in the first reply", t:"orders where you did closed in half the time of the ones where you said &ldquo;soon.&rdquo;"},
+        {f:"Samples went out before the second conversation", t:"true in 9 of your last 11 closed programs."},
+        {f:"You had two or more contacts at the account", t:"single-contact accounts closed less than half as often."}
+      ],
+      loss:[
+        {f:"A gap of five days or more, mid-conversation", t:"present in 7 of your 9 lost programs. In six of them, the gap was on your side."},
+        {f:"Price sent with no options", t:"one number and nothing else. Deals where you gave two or three choices closed far more often."},
+        {f:"Quotes sent Friday after 3pm", t:"replied to about half as often as the same quote sent Tuesday morning."},
+        {f:"No date attached to the next step", t:"&ldquo;I&rsquo;ll follow up&rdquo; instead of &ldquo;I&rsquo;ll call you Thursday.&rdquo;"}
+      ],
+      basis:"Based on 1,847 email threads across 62 accounts, last 18 months."
+    },
+    {
+      read:"Your reorders come from eight accounts. Six of them heard from you in the last two weeks. Two haven&rsquo;t heard from you since July.",
+      win:[
+        {f:"You asked a question in the last line", t:"your emails that ended in a question got a reply 71% of the time. The ones that ended in a statement, 38%."},
+        {f:"You wrote fewer than 120 words", t:"your short emails outperform your long ones on reply rate by a wide margin."},
+        {f:"The buyer saw physical product within 30 days", t:"every program over $50K in your book started with samples in a buyer&rsquo;s hands."},
+        {f:"You followed up a third time", t:"a third of your closes came after the second follow-up. You usually stop at two."}
+      ],
+      loss:[
+        {f:"Handed off to someone inside without you staying on the thread", t:"those threads went quiet twice as often."},
+        {f:"The buyer asked about timing and got an estimate, not a date", t:"appears in most of your stalled programs."},
+        {f:"August and late December sends", t:"your two worst reply months. Worth knowing before you plan a push."},
+        {f:"Conversations that never moved off email", t:"the programs that closed almost all had a call or a showroom visit in them."}
+      ],
+      basis:"Based on 1,847 email threads across 62 accounts, last 18 months."
+    }
+  ];
+
+  var leadSets = [
+    [
+      {who:"Nina Alvarado — now at Bealls", why:"She bought your beanie program at TJ Maxx in 2024. A reply last week came from a Bealls address — she changed jobs and nobody told you.", tag:"Job change", sev:"crit",
+       draft:{to:"Nina Alvarado <nalvarado@bealls.example>", subj:"Saw you landed at Bealls", body:"Nina,\n\nSaw the new address — congratulations on the move.\n\nThe beanie program you took at your last stop had a good run, and we've since added two colorways and a fleece-lined glove at the same price point. If Bealls is open to a new resource in cold weather, I'd rather be early in your calendar than late.\n\nWorth fifteen minutes in the next couple weeks?\n\nSammy"}},
+      {who:"Devon Park — Ollie&rsquo;s Bargain Outlet", why:"Emailed you at the January show asking for a line sheet. You sent it. Nothing since, and nobody followed up.", tag:"Dropped lead", sev:"warn",
+       draft:{to:"Devon Park <dpark@ollies.example>", subj:"Following up from the January show", body:"Devon,\n\nWe met at the January show and I sent over the line sheet — then we both got busy, and that one is on me.\n\nTwo things have changed since: the pet line is now in test at a comparable chain, and we've got closeout availability on cold weather that fits your price point better than anything I showed you in January.\n\nCan I send a small sample box? No commitment, just so you have hands on it.\n\nSammy"}},
+      {who:"Marisol Vega — Burlington, home division", why:"Same company you already sell. Different buyer, different category. Your home accessories have never been in front of her.", tag:"Expansion", sev:"good",
+       draft:{to:"Marisol Vega <mvega@burlington.example>", subj:"Intro — home accessories", body:"Marisol,\n\nI handle the legwear and cold weather business with Dana on your side of the building, and I'd like to introduce myself on home.\n\nWe design and produce the same categories you're buying today, and because the programs already ship to your DCs, onboarding on our end is nothing.\n\nHappy to send a look book, or come by the showroom if that's easier. Either way, good to meet you.\n\nSammy"}},
+      {who:"Dana Reyes — Burlington (referral ask)", why:"She has sent you two referrals before and the last program closed clean. You have not asked her for one in 14 months.", tag:"Referral", sev:"good",
+       draft:{to:"Dana Reyes <dreyes@burlington.example>", subj:"A favor", body:"Dana,\n\nSince the spring program is squared away, a small favor.\n\nYou've pointed me at good people before. Is there anyone in your circle — another buyer, another chain — who should know what we do? I'd rather come recommended than cold.\n\nNo pressure either way, and thanks for the last two.\n\nSammy"}}
+    ],
+    [
+      {who:"Citi Trends — no contact on file", why:"Carries every category you sell, at your price point, in doors where two of your accounts already sit. You have never emailed anyone there.", tag:"Look-alike", sev:"warn",
+       draft:{to:"(buyer to be identified)", subj:"Introduction — legwear, accessories, cold weather", body:"We design, produce and ship legwear, accessories, cold weather and pet for chains that sit right alongside yours, and we handle the program end to end — design through the DC.\n\nI'd like fifteen minutes to show you what we're doing for comparable doors this season, and what the price points look like.\n\nIf accessories aren't yours, a pointer to the right desk would be a real help.\n\nSammy"}},
+      {who:"Robert Nyquist — Macy&rsquo;s (second contact)", why:"You have one contact at an account doing real volume. Single-contact accounts in your book close less than half as often and die when the buyer leaves.", tag:"Risk cover", sev:"crit",
+       draft:{to:"Robert Nyquist <rnyquist@macys.example>", subj:"Introduction", body:"Robert,\n\nTom and I have worked together on the accessories side for a while and I wanted to put a second name in front of you, since these programs tend to outlast any one calendar.\n\nNothing needed today. If it's useful I'll send the spring line when it's ready, and you can tell me whether it's worth a conversation.\n\nSammy"}},
+      {who:"Tanya Brooks — emailed you in June", why:"Asked whether you do private label. She got a two-line answer and no follow-up. That question is usually the start of a program, not a question.", tag:"Dropped lead", sev:"warn",
+       draft:{to:"Tanya Brooks <tbrooks@retail.example>", subj:"Re: private label", body:"Tanya,\n\nYou asked in June whether we do private label. The short answer is yes, and it's a real part of our business — I gave you a thinner answer than the question deserved.\n\nWe develop store-brand programs from scratch: design, sampling, production and delivery to your DC, under your label.\n\nIf that's still live on your side, I can put a short capability deck together this week.\n\nSammy"}},
+      {who:"Trade show list — 41 badges scanned", why:"From the January show. Nine got a follow-up email. Thirty-two never heard from you at all.", tag:"Unworked list", sev:"crit",
+       draft:{to:"(32 contacts)", subj:"Good to meet you at the show", body:"Good meeting you at the show. I'm following up later than I meant to.\n\nHere's what we do in one line: design, produce and ship legwear, accessories, cold weather, home and pet programs for retailers at your price point, start to finish.\n\nIf that's useful, I'll send a line sheet. If it isn't, tell me and I'll stop taking up your inbox.\n\nSammy"}}
+    ]
+  ];
+
+  function renderLeads(i){
+    var list = leadSets[i % leadSets.length];
+    var host=$("#newbiz"); host.innerHTML="";
+    list.forEach(function(L,n){
+      var row=document.createElement("div"); row.className="row";
+      row.innerHTML='<div class="stripe '+L.sev+'"></div><div class="main"><div class="who">'+L.who+'</div>'+
+        '<div class="what">'+L.why+'</div><div class="metaline"><span class="pill '+L.sev+'">'+L.tag+'</span>'+
+        '<button class="btn" data-lead="'+(i%leadSets.length)+'-'+n+'" type="button">Draft the intro</button></div></div>';
+      host.appendChild(row);
+    });
+    $("#newCount").textContent = list.length+" worth a call";
+  }
+
+  function renderInsight(i){
+    var s = insightSets[i % insightSets.length];
+    $("#iread").innerHTML = s.read;
+    var win=$("#iwin"), loss=$("#iloss");
+    win.innerHTML=""; loss.innerHTML="";
+    s.win.forEach(function(x){
+      var li=document.createElement("li");
+      li.innerHTML='<span class="fig win">'+x.f+'</span>'+x.t;
+      win.appendChild(li);
+    });
+    s.loss.forEach(function(x){
+      var li=document.createElement("li");
+      li.innerHTML='<span class="fig loss">'+x.f+'</span>'+x.t;
+      loss.appendChild(li);
+    });
+    $("#ibasis").textContent = s.basis;
+  }
+
+  function ageLabel(d){ return d===1 ? "1 day" : d+" days"; }
+
+  function renderWaiting(filter){
+    var host = $("#waiting"); host.innerHTML="";
+    var list = waiting.filter(function(w){ return filter==="all" || w.type===filter; });
+    if(!list.length){ host.innerHTML='<div class="what" style="padding:14px 0">Nothing here. Enjoy it.</div>'; }
+    list.forEach(function(w){
+      var row = document.createElement("div"); row.className="row";
+      row.innerHTML =
+        '<div class="stripe '+w.sev+'"></div>'+
+        '<div class="main"><div class="who">'+w.who+'</div>'+
+        '<div class="what">'+w.what+'</div>'+
+        '<div class="metaline"><span class="pill '+w.sev+'">'+ageLabel(w.days)+' waiting</span>'+
+        '<span class="pill">'+(w.type==="buyer"?"Customer":"Inside Gina")+'</span>'+
+        '<button class="btn" data-draft="'+w.id+'" type="button">Draft a reply</button>'+
+        '<button class="btn ghost" data-done="'+w.id+'" type="button">Handled</button></div></div>';
+      host.appendChild(row);
+    });
+    updateHeadline();
+  }
+
+  function renderPromises(){
+    var host=$("#promises"); host.innerHTML="";
+    promises.forEach(function(p,i){
+      var d=document.createElement("label"); d.className="check";
+      d.innerHTML='<input type="checkbox" id="promise-'+i+'"><span class="main"><span class="who">'+p.who+'</span>'+
+        '<div class="what">'+p.what+'</div><div class="metaline"><span class="pill '+p.sev+'">said '+ageLabel(p.days)+' ago</span></div></span>';
+      d.querySelector("input").addEventListener("change", function(e){
+        d.classList.toggle("done", e.target.checked);
+        countPromises();
+        if(e.target.checked) toast("Cleared. One less thing.");
+      });
+      host.appendChild(d);
+    });
+    countPromises();
+  }
+  function countPromises(){
+    var open = document.querySelectorAll("#promises .check:not(.done)").length;
+    $("#promiseCount").textContent = open+" still open";
+    updateHeadline();
+  }
+
+  function renderQuiet(){
+    var host=$("#quiet"); host.innerHTML="";
+    quiet.forEach(function(q){
+      var row=document.createElement("div"); row.className="row";
+      row.innerHTML='<div class="main"><div class="who">'+q.who+'</div><div class="what">'+q.what+'</div>'+
+        '<div class="metaline"><span class="pill warn">'+q.days+' days quiet</span>'+
+        '<button class="btn" data-checkin="'+q.who+'" type="button">Write a check-in</button></div></div>';
+      host.appendChild(row);
+    });
+  }
+
+  function renderToday(){
+    var host=$("#today"); host.innerHTML="";
+    today.forEach(function(s){
+      var d=document.createElement("div"); d.className="slot";
+      d.innerHTML='<div class="time">'+s.t+'</div><div class="main"><div class="who" style="font-size:14px">'+s.who+'</div><div class="what">'+s.note+'</div></div>';
+      host.appendChild(d);
+    });
+    $("#todayCount").textContent = today.length+" items";
+  }
+
+  function renderStats(){
+    var host=$("#stats"); host.innerHTML="";
+    stats.forEach(function(s){
+      var d=document.createElement("div"); d.className="stat";
+      d.innerHTML='<div class="n">'+s.n+'</div><div class="l">'+s.l+'</div><div class="d '+s.c+'">'+s.d+'</div>';
+      host.appendChild(d);
+    });
+  }
+
+  function renderClasses(){
+    var host=$("#classes"); host.innerHTML="";
+    classes.forEach(function(c){
+      var d=document.createElement("div"); d.className="cls";
+      d.innerHTML='<span>'+c.c+'</span><span class="t">'+c.t+'</span>';
+      host.appendChild(d);
+    });
+  }
+
+  var draftTemplates = [
+    {label:"Meeting recap", to:"Buyer", subj:"Great seeing you today", body:"Thanks for the time today. Quick recap of where we landed:\n\n— You're taking the spring assortment into four doors to start\n— I'm sending revised pricing on the gift set by Thursday\n— We'll revisit the pet line after the holiday reset\n\nIf I got any of that wrong, tell me now rather than in February.\n\nSammy"},
+    {label:"Sample follow-up", to:"Buyer", subj:"Samples — did they land?", body:"Wanted to make sure the samples arrived and made it to the right desk.\n\nNo rush on a decision. If anything in the box missed the mark, that's useful to me too — I'd rather hear it than guess.\n\nSammy"},
+    {label:"Order status", to:"Buyer", subj:"Your order — where it stands", body:"Quick status so you're not wondering:\n\n— Cut and sewn, in QC now\n— Leaves the warehouse the week of the 14th\n— Tracking comes to you the day it ships\n\nI'll flag it the second anything moves.\n\nSammy"},
+    {label:"Price change", to:"Buyer", subj:"A heads up on pricing", body:"Wanted you to hear this from me first rather than see it on an invoice.\n\nFreight costs moved on the cold weather program and pricing goes up 4% at the start of next quarter. Anything you commit to before then holds at the current number.\n\nHappy to walk through it if that's easier.\n\nSammy"}
+  ];
+  function renderDrafts(){
+    var host=$("#drafts"); host.innerHTML="";
+    draftTemplates.forEach(function(t,i){
+      var b=document.createElement("button"); b.className="btn"; b.type="button"; b.textContent=t.label;
+      b.addEventListener("click", function(){ openDrawer(t.label, t.to+" (you pick)", t.subj, t.body); });
+      host.appendChild(b);
+    });
+  }
+
+  function renderChips(){
+    var host=$("#chips"); host.innerHTML="";
+    var qs=["What did I tell Burlington about the spring delivery?","What pricing did I quote on cold weather?","What did I promise and never do?","When did TJ Maxx last order?","Which accounts have gone quiet?"];
+    qs.forEach(function(q){
+      var b=document.createElement("button"); b.className="chip"; b.type="button"; b.textContent=q;
+      b.addEventListener("click", function(){ $("#askinput").value=q; ask(q); });
+      host.appendChild(b);
+    });
+  }
+
+  function updateHeadline(){
+    var openW = waiting.length;
+    var oldest = waiting.reduce(function(m,w){ return Math.max(m,w.days); },0);
+    var openP = document.querySelectorAll("#promises .check:not(.done)").length;
+    $("#hl").innerHTML = "<b>"+openW+" people</b> are waiting on you. The oldest has been sitting <b>"+ageLabel(oldest)+
+      "</b>. You have <b>"+openP+" open promises</b>. Gabe has a midterm Thursday.";
+    $("#hlsub").textContent = "Everything below is drawn from your mailbox and calendar. Clear the top panel and the day is basically won.";
+  }
+
+  /* ---------- interactions ---------- */
+  function toast(msg){
+    var t=$("#toast"); t.textContent=msg; t.classList.add("show");
+    clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove("show"); },2200);
+  }
+
+  var lastFocus=null;
+  function openDrawer(title, to, subj, body){
+    lastFocus = document.activeElement;
+    $("#dtitle").textContent=title;
+    $("#dmeta").innerHTML='<div><b>To</b> &nbsp;'+to+'</div><div><b>Subject</b> &nbsp;'+subj+'</div>';
+    $("#dbodytext").textContent=body;
+    $("#drawer").classList.add("open"); $("#drawer").setAttribute("aria-hidden","false");
+    $("#scrim").classList.add("open");
+    $("#closeDrawer").focus();
+  }
+  function closeDrawer(){
+    $("#drawer").classList.remove("open"); $("#drawer").setAttribute("aria-hidden","true");
+    $("#scrim").classList.remove("open");
+    if(lastFocus) lastFocus.focus();
+  }
+  $("#closeDrawer").addEventListener("click", closeDrawer);
+  $("#scrim").addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeDrawer(); });
+  $("#sendBtn").addEventListener("click", function(){ closeDrawer(); toast("Demo only — nothing was sent."); });
+  $("#tweakBtn").addEventListener("click", function(){
+    var t=$("#dbodytext").textContent.split("\n\n");
+    $("#dbodytext").textContent = t.slice(0,2).join("\n\n")+"\n\nSammy";
+    toast("Shortened.");
+  });
+
+  document.addEventListener("click", function(e){
+    var b=e.target.closest("button"); if(!b) return;
+    if(b.dataset.draft){
+      var w = waiting.filter(function(x){ return String(x.id)===b.dataset.draft; })[0];
+      if(w) openDrawer("Draft reply", w.draft.to, w.draft.subj, w.draft.body);
+    }
+    if(b.dataset.done){
+      var id=b.dataset.done;
+      waiting = waiting.filter(function(x){ return String(x.id)!==id; });
+      renderWaiting(currentFilter); toast("Marked handled.");
+    }
+    if(b.dataset.lead){
+      var parts=b.dataset.lead.split("-");
+      var L=leadSets[+parts[0]][+parts[1]];
+      if(L) openDrawer("Intro to a new prospect", L.draft.to, L.draft.subj, L.draft.body);
+    }
+    if(b.dataset.checkin){
+      openDrawer("Check-in", b.dataset.checkin, "Been a minute",
+        "It's been a while since we talked and that's on me.\n\nWe've moved a few things since your last order — new colorways in the beanie program and a pet line that's doing real numbers in comparable doors. No pitch attached to this note; I'd just rather you hear it from me than from a competitor.\n\nWorth fifteen minutes this month?\n\nSammy");
+    }
+  });
+
+  var currentFilter="all";
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.addEventListener("click", function(){
+      document.querySelectorAll(".tab").forEach(function(x){ x.setAttribute("aria-selected","false"); });
+      t.setAttribute("aria-selected","true");
+      currentFilter=t.dataset.filter; renderWaiting(currentFilter);
+    });
+  });
+
+  function ask(q){
+    var s=q.toLowerCase(), key=null;
+    if(/burlington|spring|delivery|ship/.test(s)) key="burlington";
+    else if(/pric|quote|cost|cold/.test(s)) key="pricing";
+    else if(/promis|said|owe|follow/.test(s)) key="promise";
+    else if(/tjmaxx|maxx|angela|order/.test(s)) key="tjmaxx";
+    else if(/quiet|dark|hear|silent/.test(s)) key="quiet";
+    var box=$("#answer");
+    if(!key){
+      box.innerHTML='<p>In the real thing this answer comes from your actual mailbox. In this demo, try one of the suggested questions below the box.</p>';
+    } else {
+      var a=answers[key];
+      box.innerHTML='<p>'+a.a+'</p><div class="src"><b>From these emails:</b><br>'+a.s.join("<br>")+'</div>';
+    }
+    box.hidden=false;
+  }
+  $("#askform").addEventListener("submit", function(e){ e.preventDefault(); ask($("#askinput").value||""); });
+
+  var ji=0, ti=0;
+  $("#joke").innerHTML = jokes[0];
+  $("#newJoke").addEventListener("click", function(){ ji=(ji+1)%jokes.length; $("#joke").innerHTML=jokes[ji]; });
+  $("#textGabe").addEventListener("click", function(){
+    openDrawer("Text to Gabe","Gabe","(text message)", texts[ti].replace(/&rsquo;/g,"'").replace(/&lsquo;/g,"'"));
+    ti=(ti+1)%texts.length;
+  });
+
+  var ii=0, li=0;
+  $("#moreLeads").addEventListener("click", function(){ li++; renderLeads(li); toast("Another pass through the mailbox."); });
+  $("#moreInsight").addEventListener("click", function(){ ii++; renderInsight(ii); toast("Different cut of the same mailbox."); });
+
+  var themeBtn=$("#themeBtn");
+  document.documentElement.setAttribute("data-theme","light");
+  themeBtn.addEventListener("click", function(){
+    var dark = document.documentElement.getAttribute("data-theme")==="dark";
+    document.documentElement.setAttribute("data-theme", dark?"light":"dark");
+    themeBtn.textContent = dark?"Dark":"Light";
+  });
+
+  renderWaiting("all"); renderPromises(); renderQuiet(); renderToday(); renderStats(); renderClasses(); renderDrafts(); renderChips(); renderInsight(0); renderLeads(0);
+})();
+</script>
+
+</body>
+</html>

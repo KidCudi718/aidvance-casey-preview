@@ -844,6 +844,49 @@ button, a { -webkit-tap-highlight-color: transparent; }
   line-height: 1.1;
 }
 
+.m-page:has(.desk-host) .m-foot { display: none; }
+
+.m-page:has(.desk-host) .m-main {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.desk-host {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: #000;
+}
+
+.desk-cue {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 18px;
+  padding: 12px 22px;
+  border-bottom: 1px solid rgba(244, 244, 242, 0.14);
+}
+
+.desk-cue p {
+  margin: 0;
+  font-family: var(--font-mono), "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(244, 244, 242, 0.72);
+}
+
+.desk-host iframe {
+  flex: 1;
+  width: 100%;
+  min-height: 70dvh;
+  border: 0;
+  background: #f4f3f0;
+}
+
 @media (max-width: 860px) {
   .room-bar,
   .m-bar-inner { flex-wrap: wrap; row-gap: 8px; }
