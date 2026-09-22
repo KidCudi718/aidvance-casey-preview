@@ -168,6 +168,7 @@ function attachTour(frame: HTMLIFrameElement): TourHandle {
   if (!doc || !view || !doc.head || !doc.body) {
     return { start() {}, stop() {} };
   }
+  const win = view;
 
   doc.getElementById("aidv-tour-style")?.remove();
   doc.getElementById("aidv-card")?.remove();
@@ -240,7 +241,7 @@ function attachTour(frame: HTMLIFrameElement): TourHandle {
 
   const place = () => {
     if (!open) return;
-    const narrow = view.innerWidth < 720;
+    const narrow = win.innerWidth < 720;
     marks.forEach((mark, markIndex) => {
       const host = hosts[markIndex];
       if (!host) return;
@@ -249,7 +250,7 @@ function attachTour(frame: HTMLIFrameElement): TourHandle {
       const shift = shifts[markIndex] ?? 0;
       let left = rect.left + 12 + shift * (size + 8);
       let top = rect.top - 8;
-      if (left + size > view.innerWidth - 8) left = Math.max(8, view.innerWidth - size - 8);
+      if (left + size > win.innerWidth - 8) left = Math.max(8, win.innerWidth - size - 8);
       if (left < 8) left = 8;
       mark.style.left = `${left}px`;
       mark.style.top = `${top}px`;
@@ -275,17 +276,17 @@ function attachTour(frame: HTMLIFrameElement): TourHandle {
     const height = box.height || 180;
     let left = rect.left;
     let top = rect.bottom + 12;
-    if (top + height > view.innerHeight - 12) top = rect.top - height - 12;
+    if (top + height > win.innerHeight - 12) top = rect.top - height - 12;
     if (top < 12) top = 12;
-    if (left + width > view.innerWidth - 12) left = view.innerWidth - width - 12;
+    if (left + width > win.innerWidth - 12) left = win.innerWidth - width - 12;
     if (left < 12) left = 12;
     card.style.left = `${left}px`;
     card.style.top = `${top}px`;
   };
 
   const schedulePlace = () => {
-    view.cancelAnimationFrame(placeFrame);
-    placeFrame = view.requestAnimationFrame(place);
+    win.cancelAnimationFrame(placeFrame);
+    placeFrame = win.requestAnimationFrame(place);
   };
 
   function hide() {
@@ -313,16 +314,16 @@ function attachTour(frame: HTMLIFrameElement): TourHandle {
       mark.hidden = false;
       mark.classList.toggle("is-on", markIndex === nextIndex);
     });
-    const narrow = view.innerWidth < 720;
+    const narrow = win.innerWidth < 720;
     host.style.scrollMarginTop = "24px";
     host.style.scrollMarginBottom = narrow ? "220px" : "28px";
-    const reduce = view.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduce = win.matchMedia("(prefers-reduced-motion: reduce)").matches;
     host.scrollIntoView({
       block: narrow ? "start" : "center",
       behavior: reduce ? "auto" : "smooth",
     });
     schedulePlace();
-    view.setTimeout(schedulePlace, reduce ? 0 : 360);
+    win.setTimeout(schedulePlace, reduce ? 0 : 360);
   }
 
   function finish(value: "done" | "skipped") {
@@ -338,15 +339,15 @@ function attachTour(frame: HTMLIFrameElement): TourHandle {
     else show(index + 1);
   });
   skip.addEventListener("click", () => finish("skipped"));
-  view.addEventListener("scroll", schedulePlace, { passive: true });
-  view.addEventListener("resize", schedulePlace);
+  win.addEventListener("scroll", schedulePlace, { passive: true });
+  win.addEventListener("resize", schedulePlace);
   doc.addEventListener("scroll", schedulePlace, { passive: true, capture: true });
 
   const onKey = (event: KeyboardEvent) => {
     if (!open || event.key !== "Escape") return;
     finish("skipped");
   };
-  view.addEventListener("keydown", onKey);
+  win.addEventListener("keydown", onKey);
 
   return {
     start() {
@@ -354,10 +355,10 @@ function attachTour(frame: HTMLIFrameElement): TourHandle {
       show(0);
     },
     stop() {
-      view.cancelAnimationFrame(placeFrame);
-      view.removeEventListener("scroll", schedulePlace);
-      view.removeEventListener("resize", schedulePlace);
-      view.removeEventListener("keydown", onKey);
+      win.cancelAnimationFrame(placeFrame);
+      win.removeEventListener("scroll", schedulePlace);
+      win.removeEventListener("resize", schedulePlace);
+      win.removeEventListener("keydown", onKey);
       doc.removeEventListener("scroll", schedulePlace, true);
       marks.forEach((mark) => mark.remove());
       card.remove();
