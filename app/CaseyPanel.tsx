@@ -115,6 +115,7 @@ export default function CaseyPanel() {
   const [mailOptions, setMailOptions] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
+  const [bookNoted, setBookNoted] = useState(false);
 
   const stateRef = useRef<State>("idle");
   const activeRef = useRef(false);
@@ -213,6 +214,7 @@ export default function CaseyPanel() {
     setMailOptions(false);
     setCopied(false);
     setCopyFailed(false);
+    setBookNoted(false);
     window.clearTimeout(copyTimerRef.current);
     turnsRef.current = [];
     pendingReplyRef.current = false;
@@ -370,6 +372,25 @@ export default function CaseyPanel() {
     }
   }, []);
 
+  // If the tab is backgrounded, iOS suspends Speko playback. Coming back
+  // resumes audio. This does not end the call.
+  useEffect(() => {
+    if (!live) return;
+
+    const resumeAfterReturn = () => {
+      if (document.visibilityState === "hidden") return;
+      if (!activeRef.current) return;
+      void unmute();
+    };
+
+    document.addEventListener("visibilitychange", resumeAfterReturn);
+    window.addEventListener("focus", resumeAfterReturn);
+    return () => {
+      document.removeEventListener("visibilitychange", resumeAfterReturn);
+      window.removeEventListener("focus", resumeAfterReturn);
+    };
+  }, [live, unmute]);
+
   useEffect(() => () => window.clearTimeout(copyTimerRef.current), []);
 
   const bookDave = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
@@ -474,7 +495,7 @@ export default function CaseyPanel() {
             </button>
           </div>
         ) : needsUnmute ? (
-          <button type="button" className="talk" onClick={() => void unmute()}>
+          <button type="button" className="talk talk--resume" onClick={() => void unmute()}>
             <span className="talk-label" key="unmute">
               Tap to unmute
             </span>
@@ -506,15 +527,15 @@ export default function CaseyPanel() {
         )}
 
         {live ? (
-          <a
-            className="book book--live"
-            href={GMAIL_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={bookDave}
-          >
+          <button type="button" className="book book--live" onClick={() => setBookNoted(true)}>
             {DAVE_LABEL}
-          </a>
+          </button>
+        ) : null}
+
+        {live && bookNoted ? (
+          <p className="book-note" role="status">
+            Got it — booking link in the morning. Stay on the call.
+          </p>
         ) : null}
 
         {state === "done" && mailOptions ? (
