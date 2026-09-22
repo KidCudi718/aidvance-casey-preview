@@ -63,7 +63,7 @@ export default function AiAssessmentPage() {
       <p className="m-copy">No generic AI playbook. This is built around your actual business.</p>
 
       <section className="m-case" aria-labelledby="how-heading">
-        <h2 className="m-headline" id="how-heading">
+        <h2 className="m-kicker" id="how-heading">
           How it works
         </h2>
         <ol className="m-grid m-deliver">
@@ -78,7 +78,7 @@ export default function AiAssessmentPage() {
       </section>
 
       <section className="m-case" aria-labelledby="get-heading">
-        <h2 className="m-headline" id="get-heading">
+        <h2 className="m-kicker" id="get-heading">
           What you get
         </h2>
         <ul className="m-grid m-deliver">
@@ -91,7 +91,7 @@ export default function AiAssessmentPage() {
         </ul>
       </section>
 
-      <p className="m-aside">
+      <p className="m-copy">
         Sometimes the answer is AI. Sometimes it’s automation. Sometimes the smartest move is to
         leave it alone.
       </p>
@@ -101,7 +101,7 @@ export default function AiAssessmentPage() {
       </p>
 
       <section className="m-case" aria-labelledby="sample-heading">
-        <h2 className="m-headline" id="sample-heading">
+        <h2 className="m-kicker" id="sample-heading">
           This is what clarity looks like.
         </h2>
         <article className="m-card">
@@ -116,7 +116,7 @@ export default function AiAssessmentPage() {
         </article>
       </section>
 
-      <p className="m-aside">
+      <p className="m-copy">
         Know where the leaks are before you spend money fixing the wrong ones.
       </p>
       <div className="m-cta">
