@@ -54,7 +54,7 @@ const STEPS = [
   },
   {
     index: "03",
-    title: "Written assessment",
+    title: "Written Assessment",
     body: "The roadmap: what first, what to leave alone, what to implement, what stays human.",
   },
   {
