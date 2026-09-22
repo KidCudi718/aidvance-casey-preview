@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { VoiceConversation } from "@spekoai/client";
 import PresenceVisual, { type PresenceMode } from "./PresenceVisual";
+import SiteHeader from "./SiteHeader";
 import { watchAgentAudio, type CallVisual } from "./lips";
 
 type State = CallVisual;
@@ -404,14 +405,12 @@ export default function CaseyPanel() {
 
   return (
     <main
+      id="casey"
       className={live ? "room room--live" : state === "idle" ? "room room--idle" : "room"}
       data-state={state}
     >
       <header className="top">
-        <div className="brand">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.png" alt="Aidvance" />
-        </div>
+        <SiteHeader variant="room" />
       </header>
 
       <div className="stage">
