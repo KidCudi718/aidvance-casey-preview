@@ -14,7 +14,7 @@ export default function MorningDeskPage() {
         <Link className="m-textlink" href="/work">
           Back to Work
         </Link>
-        <p>Sample desk. Click around. Nothing sends for real.</p>
+        <p>This is a sample desk. Click around and try it. Nothing sends for real.</p>
       </div>
       <iframe
         title="Morning Desk, a sales dashboard built on your email inbox"
