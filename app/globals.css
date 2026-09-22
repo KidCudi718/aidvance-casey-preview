@@ -235,14 +235,24 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .room[data-state="listening"] .talk,
 .room[data-state="thinking"] .talk,
 .room[data-state="speaking"] .talk {
-  background: var(--paper);
-  color: var(--ink);
-  font-weight: 600;
+  background: #000;
+  color: var(--paper);
+  border: 1px solid rgba(244, 244, 242, 0.45);
+  box-shadow: none;
+  font-weight: 500;
   font-size: 14px;
   letter-spacing: 0.12em;
 }
-.room[data-state="listening"] .talk {
-  box-shadow: 0 0 0 5px rgba(244, 244, 242, 0.16);
+.room[data-state="listening"] .talk:hover,
+.room[data-state="thinking"] .talk:hover,
+.room[data-state="speaking"] .talk:hover,
+.room[data-state="listening"] .talk:active,
+.room[data-state="thinking"] .talk:active,
+.room[data-state="speaking"] .talk:active {
+  background: #000;
+  color: var(--paper);
+  border: 1px solid rgba(244, 244, 242, 0.7);
+  box-shadow: none;
 }
 
 .trust {
@@ -434,16 +444,19 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 
-/* Mid-call Book Dave — stays on while Speko call is live; does not end the call */
+/* Mid-call Book Dave — solid white primary while the call is live */
 .book--live {
   margin-top: 12px;
-  background: transparent;
-  color: var(--paper);
-  border: 1px solid color-mix(in srgb, var(--paper) 55%, transparent);
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--paper);
 }
-.book--live:hover {
-  background: color-mix(in srgb, var(--paper) 10%, transparent);
-  color: var(--paper);
+.book--live:hover,
+.book--live:active {
+  background: #dededc;
+  color: var(--ink);
+  border: 1px solid var(--paper);
+  box-shadow: none;
 }
 
 /* Shared site chrome — room variant lives inside the Casey header row */
