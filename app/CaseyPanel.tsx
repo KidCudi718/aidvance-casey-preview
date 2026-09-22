@@ -131,10 +131,6 @@ export default function CaseyPanel() {
     setErrMsg("");
     setNeedsUnmute(false);
     setCaption("");
-    setMailOptions(false);
-    setCopied(false);
-    setCopyFailed(false);
-    window.clearTimeout(copyTimerRef.current);
     turnsRef.current = [];
     pendingReplyRef.current = false;
     window.clearTimeout(thinkTimerRef.current);
