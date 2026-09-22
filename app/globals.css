@@ -881,28 +881,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
   color: var(--paper);
 }
 
-.desk-cue-links {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px 16px;
-}
-
-.desk-replay {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: rgba(244, 244, 242, 0.55);
-  font-family: var(--font-mono), "IBM Plex Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.desk-replay:hover { color: var(--paper); }
-
 .work-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.85fr);
