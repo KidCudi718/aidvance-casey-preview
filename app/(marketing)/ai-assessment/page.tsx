@@ -1,80 +1,126 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import BookDave from "../../BookDave";
 
 export const metadata: Metadata = {
   title: "AI Assessment · Aidvance",
   description:
-    "A written look at where AI fits one business, what to do first, and what to leave alone.",
+    "Ninety minutes inside the business, then a clear picture of where AI belongs, where it doesn’t, and what to do first.",
 };
 
-const DELIVERABLES = [
+const STEPS = [
   {
-    index: "01",
-    title: "How the work moves",
-    body: "A plain account of the workflows, the friction, and the places one person is holding together.",
+    n: "01",
+    title: "We get inside the business",
+    body: "We walk through the real operation. Leads, email, follow-up, handoffs, repeated work, bottlenecks, and the things that still depend on someone remembering.",
   },
   {
-    index: "02",
-    title: "Where AI fits",
-    body: "Recommendations for this operation, including the places a new tool would add noise.",
+    n: "02",
+    title: "We do the analysis",
+    body: "We break down what you showed us, identify the real friction, and determine what actually deserves AI, automation, an agent, or nothing at all.",
+  },
+] as const;
+
+const GAINS = [
+  {
+    title: "Clear Map",
+    body: "Where the friction is and what matters most.",
   },
   {
-    index: "03",
-    title: "What comes first",
-    body: "A short order. Do this. Leave that. Come back to the rest when the first piece is real.",
+    title: "Specific Recommendations",
+    body: "What should change and what type of solution fits.",
   },
   {
-    index: "04",
-    title: "The walkthrough",
-    body: "We sit with the findings together. The recommendations stay with you.",
+    title: "Easy Wins",
+    body: "Simple fixes your team can implement now.",
   },
+  {
+    title: "Bigger Opportunities",
+    body: "Anything that needs a real build, clearly scoped before you decide.",
+  },
+] as const;
+
+const SAMPLE = [
+  ["Finding", "Follow-up lives in one person’s inbox."],
+  ["Why it matters", "Leads go quiet when that person is in a meeting."],
+  ["Recommendation", "A morning view of who is waiting, before anyone asks."],
+  ["Priority", "Do first"],
+  ["What not to do", "Don’t buy a new system to fix a reminder problem."],
 ] as const;
 
 export default function AiAssessmentPage() {
   return (
     <main className="m-wrap">
       <p className="m-kicker">AI Assessment</p>
-      <h1 className="m-title">A clear read of one business.</h1>
+      <h1 className="m-title">What actually is an AI Assessment?</h1>
       <p className="m-lead">
-        You show how the work actually runs. We come back with a written read and a walkthrough:
-        where AI fits, where it should stay out, and what to do first.
+        We spend 90 minutes learning how your business actually works, then show you where AI
+        belongs, where it doesn’t, and what to do first.
       </p>
-
-      <div className="m-cta m-cta-early">
-        <BookDave />
-      </div>
-
-      <ul className="m-grid m-deliver">
-        {DELIVERABLES.map((item) => (
-          <li key={item.index} className="m-card">
-            <span className="m-index">{item.index}</span>
-            <h2>{item.title}</h2>
-            <p>{item.body}</p>
-          </li>
-        ))}
-      </ul>
-
-      <div className="m-split">
-        <section className="m-card">
-          <span className="m-index">For</span>
-          <p className="m-split-copy">
-            An owner or operator who will open the real desk, mess included.
-          </p>
-        </section>
-        <section className="m-card">
-          <span className="m-index">Not for</span>
-          <p className="m-split-copy">
-            A search for a software list before anyone has looked at the work.
-          </p>
-        </section>
-      </div>
 
       <div className="m-cta">
         <BookDave />
-        <Link className="m-textlink" href="/#casey">
-          Talk to Casey
-        </Link>
+      </div>
+      <p className="m-copy">No generic AI playbook. This is built around your actual business.</p>
+
+      <section className="m-case" aria-labelledby="how-heading">
+        <h2 className="m-headline" id="how-heading">
+          How it works
+        </h2>
+        <ol className="m-grid m-deliver">
+          {STEPS.map((step) => (
+            <li key={step.n} className="m-card">
+              <span className="m-index">{step.n}</span>
+              <h2>{step.title}</h2>
+              <p>{step.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="m-case" aria-labelledby="get-heading">
+        <h2 className="m-headline" id="get-heading">
+          What you get
+        </h2>
+        <ul className="m-grid m-deliver">
+          {GAINS.map((item) => (
+            <li key={item.title} className="m-card">
+              <h2>{item.title}</h2>
+              <p>{item.body}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <p className="m-aside">
+        Sometimes the answer is AI. Sometimes it’s automation. Sometimes the smartest move is to
+        leave it alone.
+      </p>
+      <p className="m-copy">
+        The goal is not to sell you more technology. The goal is to show you what is actually worth
+        fixing.
+      </p>
+
+      <section className="m-case" aria-labelledby="sample-heading">
+        <h2 className="m-headline" id="sample-heading">
+          This is what clarity looks like.
+        </h2>
+        <article className="m-card">
+          <p className="m-kicker">Sample</p>
+          {SAMPLE.map(([label, value]) => (
+            <p key={label}>
+              <span className="work-label">{label}</span>
+              <br />
+              {value}
+            </p>
+          ))}
+        </article>
+      </section>
+
+      <p className="m-aside">
+        Know where the leaks are before you spend money fixing the wrong ones.
+      </p>
+      <div className="m-cta">
+        <BookDave />
       </div>
     </main>
   );
