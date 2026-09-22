@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from "next/font/google";
 import "./globals.css";
 
@@ -9,7 +9,7 @@ const sans = IBM_Plex_Sans({
 });
 const mono = IBM_Plex_Mono({
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
   variable: "--font-mono",
 });
 const serif = Newsreader({
@@ -19,9 +19,15 @@ const serif = Newsreader({
 });
 
 export const metadata: Metadata = {
-  title: "Aidvance · Casey preview (not live)",
-  description: "Talkable Casey mock — temporary preview, not production.",
-  robots: { index: false, follow: false },
+  title: "Casey · Aidvance",
+  description: "Is AI right for your business? Talk to Casey.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

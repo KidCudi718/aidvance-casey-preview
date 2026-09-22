@@ -1,64 +1,147 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
 import { VoiceConversation } from "@spekoai/client";
-import {
-  CASEY_OPENER,
-} from "../lib/caseyVoicePrompt";
+import PresenceVisual, { type PresenceMode } from "./PresenceVisual";
+import { watchAgentAudio, type CallVisual } from "./lips";
 
-type State =
-  | "idle"
-  | "connecting"
-  | "listening"
-  | "thinking"
-  | "speaking"
-  | "error";
+type State = CallVisual;
 
-const BARS = 28;
-
-const LABELS: Record<State, string> = {
-  idle: "Press once. Just talk.",
-  connecting: "Connecting Casey (bar preview)…",
+const STATUS: Record<State, string> = {
+  idle: "",
+  requesting_mic: "Allow microphone…",
   listening: "Listening…",
-  thinking: "…",
-  speaking: "Casey is talking — interrupt anytime",
-  error: "Something went sideways.",
+  thinking: "One second…",
+  speaking: "Casey is talking…",
+  done: "That’s the conversation.",
+  error: "",
 };
 
 const BTN: Record<State, string> = {
   idle: "Talk to Casey",
-  connecting: "Connecting…",
-  listening: "End call",
-  thinking: "End call",
-  speaking: "End call",
+  requesting_mic: "Allow microphone…",
+  listening: "Stop",
+  thinking: "Stop",
+  speaking: "Stop",
+  done: "Talk again",
   error: "Try again",
 };
 
 type Turn = { role: "user" | "assistant"; text: string; at: number };
 
+const DAVE_LABEL = "Book a FREE 15 Minute Chat with Dave";
+const DAVE_EMAIL = "david.choukroun2@gmail.com";
+const DAVE_BODY =
+  "Hi Dave,\n\nI'd like to book a FREE 15 minute chat. A time that works for me:\n\n";
+
+function composeHref(base: string, fields: Record<string, string>) {
+  const query = Object.entries(fields)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+    .join("&");
+  return `${base}?${query}`;
+}
+
+// mailto does nothing when the browser has no desktop mail handler.
+// Gmail compose is a normal https tab. Outlook and mailto stay as options.
+const GMAIL_HREF = composeHref("https://mail.google.com/mail/", {
+  view: "cm",
+  fs: "1",
+  to: DAVE_EMAIL,
+  su: DAVE_LABEL,
+  body: DAVE_BODY,
+});
+
+const OUTLOOK_HREF = composeHref("https://outlook.live.com/mail/0/deeplink/compose", {
+  to: DAVE_EMAIL,
+  subject: DAVE_LABEL,
+  body: DAVE_BODY,
+});
+
+const MAILTO_HREF = `mailto:${DAVE_EMAIL}?subject=${encodeURIComponent(
+  DAVE_LABEL
+)}&body=${encodeURIComponent(DAVE_BODY)}`;
+
+function openComposeTab(url: string) {
+  try {
+    const opened = window.open(url, "_blank");
+    if (!opened) return false;
+    try {
+      if (opened.closed) return false;
+      opened.opener = null;
+    } catch {
+      /* The tab is already cross-origin. It still opened. */
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function writeClipboard(text: string) {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    /* Fall through to the selection path. */
+  }
+  try {
+    const area = document.createElement("textarea");
+    area.value = text;
+    area.setAttribute("readonly", "");
+    area.style.position = "fixed";
+    area.style.top = "0";
+    area.style.left = "0";
+    area.style.opacity = "0";
+    document.body.appendChild(area);
+    area.focus();
+    area.select();
+    const ok = document.execCommand("copy");
+    area.remove();
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 export default function CaseyPanel() {
   const [state, setState] = useState<State>("idle");
-  const [transcript, setTranscript] = useState(
-    'Bar-personality preview · same Speko voice · opens with "Hey." · production untouched.'
-  );
-  const [levels, setLevels] = useState<number[]>(() => Array(BARS).fill(0.18));
-  const [offerMeet, setOfferMeet] = useState(false);
+  const [presence, setPresence] = useState<PresenceMode>("bars");
+  const [caption, setCaption] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [needsUnmute, setNeedsUnmute] = useState(false);
+  const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
+  const [mailOptions, setMailOptions] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
 
   const stateRef = useRef<State>("idle");
   const activeRef = useRef(false);
   const convRef = useRef<VoiceConversation | null>(null);
   const turnsRef = useRef<Turn[]>([]);
-  const rafRef = useRef(0);
-  const analyserRef = useRef<AnalyserNode | null>(null);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const stopTapRef = useRef<(() => void) | null>(null);
+  const pendingReplyRef = useRef(false);
+  const thinkTimerRef = useRef(0);
+  const holdTimerRef = useRef(0);
+  const copyTimerRef = useRef(0);
 
   stateRef.current = state;
 
-  const stopWave = useCallback(() => {
-    cancelAnimationFrame(rafRef.current);
-    setLevels(Array(BARS).fill(0.18));
+  const live =
+    state === "requesting_mic" ||
+    state === "listening" ||
+    state === "thinking" ||
+    state === "speaking";
+
+  const stopAudioTap = useCallback(() => {
+    stopTapRef.current?.();
+    stopTapRef.current = null;
+    const ctx = audioCtxRef.current;
+    audioCtxRef.current = null;
+    setAnalyser(null);
+    if (ctx && ctx.state !== "closed") void ctx.close();
   }, []);
 
   const pushTurn = useCallback((role: "user" | "assistant", text: string) => {
@@ -73,14 +156,14 @@ export default function CaseyPanel() {
     turnsRef.current.push({ role, text: t, at: Date.now() });
   }, []);
 
-  const flushLog = useCallback(async () => {
-    if (!turnsRef.current.length) return;
+  const flushLog = useCallback(async (turns: Turn[]) => {
+    if (!turns.length) return;
     try {
       await fetch("/api/voice/log", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          turns: turnsRef.current,
+          turns,
           meta: { provider: "speko", personality: "bar" },
         }),
         keepalive: true,
@@ -91,10 +174,14 @@ export default function CaseyPanel() {
   }, []);
 
   const hangup = useCallback(async () => {
-    const was = activeRef.current;
     activeRef.current = false;
-    stopWave();
+    pendingReplyRef.current = false;
+    window.clearTimeout(thinkTimerRef.current);
+    window.clearTimeout(holdTimerRef.current);
     setNeedsUnmute(false);
+    stopAudioTap();
+    const turns = turnsRef.current;
+    turnsRef.current = [];
     const conv = convRef.current;
     convRef.current = null;
     try {
@@ -102,11 +189,8 @@ export default function CaseyPanel() {
     } catch {
       /* ignore */
     }
-    void audioCtxRef.current?.close();
-    audioCtxRef.current = null;
-    analyserRef.current = null;
-    if (was) void flushLog();
-  }, [flushLog, stopWave]);
+    if (turns.length) void flushLog(turns);
+  }, [flushLog, stopAudioTap]);
 
   useEffect(
     () => () => {
@@ -115,64 +199,78 @@ export default function CaseyPanel() {
     [hangup]
   );
 
-  const startMicWave = useCallback(async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const ctx = new AudioContext();
-      audioCtxRef.current = ctx;
-      if (ctx.state === "suspended") await ctx.resume();
-      const source = ctx.createMediaStreamSource(stream);
-      const analyser = ctx.createAnalyser();
-      analyser.fftSize = 128;
-      source.connect(analyser);
-      analyserRef.current = analyser;
-      const tick = () => {
-        if (!activeRef.current || !analyserRef.current) return;
-        if (stateRef.current === "listening") {
-          const data = new Uint8Array(analyserRef.current.frequencyBinCount);
-          analyserRef.current.getByteFrequencyData(data);
-          setLevels(
-            Array.from({ length: BARS }, (_, i) => {
-              const v = data[Math.floor((i / BARS) * data.length)] ?? 0;
-              return 0.12 + (v / 255) * 0.88;
-            })
-          );
-        }
-        rafRef.current = requestAnimationFrame(tick);
-      };
-      rafRef.current = requestAnimationFrame(tick);
-    } catch {
-      /* Speko also requests mic; wave is optional */
-    }
-  }, []);
-
   const startCall = useCallback(async () => {
     if (activeRef.current) {
+      if (stateRef.current === "requesting_mic") return;
       await hangup();
-      setState("idle");
-      setTranscript("Call ended.");
+      setState("done");
       return;
     }
 
     setErrMsg("");
-    setOfferMeet(false);
     setNeedsUnmute(false);
+    setCaption("");
+    setMailOptions(false);
+    setCopied(false);
+    setCopyFailed(false);
+    window.clearTimeout(copyTimerRef.current);
     turnsRef.current = [];
-    setState("connecting");
-    setTranscript("Connecting bar Casey (Speko, live voice)…");
+    pendingReplyRef.current = false;
+    window.clearTimeout(thinkTimerRef.current);
+    window.clearTimeout(holdTimerRef.current);
+    setState("requesting_mic");
     activeRef.current = true;
+
+    try {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw Object.assign(new Error("This browser can’t use the microphone."), {
+          noMic: true,
+        });
+      }
+      const mic = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mic.getTracks().forEach((track) => track.stop());
+    } catch (e) {
+      const noMic =
+        e instanceof DOMException ||
+        (e instanceof Error && "noMic" in e && Boolean((e as { noMic?: boolean }).noMic));
+      setErrMsg(
+        noMic
+          ? "Casey needs the microphone."
+          : e instanceof Error
+            ? e.message
+            : "Casey needs the microphone."
+      );
+      activeRef.current = false;
+      setState("error");
+      return;
+    }
+
+    if (!activeRef.current) return;
+
+    const ctx = new AudioContext({ latencyHint: "interactive" });
+    audioCtxRef.current = ctx;
+    try {
+      await ctx.resume();
+    } catch {
+      /* unmute path resumes again */
+    }
+    const node = ctx.createAnalyser();
+    // 512 samples ≈ 10ms at 48kHz — one frame, not a trailing window.
+    node.fftSize = 512;
+    node.smoothingTimeConstant = 0;
+    node.minDecibels = -85;
+    node.maxDecibels = -25;
+    setAnalyser(node);
+    stopTapRef.current = watchAgentAudio(ctx, node);
 
     try {
       const sessionRes = await fetch("/api/voice/session", { method: "POST" });
       if (sessionRes.status === 429) {
-        throw new Error(
-          "Casey is busy on another call. Wait a minute and try again."
-        );
+        throw new Error("Casey is busy on another call. Wait a minute and try again.");
       }
       if (!sessionRes.ok) throw new Error("Could not start Casey session");
       const session = await sessionRes.json();
-      const transportToken =
-        session.transportToken || session.conversationToken;
+      const transportToken = session.transportToken || session.conversationToken;
       const transportUrl = session.transportUrl || session.livekitUrl;
       if (!transportToken || !transportUrl) {
         throw new Error("Incomplete Speko session");
@@ -182,42 +280,58 @@ export default function CaseyPanel() {
         transportToken,
         transportUrl,
         onConnect: () => {
-          setState("listening");
-          setTranscript('Connected — she should open with "Hey."');
+          setState((s) => (s === "requesting_mic" ? "listening" : s));
         },
         onDisconnect: () => {
-          if (activeRef.current) {
-            activeRef.current = false;
-            void hangup();
-            setState("idle");
-            setTranscript("Call ended.");
-          }
+          if (!activeRef.current) return;
+          void hangup().then(() => {
+            setState("done");
+          });
         },
         onModeChange: (mode) => {
-          if (mode === "listening") setState("listening");
-          if (mode === "speaking") setState("speaking");
+          if (mode === "speaking") {
+            pendingReplyRef.current = false;
+            window.clearTimeout(thinkTimerRef.current);
+            window.clearTimeout(holdTimerRef.current);
+            setState("speaking");
+            return;
+          }
+          if (pendingReplyRef.current) return;
+          setState("listening");
         },
         onTranscript: (messages) => {
           const last = messages[messages.length - 1];
           if (!last?.text) return;
           const isUser = last.source === "user";
-          setTranscript(`${isUser ? "You" : "Casey"}: ${last.text}`);
           if (last.isFinal) {
             pushTurn(isUser ? "user" : "assistant", last.text);
-            if (
-              !isUser &&
-              messages.filter((m) => m.source === "agent" && m.isFinal)
-                .length >= 3
-            ) {
-              setOfferMeet(true);
+            if (!isUser) setCaption(last.text);
+            if (isUser) {
+              pendingReplyRef.current = true;
+              window.clearTimeout(thinkTimerRef.current);
+              thinkTimerRef.current = window.setTimeout(() => {
+                if (pendingReplyRef.current && stateRef.current === "listening") {
+                  setState("thinking");
+                }
+              }, 280);
+              window.clearTimeout(holdTimerRef.current);
+              holdTimerRef.current = window.setTimeout(() => {
+                if (
+                  activeRef.current &&
+                  pendingReplyRef.current &&
+                  stateRef.current === "thinking"
+                ) {
+                  pendingReplyRef.current = false;
+                  setState("listening");
+                }
+              }, 5000);
             }
           }
         },
         onError: (err) => {
-          const message =
-            err instanceof Error ? err.message : "Speko voice error";
+          const message = err instanceof Error ? err.message : "Speko voice error";
           setErrMsg(message);
-          setTranscript(message);
+          setCaption("");
           setState("error");
           activeRef.current = false;
           void hangup();
@@ -227,22 +341,28 @@ export default function CaseyPanel() {
         },
       });
 
+      if (!activeRef.current) {
+        try {
+          await conv.endSession();
+        } catch {
+          /* ignore */
+        }
+        return;
+      }
       convRef.current = conv;
-      await startMicWave();
-      setState("listening");
-      setTranscript("Listening… go ahead.");
+      setState((s) => (s === "requesting_mic" ? "listening" : s));
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Could not start Casey";
       setErrMsg(msg);
-      setTranscript(msg);
       activeRef.current = false;
       await hangup();
       setState("error");
     }
-  }, [hangup, pushTurn, startMicWave]);
+  }, [hangup, pushTurn]);
 
   const unmute = useCallback(async () => {
     try {
+      await audioCtxRef.current?.resume();
       await convRef.current?.startAudioPlayback();
       setNeedsUnmute(false);
     } catch {
@@ -250,41 +370,193 @@ export default function CaseyPanel() {
     }
   }, []);
 
-  const busy = state === "connecting";
+  useEffect(() => () => window.clearTimeout(copyTimerRef.current), []);
+
+  const bookDave = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
+    const modified =
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey;
+    if (modified) return;
+    // A scripted tab is cancellable. If the browser blocks it, leave the
+    // anchor's own https navigation in place and show in-page mail options.
+    if (openComposeTab(GMAIL_HREF)) {
+      event.preventDefault();
+      setMailOptions(false);
+      return;
+    }
+    setMailOptions(true);
+  }, []);
+
+  const copyDave = useCallback(async () => {
+    const ok = await writeClipboard(DAVE_EMAIL);
+    setCopied(ok);
+    setCopyFailed(!ok);
+    window.clearTimeout(copyTimerRef.current);
+    if (ok) {
+      copyTimerRef.current = window.setTimeout(() => setCopied(false), 2000);
+    }
+  }, []);
+
+  const busy = state === "requesting_mic";
 
   return (
-    <div className={`panel state-${state}`}>
-      <div className="wave" aria-hidden>
-        {levels.map((h, i) => (
-          <span key={i} style={{ ["--h" as string]: h }} />
-        ))}
+    <main
+      className={live ? "room room--live" : state === "idle" ? "room room--idle" : "room"}
+      data-state={state}
+    >
+      <header className="top">
+        <div className="brand">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="Aidvance" />
+        </div>
+        <p className="mark">Preview</p>
+      </header>
+
+      <div className="stage">
+        <div className="presence">
+          {state === "idle" ? (
+            <h1 className="heart">Is AI right for your business?</h1>
+          ) : null}
+          <div className="viz-switch" role="group" aria-label="Presence style">
+            <button
+              type="button"
+              className={presence === "bars" ? "is-on" : ""}
+              aria-pressed={presence === "bars"}
+              onClick={() => setPresence("bars")}
+            >
+              Bars
+            </button>
+            <span aria-hidden="true">|</span>
+            <button
+              type="button"
+              className={presence === "line" ? "is-on" : ""}
+              aria-pressed={presence === "line"}
+              onClick={() => setPresence("line")}
+            >
+              Line
+            </button>
+            <span aria-hidden="true">|</span>
+            <button
+              type="button"
+              className={presence === "circle" ? "is-on" : ""}
+              aria-pressed={presence === "circle"}
+              onClick={() => setPresence("circle")}
+            >
+              Circle
+            </button>
+          </div>
+          <PresenceVisual state={state} analyser={analyser} mode={presence} />
+        </div>
       </div>
-      <p className="status">{LABELS[state]}</p>
-      <p className="transcript">{transcript}</p>
-      {errMsg && state === "error" ? <p className="err">{errMsg}</p> : null}
-      {needsUnmute ? (
-        <button type="button" className="talk" onClick={() => void unmute()}>
-          Tap to unmute Casey
-        </button>
-      ) : null}
-      <button
-        type="button"
-        className="talk"
-        onClick={() => void startCall()}
-        disabled={busy}
-        aria-pressed={state !== "idle" && state !== "error"}
-      >
-        {BTN[state]}
-      </button>
-      {offerMeet ? (
-        <a className="meet" href="#meet">
-          If that helped — book Dave →
-        </a>
-      ) : null}
-      <p className="hint">
-        Bar-personality preview · same Speko voice · production / live agent
-        untouched
-      </p>
-    </div>
+
+      <div className="dock">
+        {STATUS[state] ? (
+          <p className="status" role="status" aria-live="polite" key={state}>
+            {STATUS[state]}
+          </p>
+        ) : null}
+
+        {caption && state !== "idle" && state !== "error" ? (
+          <p className="caption" aria-live="polite">
+            {caption}
+          </p>
+        ) : null}
+
+        {state === "error" ? (
+          <div className="callout" role="alert">
+            <p>{errMsg || "Something went sideways."}</p>
+            <button type="button" className="talk" onClick={() => void startCall()}>
+              <span className="talk-label" key="try">
+                Try again
+              </span>
+            </button>
+          </div>
+        ) : needsUnmute ? (
+          <button type="button" className="talk" onClick={() => void unmute()}>
+            <span className="talk-label" key="unmute">
+              Tap to unmute
+            </span>
+          </button>
+        ) : state === "done" ? (
+          <a
+            className="book"
+            href={GMAIL_HREF}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={bookDave}
+            aria-expanded={mailOptions}
+            aria-controls="dave-mail-options"
+          >
+            {DAVE_LABEL}
+          </a>
+        ) : (
+          <button
+            type="button"
+            className="talk"
+            onClick={() => void startCall()}
+            disabled={busy}
+            aria-pressed={live}
+          >
+            <span className="talk-label" key={BTN[state]}>
+              {BTN[state]}
+            </span>
+          </button>
+        )}
+
+        {state === "done" && mailOptions ? (
+          <div
+            className="mail-options"
+            id="dave-mail-options"
+            role="group"
+            aria-label="Other ways to email Dave"
+          >
+            {copyFailed ? <p className="mail-address">{DAVE_EMAIL}</p> : null}
+            <button type="button" className="mail-option" onClick={() => void copyDave()}>
+              {copied ? "Copied" : "Copy Dave’s email"}
+            </button>
+            <span className="mail-dot" aria-hidden="true">
+              ·
+            </span>
+            <a className="mail-option" href={GMAIL_HREF} target="_blank" rel="noopener noreferrer">
+              Gmail
+            </a>
+            <span className="mail-dot" aria-hidden="true">
+              ·
+            </span>
+            <a
+              className="mail-option"
+              href={OUTLOOK_HREF}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Outlook
+            </a>
+            <span className="mail-dot" aria-hidden="true">
+              ·
+            </span>
+            <a className="mail-option" href={MAILTO_HREF}>
+              Mail app
+            </a>
+          </div>
+        ) : null}
+
+        {state === "done" ? (
+          <button type="button" className="again" onClick={() => void startCall()}>
+            Talk again
+          </button>
+        ) : null}
+
+        {needsUnmute ? (
+          <button type="button" className="quiet" onClick={() => void startCall()}>
+            Stop
+          </button>
+        ) : null}
+
+        <p className="trust">Casey is AI. The mic stays in your browser.</p>
+      </div>
+    </main>
   );
 }

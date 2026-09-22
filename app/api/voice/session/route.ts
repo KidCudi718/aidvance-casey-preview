@@ -4,14 +4,13 @@ import { CASEY_OPENER } from "../../../../lib/caseyVoicePrompt";
 export const runtime = "nodejs";
 
 /**
- * Mint Speko transport for preview Casey.
- * Uses a dedicated bar-preview Speko agent (s2s + marin) — NOT the live aidvance.xyz agent.
- * Speko client "overrides" are a documented no-op; personality lives on the bar agent itself.
+ * Mint Speko transport for Casey on aidvance.xyz.
+ * Default: live Aidvance (Web) agent (marin + locked mold). Override with SPEKO_AGENT_ID if needed.
  */
 export async function POST() {
   const apiKey = process.env.SPEKO_API_KEY;
-  // Default is the bar-preview agent (marin s2s). Never fall back to the live web agent.
-  const agentId = process.env.SPEKO_AGENT_ID || "agent_5809b0a36bb74006";
+  // Production default = live web Casey. Bar preview agent stays available via SPEKO_AGENT_ID override.
+  const agentId = process.env.SPEKO_AGENT_ID || "agent_881e018fd3a54815";
   const apiBase = (
     process.env.SPEKO_API_BASE || "https://api.speko.dev/v1"
   ).replace(/\/$/, "");
@@ -20,7 +19,7 @@ export async function POST() {
     return NextResponse.json(
       {
         error: "misconfigured",
-        message: "SPEKO_API_KEY is not set on this preview.",
+        message: "SPEKO_API_KEY is not set.",
       },
       { status: 500 }
     );
