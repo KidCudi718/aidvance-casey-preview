@@ -11,7 +11,7 @@ const STATUS: Record<State, string> = {
   idle: "",
   requesting_mic: "Allow microphone…",
   listening: "Listening…",
-  thinking: "One second…",
+  thinking: "",
   speaking: "Casey is talking…",
   done: "That’s the conversation.",
   error: "",
@@ -412,7 +412,6 @@ export default function CaseyPanel() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="Aidvance" />
         </div>
-        <p className="mark">Preview</p>
       </header>
 
       <div className="stage">
@@ -506,6 +505,18 @@ export default function CaseyPanel() {
           </button>
         )}
 
+        {live || state === "listening" || state === "thinking" || state === "speaking" ? (
+          <a
+            className="book book--live"
+            href={GMAIL_HREF}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={bookDave}
+          >
+            {DAVE_LABEL}
+          </a>
+        ) : null}
+
         {state === "done" && mailOptions ? (
           <div
             className="mail-options"
@@ -555,7 +566,6 @@ export default function CaseyPanel() {
           </button>
         ) : null}
 
-        <p className="trust">Casey is AI. The mic stays in your browser.</p>
       </div>
     </main>
   );

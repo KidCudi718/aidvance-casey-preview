@@ -431,3 +431,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* Mid-call Book Dave — stays on while Speko call is live; does not end the call */
+.book--live {
+  margin-top: 12px;
+  background: transparent;
+  color: var(--paper);
+  border: 1px solid color-mix(in srgb, var(--paper) 55%, transparent);
+}
+.book--live:hover {
+  background: color-mix(in srgb, var(--paper) 10%, transparent);
+  color: var(--paper);
+}

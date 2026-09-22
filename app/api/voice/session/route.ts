@@ -90,7 +90,7 @@ export async function POST() {
       agentId,
       sessionId: data.sessionId ?? null,
       opener: CASEY_OPENER,
-      note: "Bar-preview Speko agent (s2s marin) — live aidvance.xyz Speko agent untouched.",
+      note: "Aidvance production Speko session.",
     });
   } catch (e) {
     console.error("speko session mint error", e);
