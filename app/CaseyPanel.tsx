@@ -31,8 +31,6 @@ type Turn = { role: "user" | "assistant"; text: string; at: number };
 
 const DAVE_LABEL = "Book a FREE 15 Minute Chat with Dave";
 const DAVE_EMAIL = "david.choukroun2@gmail.com";
-// Mid-call Book only. Empty sms: URL — no ?body=, so Messages opens with no canned pitch.
-const DAVE_SMS_HREF = "sms:+17188690404";
 const DAVE_BODY =
   "Hi Dave,\n\nI'd like to book a FREE 15 minute chat. A time that works for me:\n\n";
 
@@ -117,6 +115,7 @@ export default function CaseyPanel() {
   const [mailOptions, setMailOptions] = useState(false);
   const [copied, setCopied] = useState(false);
   const [copyFailed, setCopyFailed] = useState(false);
+  const [bookNoted, setBookNoted] = useState(false);
 
   const stateRef = useRef<State>("idle");
   const activeRef = useRef(false);
@@ -215,6 +214,7 @@ export default function CaseyPanel() {
     setMailOptions(false);
     setCopied(false);
     setCopyFailed(false);
+    setBookNoted(false);
     window.clearTimeout(copyTimerRef.current);
     turnsRef.current = [];
     pendingReplyRef.current = false;
@@ -372,8 +372,8 @@ export default function CaseyPanel() {
     }
   }, []);
 
-  // Opening SMS backgrounds this tab (especially iOS) and the browser suspends
-  // Speko playback. Coming back should resume audio. This does not end the call.
+  // If the tab is backgrounded, iOS suspends Speko playback. Coming back
+  // resumes audio. This does not end the call.
   useEffect(() => {
     if (!live) return;
 
@@ -527,9 +527,15 @@ export default function CaseyPanel() {
         )}
 
         {live ? (
-          <a className="book book--live" href={DAVE_SMS_HREF}>
+          <button type="button" className="book book--live" onClick={() => setBookNoted(true)}>
             {DAVE_LABEL}
-          </a>
+          </button>
+        ) : null}
+
+        {live && bookNoted ? (
+          <p className="book-note" role="status">
+            Got it — booking link in the morning. Stay on the call.
+          </p>
         ) : null}
 
         {state === "done" && mailOptions ? (
