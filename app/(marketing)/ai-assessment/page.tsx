@@ -4,7 +4,7 @@ import BookDave from "../../BookDave";
 export const metadata: Metadata = {
   title: "AI Assessment · Aidvance",
   description:
-    "Ninety minutes inside the business, then a clear map of where AI belongs, where it doesn’t, and what to do first.",
+    "Ninety minutes inside the business, then a clear picture of where AI belongs, where it doesn’t, and what to do first.",
 };
 
 const STEPS = [
@@ -20,7 +20,7 @@ const STEPS = [
   },
 ] as const;
 
-const TILES = [
+const GAINS = [
   {
     title: "Clear Map",
     body: "Where the friction is and what matters most.",
@@ -39,135 +39,89 @@ const TILES = [
   },
 ] as const;
 
+const SAMPLE = [
+  ["Finding", "Follow-up lives in one person’s inbox."],
+  ["Why it matters", "Leads go quiet when that person is in a meeting."],
+  ["Recommendation", "A morning view of who is waiting, before anyone asks."],
+  ["Priority", "Do first"],
+  ["What not to do", "Don’t buy a new system to fix a reminder problem."],
+] as const;
+
 export default function AiAssessmentPage() {
   return (
-    <main className="assess">
-      <section className="assess-hero">
-        <div className="assess-col assess-center">
-          <h1>What actually is an AI Assessment?</h1>
-          <p>
-            We spend 90 minutes learning how your business actually works, then show you where AI
-            belongs, where it doesn’t, and what to do first.
-          </p>
-          <div className="assess-cta">
-            <BookDave />
-          </div>
-          <p className="assess-aside">
-            No generic AI playbook. This is built around your actual business.
-          </p>
-        </div>
+    <main className="m-wrap">
+      <p className="m-kicker">AI Assessment</p>
+      <h1 className="m-title">What actually is an AI Assessment?</h1>
+      <p className="m-lead">
+        We spend 90 minutes learning how your business actually works, then show you where AI
+        belongs, where it doesn’t, and what to do first.
+      </p>
+
+      <div className="m-cta">
+        <BookDave />
+      </div>
+      <p className="m-copy">No generic AI playbook. This is built around your actual business.</p>
+
+      <section className="m-case" aria-labelledby="how-heading">
+        <h2 className="m-headline" id="how-heading">
+          How it works
+        </h2>
+        <ol className="m-grid m-deliver">
+          {STEPS.map((step) => (
+            <li key={step.n} className="m-card">
+              <span className="m-index">{step.n}</span>
+              <h2>{step.title}</h2>
+              <p>{step.body}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
-      <section className="assess-band" aria-labelledby="how-heading">
-        <div className="assess-wide">
-          <h2 id="how-heading">How it works</h2>
-          <ol className="assess-steps">
-            {STEPS.map((step) => (
-              <li key={step.n}>
-                <span className="assess-num">{step.n}</span>
-                <h3>{step.title}</h3>
-                <p>{step.body}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
+      <section className="m-case" aria-labelledby="get-heading">
+        <h2 className="m-headline" id="get-heading">
+          What you get
+        </h2>
+        <ul className="m-grid m-deliver">
+          {GAINS.map((item) => (
+            <li key={item.title} className="m-card">
+              <h2>{item.title}</h2>
+              <p>{item.body}</p>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      <section className="assess-plain" aria-labelledby="get-heading">
-        <div className="assess-wide">
-          <h2 id="get-heading">What you get</h2>
-          <ul className="assess-tiles">
-            {TILES.map((tile) => (
-              <li key={tile.title}>
-                <h3>{tile.title}</h3>
-                <p>{tile.body}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <p className="m-aside">
+        Sometimes the answer is AI. Sometimes it’s automation. Sometimes the smartest move is to
+        leave it alone.
+      </p>
+      <p className="m-copy">
+        The goal is not to sell you more technology. The goal is to show you what is actually worth
+        fixing.
+      </p>
+
+      <section className="m-case" aria-labelledby="sample-heading">
+        <h2 className="m-headline" id="sample-heading">
+          This is what clarity looks like.
+        </h2>
+        <article className="m-card">
+          <p className="m-kicker">Sample</p>
+          {SAMPLE.map(([label, value]) => (
+            <p key={label}>
+              <span className="work-label">{label}</span>
+              <br />
+              {value}
+            </p>
+          ))}
+        </article>
       </section>
 
-      <section className="assess-band assess-philosophy" aria-label="What the answer can be">
-        <div className="assess-col">
-          <p className="assess-statement">
-            Sometimes the answer is AI.
-            <br />
-            Sometimes it’s automation.
-            <br />
-            Sometimes the smartest move is to leave it alone.
-          </p>
-          <p className="assess-under">
-            The goal is not to sell you more technology. The goal is to show you what is actually
-            worth fixing.
-          </p>
-        </div>
-      </section>
-
-      <section className="assess-plain" aria-labelledby="sample-heading">
-        <div className="assess-wide">
-          <h2 id="sample-heading">This is what clarity looks like.</h2>
-          <figure className="assess-mock">
-            <figcaption>Sample deliverable</figcaption>
-            <div className="assess-doc">
-              <div className="assess-doc-bar">
-                <span>Finding 01</span>
-                <span>Sample</span>
-              </div>
-              <dl>
-                <div>
-                  <dt>Finding</dt>
-                  <dd>Follow-up lives in one person’s inbox.</dd>
-                </div>
-                <div>
-                  <dt>Why it matters</dt>
-                  <dd>Leads go quiet when that person is in a meeting.</dd>
-                </div>
-                <div>
-                  <dt>Recommendation</dt>
-                  <dd>A morning view of who is waiting, before anyone asks.</dd>
-                </div>
-                <div>
-                  <dt>Priority</dt>
-                  <dd>
-                    <span className="assess-priority">Do first</span>
-                  </dd>
-                </div>
-                <div>
-                  <dt>What not to do</dt>
-                  <dd>Don’t buy a new system to fix a reminder problem.</dd>
-                </div>
-              </dl>
-              <div className="assess-doc-next" aria-hidden="true">
-                <div className="assess-doc-bar">
-                  <span>Finding 02</span>
-                  <span>Sample</span>
-                </div>
-                <dl>
-                  <div>
-                    <dt>Finding</dt>
-                    <dd>The same status gets typed into three places.</dd>
-                  </div>
-                  <div>
-                    <dt>Why it matters</dt>
-                    <dd>The copies drift, and nobody trusts the latest one.</dd>
-                  </div>
-                </dl>
-              </div>
-            </div>
-          </figure>
-        </div>
-      </section>
-
-      <section className="assess-band assess-close">
-        <div className="assess-col">
-          <p className="assess-close-line">
-            Know where the leaks are before you spend money fixing the wrong ones.
-          </p>
-          <div className="assess-cta">
-            <BookDave />
-          </div>
-        </div>
-      </section>
+      <p className="m-aside">
+        Know where the leaks are before you spend money fixing the wrong ones.
+      </p>
+      <div className="m-cta">
+        <BookDave />
+      </div>
     </main>
   );
 }
