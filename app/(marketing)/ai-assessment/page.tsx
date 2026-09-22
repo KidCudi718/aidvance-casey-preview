@@ -1,111 +1,78 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import BookDave from "../../BookDave";
 
 export const metadata: Metadata = {
   title: "AI Assessment · Aidvance",
   description:
-    "A $999 AI assessment: about 90 minutes inside the business, then a written automation roadmap.",
+    "About 90 minutes inside the business, then a written AI and automation roadmap.",
 };
 
-const DELIVERABLES = [
+const ROADMAP = [
   {
-    index: "01",
-    title: "What could improve",
-    body: "Where time, attention, leads, or information are getting lost.",
+    when: "Immediate",
+    body: "The first change. The one that matters now.",
   },
   {
-    index: "02",
-    title: "What is not worth automating",
-    body: "The work a new tool would complicate, or that should stay as it is.",
+    when: "Next",
+    body: "What follows once that change is in place.",
   },
   {
-    index: "03",
-    title: "What to do first",
-    body: "A priority order, so the first change is the one that matters.",
-  },
-  {
-    index: "04",
-    title: "Tools and capabilities you may already have",
-    body: "What is already in the business, before anyone buys something new.",
-  },
-  {
-    index: "05",
-    title: "What needs implementation",
-    body: "The pieces that need a specialist to put in place.",
-  },
-  {
-    index: "06",
-    title: "What should stay human",
-    body: "The judgment, the relationships, and the exceptions that should not be automated.",
-  },
-] as const;
-
-const STEPS = [
-  {
-    index: "01",
-    title: "Discovery call",
-    body: "About 90 minutes inside the business, on how the work actually moves.",
-  },
-  {
-    index: "02",
-    title: "Analysis",
-    body: "We separate what could improve from what is not worth automating.",
-  },
-  {
-    index: "03",
-    title: "Written Assessment",
-    body: "The roadmap: what first, what to leave alone, what to implement, what stays human.",
-  },
-  {
-    index: "04",
-    title: "Walkthrough",
-    body: "We go through the findings together. The document stays with you.",
+    when: "Later",
+    body: "What a specialist implements, and what stays with a person.",
   },
 ] as const;
 
 export default function AiAssessmentPage() {
   return (
     <main className="m-wrap">
-      <p className="m-kicker">AI Assessment · $999</p>
-      <h1 className="m-title">A written roadmap.</h1>
+      <p className="m-kicker">AI Assessment</p>
+      <h1 className="m-title">A written roadmap for the business.</h1>
       <p className="m-lead">
-        About 90 minutes inside the business, then a written AI and automation roadmap. $999.
+        About 90 minutes inside the business, then a written AI and automation roadmap you can
+        hold.
       </p>
 
-      <div className="m-cta m-cta-early">
-        <Link className="talk m-talk" href="/#casey">
-          Talk to Casey
-        </Link>
-        <BookDave />
-      </div>
+      <figure className="roadmap">
+        <figcaption>Sample of the roadmap</figcaption>
+        <ol>
+          {ROADMAP.map((step, index) => (
+            <li key={step.when}>
+              <span className="roadmap-n">{index + 1}</span>
+              <span className="roadmap-when">{step.when}</span>
+              <p>{step.body}</p>
+            </li>
+          ))}
+        </ol>
+      </figure>
 
-      <ul className="m-grid m-deliver">
-        {DELIVERABLES.map((item) => (
-          <li key={item.index} className="m-card">
-            <span className="m-index">{item.index}</span>
-            <h2>{item.title}</h2>
-            <p>{item.body}</p>
+      <section className="m-guide" aria-labelledby="how-heading">
+        <h2 id="how-heading">How it goes</h2>
+        <ol>
+          <li>
+            <h3>The call</h3>
+            <p>
+              About 90 minutes. We sit inside the business and follow how the work actually moves:
+              the handoffs, the inbox, the desk, the load.
+            </p>
           </li>
-        ))}
-      </ul>
-
-      <ol className="m-grid m-flow">
-        {STEPS.map((step) => (
-          <li key={step.index} className="m-card">
-            <span className="m-index">{step.index}</span>
-            <h2>{step.title}</h2>
-            <p>{step.body}</p>
+          <li>
+            <h3>What you get in writing</h3>
+            <p>
+              A roadmap in plain English. What could improve. What is not worth automating. What to
+              do first. Tools and capabilities you may already have. What needs a specialist. What
+              should stay human. The shape is the one above: Immediate, then Next, then Later.
+            </p>
           </li>
-        ))}
-      </ol>
-
-      <p className="m-aside">No obligation to implement anything with us.</p>
+          <li>
+            <h3>The walkthrough</h3>
+            <p>
+              We go through the findings with you, in that order. You leave with the document.
+            </p>
+          </li>
+        </ol>
+      </section>
 
       <div className="m-cta">
-        <Link className="talk m-talk" href="/#casey">
-          Talk to Casey
-        </Link>
         <BookDave />
       </div>
     </main>

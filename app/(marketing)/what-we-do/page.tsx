@@ -39,16 +39,9 @@ export default function WhatWeDoPage() {
         </li>
       </ol>
 
-      <p className="m-aside">
-        When a simple prototype or proof helps make the idea tangible, we may build one.
-      </p>
-
-      <div className="m-doors">
-        <Link className="talk m-talk" href="/#casey">
-          Talk to Casey
-        </Link>
-        <Link className="m-textlink" href="/work">
-          See the work
+      <div className="m-after">
+        <Link className="talk m-talk" href="/work">
+          See the Work
         </Link>
       </div>
     </main>

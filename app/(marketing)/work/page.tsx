@@ -4,8 +4,7 @@ import BookDave from "../../BookDave";
 
 export const metadata: Metadata = {
   title: "Work · Aidvance",
-  description:
-    "Morning Desk is a sales dashboard built on your email inbox. Try the sample. Nothing sends for real.",
+  description: "Morning Desk is a sales dashboard built on your email inbox.",
 };
 
 const DESK = "/work/morning-desk";
@@ -26,24 +25,30 @@ export default function WorkPage() {
             tabIndex={-1}
             aria-hidden="true"
           />
-          <Link className="work-preview-hit" href={DESK}>
-            Click around the sample desk
-          </Link>
         </div>
 
-        <p className="work-try">Try it. Don’t worry. Nothing sends for real.</p>
-
         <Link className="talk m-talk work-open" href={DESK}>
-          Open Morning Desk — click around
+          Open Morning Desk
         </Link>
+        <p className="work-try">Nothing sends for real.</p>
       </article>
 
       <div className="m-cta">
-        <Link className="talk m-talk" href="/#casey">
-          Talk to Casey
-        </Link>
         <BookDave />
       </div>
+
+      <section className="work-watch" aria-labelledby="watch-heading">
+        <h2 id="watch-heading">Watch how Morning Desk works</h2>
+        <video
+          className="work-video"
+          controls
+          playsInline
+          preload="metadata"
+          src="/videos/morning-desk.mp4"
+        >
+          Your browser can’t play this video.
+        </video>
+      </section>
     </main>
   );
 }
