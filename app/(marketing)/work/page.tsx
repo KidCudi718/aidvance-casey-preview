@@ -36,9 +36,10 @@ export default function WorkPage() {
             <li key={label}>{label}</li>
           ))}
         </ul>
+        <p className="m-copy">The interactive desk is being moved onto this site.</p>
         <p className="m-demo">
           <Link className="m-textlink" href="/work/morning-desk">
-            Explore the demo
+            Morning Desk
           </Link>
         </p>
       </article>
