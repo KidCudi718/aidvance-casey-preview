@@ -8,7 +8,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
       <div className="m-main">{children}</div>
       <footer className="m-foot">
         <p className="m-foot-heart">Is AI right for your business?</p>
-        <Link className="m-textlink" href="/#casey">
+        <Link className="talk m-foot-talk" href="/#casey">
           Talk to Casey
         </Link>
       </footer>

@@ -1,111 +1,125 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import BookDave from "../../BookDave";
 
 export const metadata: Metadata = {
   title: "AI Assessment · Aidvance",
   description:
-    "A $999 AI assessment: about 90 minutes inside the business, then a written automation roadmap.",
+    "Ninety minutes inside the business, then a clear picture of where AI belongs, where it doesn’t, and what to do first.",
 };
-
-const DELIVERABLES = [
-  {
-    index: "01",
-    title: "What could improve",
-    body: "Where time, attention, leads, or information are getting lost.",
-  },
-  {
-    index: "02",
-    title: "What is not worth automating",
-    body: "The work a new tool would complicate, or that should stay as it is.",
-  },
-  {
-    index: "03",
-    title: "What to do first",
-    body: "A priority order, so the first change is the one that matters.",
-  },
-  {
-    index: "04",
-    title: "Tools and capabilities you may already have",
-    body: "What is already in the business, before anyone buys something new.",
-  },
-  {
-    index: "05",
-    title: "What needs implementation",
-    body: "The pieces that need a specialist to put in place.",
-  },
-  {
-    index: "06",
-    title: "What should stay human",
-    body: "The judgment, the relationships, and the exceptions that should not be automated.",
-  },
-] as const;
 
 const STEPS = [
   {
-    index: "01",
-    title: "Discovery call",
-    body: "About 90 minutes inside the business, on how the work actually moves.",
+    n: "01",
+    title: "We get inside the business",
+    body: "We walk through the real operation. Leads, email, follow-up, handoffs, repeated work, bottlenecks, and the things that still depend on someone remembering.",
   },
   {
-    index: "02",
-    title: "Analysis",
-    body: "We separate what could improve from what is not worth automating.",
+    n: "02",
+    title: "We do the analysis",
+    body: "We break down what you showed us, identify the real friction, and determine what actually deserves AI, automation, an agent, or nothing at all.",
+  },
+] as const;
+
+const GAINS = [
+  {
+    title: "Clear Map",
+    body: "Where the friction is and what matters most.",
   },
   {
-    index: "03",
-    title: "Written Assessment",
-    body: "The roadmap: what first, what to leave alone, what to implement, what stays human.",
+    title: "Specific Recommendations",
+    body: "What should change and what type of solution fits.",
   },
   {
-    index: "04",
-    title: "Walkthrough",
-    body: "We go through the findings together. The document stays with you.",
+    title: "Easy Wins",
+    body: "Simple fixes your team can implement now.",
   },
+  {
+    title: "Bigger Opportunities",
+    body: "Anything that needs a real build, clearly scoped before you decide.",
+  },
+] as const;
+
+const SAMPLE = [
+  ["Finding", "Follow-up lives in one person’s inbox."],
+  ["Why it matters", "Leads go quiet when that person is in a meeting."],
+  ["Recommendation", "A morning view of who is waiting, before anyone asks."],
+  ["Priority", "Do first"],
+  ["What not to do", "Don’t buy a new system to fix a reminder problem."],
 ] as const;
 
 export default function AiAssessmentPage() {
   return (
     <main className="m-wrap">
-      <p className="m-kicker">AI Assessment · $999</p>
-      <h1 className="m-title">A written roadmap.</h1>
+      <p className="m-kicker">AI Assessment</p>
+      <h1 className="m-title">What actually is an AI Assessment?</h1>
       <p className="m-lead">
-        About 90 minutes inside the business, then a written AI and automation roadmap. $999.
+        We spend 90 minutes learning how your business actually works, then show you where AI
+        belongs, where it doesn’t, and what to do first.
       </p>
 
-      <div className="m-cta m-cta-early">
-        <Link className="talk m-talk" href="/#casey">
-          Talk to Casey
-        </Link>
+      <div className="m-cta">
         <BookDave />
       </div>
+      <p className="m-copy">No generic AI playbook. This is built around your actual business.</p>
 
-      <ul className="m-grid m-deliver">
-        {DELIVERABLES.map((item) => (
-          <li key={item.index} className="m-card">
-            <span className="m-index">{item.index}</span>
-            <h2>{item.title}</h2>
-            <p>{item.body}</p>
-          </li>
-        ))}
-      </ul>
+      <section className="m-case" aria-labelledby="how-heading">
+        <h2 className="m-headline" id="how-heading">
+          How it works
+        </h2>
+        <ol className="m-grid m-deliver">
+          {STEPS.map((step) => (
+            <li key={step.n} className="m-card">
+              <span className="m-index">{step.n}</span>
+              <h2>{step.title}</h2>
+              <p>{step.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
 
-      <ol className="m-grid m-flow">
-        {STEPS.map((step) => (
-          <li key={step.index} className="m-card">
-            <span className="m-index">{step.index}</span>
-            <h2>{step.title}</h2>
-            <p>{step.body}</p>
-          </li>
-        ))}
-      </ol>
+      <section className="m-case" aria-labelledby="get-heading">
+        <h2 className="m-headline" id="get-heading">
+          What you get
+        </h2>
+        <ul className="m-grid m-deliver">
+          {GAINS.map((item) => (
+            <li key={item.title} className="m-card">
+              <h2>{item.title}</h2>
+              <p>{item.body}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-      <p className="m-aside">No obligation to implement anything with us.</p>
+      <p className="m-aside">
+        Sometimes the answer is AI. Sometimes it’s automation. Sometimes the smartest move is to
+        leave it alone.
+      </p>
+      <p className="m-copy">
+        The goal is not to sell you more technology. The goal is to show you what is actually worth
+        fixing.
+      </p>
 
+      <section className="m-case" aria-labelledby="sample-heading">
+        <h2 className="m-headline" id="sample-heading">
+          This is what clarity looks like.
+        </h2>
+        <article className="m-card">
+          <p className="m-kicker">Sample</p>
+          {SAMPLE.map(([label, value]) => (
+            <p key={label}>
+              <span className="work-label">{label}</span>
+              <br />
+              {value}
+            </p>
+          ))}
+        </article>
+      </section>
+
+      <p className="m-aside">
+        Know where the leaks are before you spend money fixing the wrong ones.
+      </p>
       <div className="m-cta">
-        <Link className="talk m-talk" href="/#casey">
-          Talk to Casey
-        </Link>
         <BookDave />
       </div>
     </main>

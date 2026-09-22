@@ -840,7 +840,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .m-foot {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 16px 28px;
   width: min(1120px, 100%);
@@ -855,6 +855,21 @@ button, a { -webkit-tap-highlight-color: transparent; }
   font-size: clamp(1.4rem, 3vw, 1.8rem);
   letter-spacing: -0.03em;
   line-height: 1.1;
+}
+
+.m-foot-talk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 220px;
+  flex: none;
+  text-decoration: none;
+}
+
+.m-after {
+  display: flex;
+  margin-top: 28px;
 }
 
 .m-page:has(.desk-host) .m-foot { display: none; }
@@ -970,23 +985,25 @@ button, a { -webkit-tap-highlight-color: transparent; }
   pointer-events: none;
 }
 
-.work-preview-hit {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: flex-start;
-  padding: 12px 14px;
-  background: linear-gradient(to bottom, rgba(5, 5, 5, 0.55), rgba(5, 5, 5, 0) 72px);
-  color: var(--paper);
-  text-decoration: none;
-  font-family: var(--font-mono), "IBM Plex Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+.work-watch {
+  margin-top: 56px;
 }
 
-.work-preview-hit:hover {
-  background: linear-gradient(to bottom, rgba(5, 5, 5, 0.72), rgba(5, 5, 5, 0) 96px);
+.work-watch h2 {
+  margin: 0 0 16px;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.8rem, 3.4vw, 2.4rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.work-video {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #000;
+  border: 1px solid rgba(244, 244, 242, 0.2);
 }
 
 .work-chips {
@@ -1044,6 +1061,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
     flex: 1 0 100%;
   }
   .m-steps,
+  .m-deliver,
   .m-flow,
   .m-facts,
   .m-split,
