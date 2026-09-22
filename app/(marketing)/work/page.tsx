@@ -5,67 +5,38 @@ import BookDave from "../../BookDave";
 export const metadata: Metadata = {
   title: "Work · Aidvance",
   description:
-    "Proof after we listen, judge, and recommend: try Morning Desk, a sales dashboard on the inbox, and a freight assessment that recommended not building.",
+    "Morning Desk is a sales dashboard built on your email inbox. Try the sample. Nothing sends for real.",
 };
 
 const DESK = "/work/morning-desk";
-const CHIPS = ["Waiting", "Promises", "Quiet", "New business"] as const;
 
 export default function WorkPage() {
   return (
     <main className="m-wrap">
       <p className="m-kicker">Work</p>
-      <h1 className="m-title">Here is the proof.</h1>
-      <p className="m-lead">After we listen, judge, and recommend, here is the proof.</p>
+      <h1 className="m-title">Morning Desk</h1>
+      <p className="work-sub">A sales dashboard built on your email inbox</p>
+      <p className="m-lead">Imagine if you could talk to your email — and it could talk back.</p>
 
-      <div className="work-grid">
-        <article className="m-card work-card">
-          <p className="m-kicker">Something we built</p>
-          <h2>Morning Desk</h2>
-          <p className="work-sub">A sales dashboard built on your email inbox</p>
-
-          <div className="work-preview">
-            <iframe
-              title="Preview of Morning Desk"
-              src="/work/morning-desk/app/index.html"
-              tabIndex={-1}
-              aria-hidden="true"
-            />
-            <Link className="work-preview-hit" href={DESK}>
-              Click around the sample desk
-            </Link>
-          </div>
-
-          <p className="work-line">Waiting, promises, gone quiet, and new business already in the mail.</p>
-          <p className="work-try">Try it. Nothing sends for real.</p>
-
-          <ul className="work-chips">
-            {CHIPS.map((chip) => (
-              <li key={chip}>
-                <Link href={DESK}>{chip}</Link>
-              </li>
-            ))}
-          </ul>
-
-          <Link className="talk m-talk work-open" href={DESK}>
-            Open Morning Desk — click around
+      <article className="m-card work-card work-hero">
+        <div className="work-preview">
+          <iframe
+            title="Preview of Morning Desk"
+            src="/work/morning-desk/app/index.html"
+            tabIndex={-1}
+            aria-hidden="true"
+          />
+          <Link className="work-preview-hit" href={DESK}>
+            Click around the sample desk
           </Link>
-        </article>
+        </div>
 
-        <article className="m-card work-card">
-          <p className="m-kicker">Something we told them not to build</p>
-          <h2>Freight Brokerage Assessment</h2>
-          <p className="work-sub">Diagnose first. Skip the expensive build.</p>
-          <p className="work-label">What they assumed</p>
-          <p className="work-note">One workflow was the obvious thing to automate.</p>
-          <p className="work-label">What we found</p>
-          <p className="work-note">The bigger opportunity was elsewhere.</p>
-          <p className="work-label">What we said</p>
-          <p className="work-note">
-            Skip the expensive integration. Start with simpler changes, using tools they already had.
-          </p>
-        </article>
-      </div>
+        <p className="work-try">Try it. Don’t worry. Nothing sends for real.</p>
+
+        <Link className="talk m-talk work-open" href={DESK}>
+          Open Morning Desk — click around
+        </Link>
+      </article>
 
       <div className="m-cta">
         <Link className="talk m-talk" href="/#casey">

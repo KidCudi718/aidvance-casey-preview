@@ -889,6 +889,18 @@ button, a { -webkit-tap-highlight-color: transparent; }
   align-items: stretch;
 }
 
+.work-hero { margin-top: 28px; }
+
+.m-wrap > .work-sub {
+  margin: 18px 0 0;
+  max-width: 36rem;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.35;
+  color: rgba(244, 244, 242, 0.72);
+}
+
 .work-card {
   display: flex;
   flex-direction: column;
