@@ -8,8 +8,6 @@ export const metadata: Metadata = {
     "Morning Desk, a sales dashboard built on the inbox, and a freight brokerage assessment that recommended not building an expensive integration.",
 };
 
-const DEMO = "https://morning-desk-demo-daves-projects-9a958cf9.vercel.app/";
-
 const LABELS = ["Waiting on you", "Promises you made", "Gone quiet", "New business"] as const;
 
 export default function WorkPage() {
@@ -39,9 +37,9 @@ export default function WorkPage() {
           ))}
         </ul>
         <p className="m-demo">
-          <a className="m-textlink" href={DEMO} target="_blank" rel="noopener noreferrer">
+          <Link className="m-textlink" href="/work/morning-desk">
             Explore the demo
-          </a>
+          </Link>
         </p>
       </article>
 

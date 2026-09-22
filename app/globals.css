@@ -853,6 +853,210 @@ button, a { -webkit-tap-highlight-color: transparent; }
   line-height: 1.1;
 }
 
+.desk-back { margin: 0 0 28px; }
+
+.desk-notice {
+  min-height: 1.4em;
+  margin: 18px 0 0;
+  font-family: var(--font-mono), "IBM Plex Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(244, 244, 242, 0.62);
+}
+
+.desk-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.8fr);
+  gap: 16px;
+  margin-top: 40px;
+}
+
+.desk-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.desk-ask,
+.desk-drafts { grid-column: 1 / -1; }
+
+.desk-panel h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.desk-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.desk-head .m-index { margin: 0; }
+
+.desk-list,
+.desk-static,
+.desk-messages,
+.desk-draft-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.desk-item {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 14px 0;
+  border: 0;
+  border-top: 1px solid rgba(244, 244, 242, 0.14);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.desk-item:hover .desk-subject,
+.desk-item.is-on .desk-subject { color: var(--paper); }
+
+.desk-item.is-on { background: rgba(244, 244, 242, 0.04); }
+
+.desk-item:focus { outline: none; }
+.desk-item:focus-visible { outline: 1px solid var(--paper); outline-offset: 3px; }
+
+.desk-who {
+  display: block;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.desk-subject {
+  display: block;
+  margin-top: 4px;
+  color: rgba(244, 244, 242, 0.88);
+}
+
+.desk-meta {
+  display: block;
+  margin-top: 4px;
+  color: rgba(244, 244, 242, 0.58);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.desk-static li,
+.desk-messages li {
+  padding: 12px 0;
+  border-top: 1px solid rgba(244, 244, 242, 0.14);
+}
+
+.desk-messages li p:last-child {
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+
+.desk-thread {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+
+.desk-thread h3 {
+  margin: 8px 0 0;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+
+.desk-ask-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.desk-ask-form input {
+  flex: 1 1 220px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(244, 244, 242, 0.28);
+  background: #000;
+  color: var(--paper);
+  font: inherit;
+}
+
+.desk-ask-form input:focus { outline: 1px solid var(--paper); outline-offset: 2px; }
+
+.desk-btn {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border: 1px solid rgba(244, 244, 242, 0.4);
+  background: transparent;
+  color: var(--paper);
+  font-family: var(--font-mono), "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.desk-btn:hover:not(:disabled) { border-color: var(--paper); }
+
+.desk-btn:focus { outline: none; }
+.desk-btn:focus-visible { outline: 1px solid var(--paper); outline-offset: 3px; }
+
+.desk-btn:disabled { opacity: 0.4; cursor: default; }
+
+.desk-btn-solid {
+  background: var(--paper);
+  color: var(--ink);
+  border-color: var(--paper);
+}
+
+.desk-btn-solid:hover:not(:disabled) { background: transparent; color: var(--paper); }
+
+.desk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.desk-actions .desk-btn { margin-top: 16px; }
+
+.desk-answer,
+.desk-body {
+  margin: 16px 0 0;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.desk-answer {
+  padding-top: 14px;
+  border-top: 1px solid rgba(244, 244, 242, 0.14);
+}
+
+.desk-draft {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(244, 244, 242, 0.14);
+}
+
+.desk-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 @media (max-width: 860px) {
   .room-bar,
   .m-bar-inner { flex-wrap: wrap; row-gap: 8px; }
@@ -869,6 +1073,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .m-show .m-frame iframe,
   .m-frame iframe { height: 560px; min-height: 0; }
   .m-wrap { padding-top: 48px; }
+  .desk-grid { grid-template-columns: 1fr; }
   .m-title { max-width: 14ch; }
   .m-card { padding: 22px 18px 26px; }
 }
