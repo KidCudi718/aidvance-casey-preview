@@ -49,7 +49,7 @@ const SAMPLE = [
 
 export default function AiAssessmentPage() {
   return (
-    <main className="m-wrap">
+    <main className="m-wrap m-assess">
       <p className="m-kicker">AI Assessment</p>
       <h1 className="m-title">What actually is an AI Assessment?</h1>
       <p className="m-lead">
@@ -104,12 +104,11 @@ export default function AiAssessmentPage() {
         <h2 className="m-kicker" id="sample-heading">
           This is what clarity looks like.
         </h2>
-        <article className="m-card">
+        <article className="m-card assess-sample">
           <p className="m-kicker">Sample</p>
           {SAMPLE.map(([label, value]) => (
-            <p key={label}>
+            <p key={label} className="assess-row">
               <span className="work-label">{label}</span>
-              <br />
               {value}
             </p>
           ))}
