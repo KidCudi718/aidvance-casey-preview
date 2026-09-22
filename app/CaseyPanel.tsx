@@ -505,7 +505,7 @@ export default function CaseyPanel() {
           </button>
         )}
 
-        {live || state === "listening" || state === "thinking" || state === "speaking" ? (
+        {live ? (
           <a
             className="book book--live"
             href={GMAIL_HREF}
