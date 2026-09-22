@@ -5,43 +5,78 @@ import BookDave from "../../BookDave";
 export const metadata: Metadata = {
   title: "AI Assessment · Aidvance",
   description:
-    "A written look at where AI fits one business, what to do first, and what to leave alone.",
+    "A $999 AI assessment: about 90 minutes inside the business, then a written automation roadmap.",
 };
 
 const DELIVERABLES = [
   {
     index: "01",
-    title: "How the work moves",
-    body: "A plain account of the workflows, the friction, and the places one person is holding together.",
+    title: "What could improve",
+    body: "Where time, attention, leads, or information are getting lost.",
   },
   {
     index: "02",
-    title: "Where AI fits",
-    body: "Recommendations for this operation, including the places a new tool would add noise.",
+    title: "What is not worth automating",
+    body: "The work a new tool would complicate, or that should stay as it is.",
   },
   {
     index: "03",
-    title: "What comes first",
-    body: "A short order. Do this. Leave that. Come back to the rest when the first piece is real.",
+    title: "What to do first",
+    body: "A priority order, so the first change is the one that matters.",
   },
   {
     index: "04",
-    title: "The walkthrough",
-    body: "We sit with the findings together. The recommendations stay with you.",
+    title: "Tools and capabilities you may already have",
+    body: "What is already in the business, before anyone buys something new.",
+  },
+  {
+    index: "05",
+    title: "What needs implementation",
+    body: "The pieces that need a specialist to put in place.",
+  },
+  {
+    index: "06",
+    title: "What should stay human",
+    body: "The judgment, the relationships, and the exceptions that should not be automated.",
+  },
+] as const;
+
+const STEPS = [
+  {
+    index: "01",
+    title: "Discovery call",
+    body: "About 90 minutes inside the business, on how the work actually moves.",
+  },
+  {
+    index: "02",
+    title: "Analysis",
+    body: "We separate what could improve from what is not worth automating.",
+  },
+  {
+    index: "03",
+    title: "Written assessment",
+    body: "The roadmap: what first, what to leave alone, what to implement, what stays human.",
+  },
+  {
+    index: "04",
+    title: "Walkthrough",
+    body: "We go through the findings together. The document stays with you.",
   },
 ] as const;
 
 export default function AiAssessmentPage() {
   return (
     <main className="m-wrap">
-      <p className="m-kicker">AI Assessment</p>
-      <h1 className="m-title">A clear read of one business.</h1>
+      <p className="m-kicker">AI Assessment · $999</p>
+      <h1 className="m-title">A written roadmap.</h1>
       <p className="m-lead">
-        You show how the work actually runs. We come back with a written read and a walkthrough:
-        where AI fits, where it should stay out, and what to do first.
+        About 90 minutes inside the business, then a written AI and automation roadmap. $999.
       </p>
 
       <div className="m-cta m-cta-early">
+        <Link className="talk m-talk" href="/#casey">
+          Talk to Casey
+        </Link>
         <BookDave />
       </div>
 
@@ -55,26 +90,23 @@ export default function AiAssessmentPage() {
         ))}
       </ul>
 
-      <div className="m-split">
-        <section className="m-card">
-          <span className="m-index">For</span>
-          <p className="m-split-copy">
-            An owner or operator who will open the real desk, mess included.
-          </p>
-        </section>
-        <section className="m-card">
-          <span className="m-index">Not for</span>
-          <p className="m-split-copy">
-            A search for a software list before anyone has looked at the work.
-          </p>
-        </section>
-      </div>
+      <ol className="m-grid m-flow">
+        {STEPS.map((step) => (
+          <li key={step.index} className="m-card">
+            <span className="m-index">{step.index}</span>
+            <h2>{step.title}</h2>
+            <p>{step.body}</p>
+          </li>
+        ))}
+      </ol>
+
+      <p className="m-aside">No obligation to implement anything with us.</p>
 
       <div className="m-cta">
-        <BookDave />
-        <Link className="m-textlink" href="/#casey">
+        <Link className="talk m-talk" href="/#casey">
           Talk to Casey
         </Link>
+        <BookDave />
       </div>
     </main>
   );

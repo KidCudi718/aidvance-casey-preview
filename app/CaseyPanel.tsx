@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { VoiceConversation } from "@spekoai/client";
 import PresenceVisual, { type PresenceMode } from "./PresenceVisual";
 import SiteHeader from "./SiteHeader";
@@ -30,82 +30,6 @@ const BTN: Record<State, string> = {
 
 type Turn = { role: "user" | "assistant"; text: string; at: number };
 
-const DAVE_LABEL = "Book a FREE 15 Minute Chat with Dave";
-const DAVE_EMAIL = "david.choukroun2@gmail.com";
-const DAVE_BODY =
-  "Hi Dave,\n\nI'd like to book a FREE 15 minute chat. A time that works for me:\n\n";
-
-function composeHref(base: string, fields: Record<string, string>) {
-  const query = Object.entries(fields)
-    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-    .join("&");
-  return `${base}?${query}`;
-}
-
-// mailto does nothing when the browser has no desktop mail handler.
-// Gmail compose is a normal https tab. Outlook and mailto stay as options.
-const GMAIL_HREF = composeHref("https://mail.google.com/mail/", {
-  view: "cm",
-  fs: "1",
-  to: DAVE_EMAIL,
-  su: DAVE_LABEL,
-  body: DAVE_BODY,
-});
-
-const OUTLOOK_HREF = composeHref("https://outlook.live.com/mail/0/deeplink/compose", {
-  to: DAVE_EMAIL,
-  subject: DAVE_LABEL,
-  body: DAVE_BODY,
-});
-
-const MAILTO_HREF = `mailto:${DAVE_EMAIL}?subject=${encodeURIComponent(
-  DAVE_LABEL
-)}&body=${encodeURIComponent(DAVE_BODY)}`;
-
-function openComposeTab(url: string) {
-  try {
-    const opened = window.open(url, "_blank");
-    if (!opened) return false;
-    try {
-      if (opened.closed) return false;
-      opened.opener = null;
-    } catch {
-      /* The tab is already cross-origin. It still opened. */
-    }
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-async function writeClipboard(text: string) {
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      return true;
-    }
-  } catch {
-    /* Fall through to the selection path. */
-  }
-  try {
-    const area = document.createElement("textarea");
-    area.value = text;
-    area.setAttribute("readonly", "");
-    area.style.position = "fixed";
-    area.style.top = "0";
-    area.style.left = "0";
-    area.style.opacity = "0";
-    document.body.appendChild(area);
-    area.focus();
-    area.select();
-    const ok = document.execCommand("copy");
-    area.remove();
-    return ok;
-  } catch {
-    return false;
-  }
-}
-
 export default function CaseyPanel() {
   const [state, setState] = useState<State>("idle");
   const [presence, setPresence] = useState<PresenceMode>("bars");
@@ -113,9 +37,6 @@ export default function CaseyPanel() {
   const [errMsg, setErrMsg] = useState("");
   const [needsUnmute, setNeedsUnmute] = useState(false);
   const [analyser, setAnalyser] = useState<AnalyserNode | null>(null);
-  const [mailOptions, setMailOptions] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const [copyFailed, setCopyFailed] = useState(false);
 
   const stateRef = useRef<State>("idle");
   const activeRef = useRef(false);
@@ -126,7 +47,6 @@ export default function CaseyPanel() {
   const pendingReplyRef = useRef(false);
   const thinkTimerRef = useRef(0);
   const holdTimerRef = useRef(0);
-  const copyTimerRef = useRef(0);
 
   stateRef.current = state;
 
@@ -371,36 +291,6 @@ export default function CaseyPanel() {
     }
   }, []);
 
-  useEffect(() => () => window.clearTimeout(copyTimerRef.current), []);
-
-  const bookDave = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
-    const modified =
-      event.button !== 0 ||
-      event.metaKey ||
-      event.ctrlKey ||
-      event.shiftKey ||
-      event.altKey;
-    if (modified) return;
-    // A scripted tab is cancellable. If the browser blocks it, leave the
-    // anchor's own https navigation in place and show in-page mail options.
-    if (openComposeTab(GMAIL_HREF)) {
-      event.preventDefault();
-      setMailOptions(false);
-      return;
-    }
-    setMailOptions(true);
-  }, []);
-
-  const copyDave = useCallback(async () => {
-    const ok = await writeClipboard(DAVE_EMAIL);
-    setCopied(ok);
-    setCopyFailed(!ok);
-    window.clearTimeout(copyTimerRef.current);
-    if (ok) {
-      copyTimerRef.current = window.setTimeout(() => setCopied(false), 2000);
-    }
-  }, []);
-
   const busy = state === "requesting_mic";
 
   return (
@@ -479,17 +369,7 @@ export default function CaseyPanel() {
             </span>
           </button>
         ) : state === "done" ? (
-          <a
-            className="book"
-            href={GMAIL_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={bookDave}
-            aria-expanded={mailOptions}
-            aria-controls="dave-mail-options"
-          >
-            {DAVE_LABEL}
-          </a>
+          <p className="book-soon">Booking a time with Dave opens soon.</p>
         ) : (
           <button
             type="button"
@@ -503,55 +383,6 @@ export default function CaseyPanel() {
             </span>
           </button>
         )}
-
-        {live ? (
-          <a
-            className="book book--live"
-            href={GMAIL_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={bookDave}
-          >
-            {DAVE_LABEL}
-          </a>
-        ) : null}
-
-        {state === "done" && mailOptions ? (
-          <div
-            className="mail-options"
-            id="dave-mail-options"
-            role="group"
-            aria-label="Other ways to email Dave"
-          >
-            {copyFailed ? <p className="mail-address">{DAVE_EMAIL}</p> : null}
-            <button type="button" className="mail-option" onClick={() => void copyDave()}>
-              {copied ? "Copied" : "Copy Dave’s email"}
-            </button>
-            <span className="mail-dot" aria-hidden="true">
-              ·
-            </span>
-            <a className="mail-option" href={GMAIL_HREF} target="_blank" rel="noopener noreferrer">
-              Gmail
-            </a>
-            <span className="mail-dot" aria-hidden="true">
-              ·
-            </span>
-            <a
-              className="mail-option"
-              href={OUTLOOK_HREF}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Outlook
-            </a>
-            <span className="mail-dot" aria-hidden="true">
-              ·
-            </span>
-            <a className="mail-option" href={MAILTO_HREF}>
-              Mail app
-            </a>
-          </div>
-        ) : null}
 
         {state === "done" ? (
           <button type="button" className="again" onClick={() => void startCall()}>
