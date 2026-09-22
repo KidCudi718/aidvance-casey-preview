@@ -72,7 +72,12 @@ function loadCalendly(): Promise<boolean> {
   return widgetLoad;
 }
 
-/** Calendly pins document.body on iPhone. That can suspend the call's audio element. */
+/**
+ * Same open path on phone, tablet, laptop, and desktop: Calendly's popup
+ * overlay on this page. Never navigate, never target=_blank, never mail.
+ * On some phones Calendly also sets document.body position:fixed, which can
+ * suspend the call's audio element. Undo that pin when it happens.
+ */
 function releaseBodyPin() {
   const body = document.body;
   if (body.style.position !== "fixed") return;
