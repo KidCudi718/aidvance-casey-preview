@@ -31,6 +31,8 @@ type Turn = { role: "user" | "assistant"; text: string; at: number };
 
 const DAVE_LABEL = "Book a FREE 15 Minute Chat with Dave";
 const DAVE_EMAIL = "david.choukroun2@gmail.com";
+// Mid-call Book only. Empty sms: URL — no ?body=, so Messages opens with no canned pitch.
+const DAVE_SMS_HREF = "sms:+17188690404";
 const DAVE_BODY =
   "Hi Dave,\n\nI'd like to book a FREE 15 minute chat. A time that works for me:\n\n";
 
@@ -370,6 +372,25 @@ export default function CaseyPanel() {
     }
   }, []);
 
+  // Opening SMS backgrounds this tab (especially iOS) and the browser suspends
+  // Speko playback. Coming back should resume audio. This does not end the call.
+  useEffect(() => {
+    if (!live) return;
+
+    const resumeAfterReturn = () => {
+      if (document.visibilityState === "hidden") return;
+      if (!activeRef.current) return;
+      void unmute();
+    };
+
+    document.addEventListener("visibilitychange", resumeAfterReturn);
+    window.addEventListener("focus", resumeAfterReturn);
+    return () => {
+      document.removeEventListener("visibilitychange", resumeAfterReturn);
+      window.removeEventListener("focus", resumeAfterReturn);
+    };
+  }, [live, unmute]);
+
   useEffect(() => () => window.clearTimeout(copyTimerRef.current), []);
 
   const bookDave = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
@@ -474,7 +495,7 @@ export default function CaseyPanel() {
             </button>
           </div>
         ) : needsUnmute ? (
-          <button type="button" className="talk" onClick={() => void unmute()}>
+          <button type="button" className="talk talk--resume" onClick={() => void unmute()}>
             <span className="talk-label" key="unmute">
               Tap to unmute
             </span>
@@ -506,13 +527,7 @@ export default function CaseyPanel() {
         )}
 
         {live ? (
-          <a
-            className="book book--live"
-            href={GMAIL_HREF}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={bookDave}
-          >
+          <a className="book book--live" href={DAVE_SMS_HREF}>
             {DAVE_LABEL}
           </a>
         ) : null}
