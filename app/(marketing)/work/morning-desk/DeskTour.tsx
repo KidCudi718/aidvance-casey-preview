@@ -124,7 +124,9 @@ const TOUR_CSS = `
 `;
 
 function el(node: Element | null): HTMLElement | null {
-  return node instanceof HTMLElement ? node : null;
+  // Iframe nodes are not instanceof this window's HTMLElement.
+  if (node === null || node.nodeType !== 1) return null;
+  return node as HTMLElement;
 }
 
 function sectionOf(node: Element | null): HTMLElement | null {
