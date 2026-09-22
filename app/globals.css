@@ -939,10 +939,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .work-preview {
   position: relative;
-  height: 228px;
+  height: 540px;
   overflow: hidden;
   border: 1px solid rgba(244, 244, 242, 0.28);
-  background: #f4f3f0;
+  background: #000;
 }
 
 .work-preview iframe {
@@ -950,7 +950,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   top: 0;
   left: 0;
   width: 200%;
-  height: 520px;
+  height: 1120px;
   border: 0;
   transform: scale(0.5);
   transform-origin: top left;
@@ -961,9 +961,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   padding: 12px 14px;
-  background: linear-gradient(to top, rgba(5, 5, 5, 0.78), rgba(5, 5, 5, 0) 52%);
+  background: linear-gradient(to bottom, rgba(5, 5, 5, 0.55), rgba(5, 5, 5, 0) 72px);
   color: var(--paper);
   text-decoration: none;
   font-family: var(--font-mono), "IBM Plex Mono", monospace;
@@ -973,7 +973,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .work-preview-hit:hover {
-  background: linear-gradient(to top, rgba(5, 5, 5, 0.88), rgba(5, 5, 5, 0.12) 70%);
+  background: linear-gradient(to bottom, rgba(5, 5, 5, 0.72), rgba(5, 5, 5, 0) 96px);
 }
 
 .work-chips {
