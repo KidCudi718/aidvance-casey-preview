@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VoiceConversation } from "@spekoai/client";
+import BookDave from "./BookDave";
 import PresenceVisual, { type PresenceMode } from "./PresenceVisual";
 import SiteHeader from "./SiteHeader";
 import { watchAgentAudio, type CallVisual } from "./lips";
@@ -365,7 +366,7 @@ export default function CaseyPanel() {
             </span>
           </button>
         ) : state === "done" ? (
-          <p className="book-soon">Booking a time with Dave opens soon.</p>
+          <BookDave />
         ) : (
           <button
             type="button"
@@ -379,6 +380,8 @@ export default function CaseyPanel() {
             </span>
           </button>
         )}
+
+        {live ? <BookDave live /> : null}
 
         {state === "done" ? (
           <button type="button" className="again" onClick={() => void startCall()}>

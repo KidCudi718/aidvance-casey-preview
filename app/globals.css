@@ -787,16 +787,6 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .m-cta .m-note,
 .m-cta-early .m-note { margin: 0; }
 
-.book-soon {
-  margin: 0;
-  max-width: 24rem;
-  text-align: center;
-  font-family: var(--font-serif), "Newsreader", Georgia, serif;
-  font-size: 1.2rem;
-  line-height: 1.35;
-  color: rgba(244, 244, 242, 0.78);
-}
-
 .m-frame {
   margin: 0;
   border: 1px solid rgba(244, 244, 242, 0.28);
