@@ -16,10 +16,6 @@ export default function MorningDeskPage() {
         </Link>
         <div className="desk-intro">
           <p>Morning Desk turns an inbox into a working sales view.</p>
-          <p>
-            See who needs a reply, what you promised, which conversations went quiet, and what new
-            business is already sitting there.
-          </p>
           <p>Nothing sends for real.</p>
         </div>
         <div className="desk-actions">

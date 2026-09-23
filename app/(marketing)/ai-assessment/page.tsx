@@ -116,15 +116,6 @@ export default function AiAssessmentPage() {
         </ul>
       </section>
 
-      <p className="m-copy">
-        Sometimes the answer is AI. Sometimes it’s automation. Sometimes the smartest move is to
-        leave it alone.
-      </p>
-      <p className="m-copy">
-        The goal is not to sell you more technology. The goal is to show you what is actually worth
-        fixing.
-      </p>
-
       <section className="m-case" aria-labelledby="sample-heading">
         <h2 className="m-kicker" id="sample-heading">
           Sample from an assessment
@@ -139,9 +130,6 @@ export default function AiAssessmentPage() {
         </article>
       </section>
 
-      <p className="m-copy">
-        Know where the leaks are before you spend money fixing the wrong ones.
-      </p>
       <AssessCta />
     </main>
   );

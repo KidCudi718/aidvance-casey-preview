@@ -402,15 +402,7 @@ export default function CaseyPanel() {
 
         {state === "idle" ? (
           <div className="home-under">
-            <p className="home-frame">
-              Casey is Aidvance’s AI business concierge. Tell her how your business actually works
-              and she’ll help you figure out where AI or automation may actually be useful.
-            </p>
-            <ul className="m-labels">
-              <li>Talk about the business</li>
-              <li>Find the friction</li>
-              <li>Figure out what belongs</li>
-            </ul>
+            <p className="home-frame">Casey is Aidvance’s AI business concierge.</p>
             <p className="home-proof">
               <span>See what this looks like in practice</span>
               <span aria-hidden="true">·</span>

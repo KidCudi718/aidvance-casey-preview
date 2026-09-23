@@ -4,7 +4,7 @@ import BookDave from "../../BookDave";
 
 export const metadata: Metadata = {
   title: "About · Aidvance",
-  description: "Aidvance helps operators see where AI belongs — and where it doesn’t.",
+  description: "Who Aidvance works with, how an engagement goes, and how to reach Dave.",
 };
 
 const HOW = [
@@ -35,32 +35,7 @@ const FAQ = [
 export default function AboutPage() {
   return (
     <main className="m-wrap m-about">
-      <p className="m-kicker">About</p>
-      <h1 className="m-title">Aidvance helps operators see where AI belongs — and where it doesn’t.</h1>
-      <p className="m-lead">
-        We start with how the business actually runs. Then we say what to automate, what to build,
-        and what to leave alone.
-      </p>
-
-      <section className="m-case" aria-labelledby="do-heading">
-        <h2 className="m-kicker" id="do-heading">
-          What we do
-        </h2>
-        <p className="m-copy">
-          Free conversations with Casey. A paid AI Assessment when it’s worth going deeper. Build
-          work only when the workflow earns it.
-        </p>
-      </section>
-
-      <section className="m-case" aria-labelledby="different-heading">
-        <h2 className="m-kicker" id="different-heading">
-          Different
-        </h2>
-        <p className="m-copy">
-          We don’t start with tools. We will say leave it alone. Casey is the first conversation,
-          before anyone buys.
-        </p>
-      </section>
+      <h1 className="m-kicker">About</h1>
 
       <section className="m-case" aria-labelledby="who-heading">
         <h2 className="m-kicker" id="who-heading">

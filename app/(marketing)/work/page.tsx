@@ -4,8 +4,7 @@ import BookDave from "../../BookDave";
 
 export const metadata: Metadata = {
   title: "Work · Aidvance",
-  description:
-    "Sometimes the answer is to build something. Sometimes the answer is not to.",
+  description: "Morning Desk, and a freight brokerage assessment.",
 };
 
 const DESK = "/work/morning-desk";
@@ -13,10 +12,7 @@ const DESK = "/work/morning-desk";
 export default function WorkPage() {
   return (
     <main className="m-wrap m-work">
-      <p className="m-kicker">Work</p>
-      <h1 className="m-title">
-        Sometimes the answer is to build something. Sometimes the answer is not to.
-      </h1>
+      <h1 className="m-kicker">Work</h1>
 
       <div className="work-grid">
         <article className="m-card work-card">
