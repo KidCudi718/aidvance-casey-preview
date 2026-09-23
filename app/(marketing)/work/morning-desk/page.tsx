@@ -14,10 +14,7 @@ export default function MorningDeskPage() {
         <Link className="m-textlink" href="/work">
           Back to Work
         </Link>
-        <div className="desk-intro">
-          <p>Morning Desk turns an inbox into a working sales view.</p>
-          <p>Nothing sends for real.</p>
-        </div>
+        <p className="desk-intro">Nothing sends for real.</p>
         <div className="desk-actions">
           <a className="m-textlink" href="#desk-demo">
             Open the demo
