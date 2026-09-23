@@ -6,8 +6,9 @@ import { usePathname } from "next/navigation";
 const LINKS = [
   { href: "/", label: "Home" },
   { href: "/what-we-do", label: "What We Do" },
-  { href: "/ai-assessment", label: "AI Assessment" },
   { href: "/work", label: "Work" },
+  { href: "/about", label: "About" },
+  { href: "/ai-assessment", label: "AI Assessment" },
 ] as const;
 
 export default function SiteHeader({ variant = "page" }: { variant?: "page" | "room" }) {

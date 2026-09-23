@@ -4,109 +4,95 @@ import BookDave from "../../BookDave";
 
 export const metadata: Metadata = {
   title: "Work · Aidvance",
-  description: "Sammy’s Morning Desk, and how Aidvance looked at Ultimate Logistics.",
+  description: "Morning Desk, and a freight brokerage assessment.",
 };
 
-const DEMO = "https://morning-desk-demo-daves-projects-9a958cf9.vercel.app/";
+const DESK = "/work/morning-desk";
 
 export default function WorkPage() {
   return (
-    <main className="m-wrap">
-      <p className="m-kicker">Work</p>
-      <h1 className="m-title">Proof you can open.</h1>
-      <p className="m-lead">Two engagements. Short on purpose.</p>
+    <main className="m-wrap m-work">
+      <h1 className="m-kicker">Work</h1>
 
-      <article className="m-case">
-        <header className="m-case-head">
-          <p className="m-index">01</p>
-          <div>
-            <h2>Sammy’s Morning Desk</h2>
-            <p className="m-for">
-              For a sales rep at a large licensing company in Manhattan.
-            </p>
-          </div>
-        </header>
+      <div className="work-grid">
+        <article className="m-card work-card">
+          <h2>Morning Desk</h2>
+          <p className="work-sub">A sales dashboard built on your email inbox</p>
+          <p>
+            Surfaces who needs a reply, promises you made, conversations going quiet, and new
+            opportunities already sitting in email.
+          </p>
 
-        <div className="m-show">
-          <figure className="m-frame">
-            <figcaption className="m-frame-bar">
-              <span>Live demo · sample data</span>
-              <a href={DEMO} target="_blank" rel="noopener noreferrer">
-                Open live demo
-              </a>
-            </figcaption>
+          <div className="work-preview">
             <iframe
-              title="Sammy’s Morning Desk, live demo with sample data"
-              src={DEMO}
-              loading="eager"
+              title="Preview of Morning Desk"
+              src="/work/morning-desk/app/index.html"
+              tabIndex={-1}
+              aria-hidden="true"
             />
-          </figure>
-
-          <div className="m-grid m-facts m-facts-side">
-            <section className="m-card">
-              <h3>Problem</h3>
-              <p>
-                The selling starts after the inbox. Buyers waiting on a reply. Promises already
-                written in sent mail. Accounts quiet for weeks. New business already in the mailbox.
-              </p>
-            </section>
-            <section className="m-card">
-              <h3>Built</h3>
-              <p>
-                A morning desk. Unanswered mail, oldest first, with the email the answer belongs to.
-                Promises pulled from his own sent mail. Quiet accounts. Drafts he still sends himself.
-              </p>
-            </section>
-            <section className="m-card">
-              <h3>Changed</h3>
-              <p>
-                The morning opens on that list. The demo is the proof. People, orders, and prices on
-                it are sample data.
-              </p>
-            </section>
           </div>
-        </div>
-      </article>
 
-      <article className="m-case">
-        <header className="m-case-head">
-          <p className="m-index">02</p>
-          <div>
-            <h2>Ultimate Logistics</h2>
-            <p className="m-for">
-              For Joe, VP. Freight brokerage, mostly LTL. A small team, on the order of $8 million.
-            </p>
-          </div>
-        </header>
-
-        <div className="m-grid m-facts">
-          <section className="m-card">
-            <h3>The day</h3>
-            <p>
-              A quote comes in. A truck gets found. The paperwork follows. Someone still has to know
-              where the freight is.
-            </p>
-          </section>
-          <section className="m-card">
-            <h3>The question</h3>
-            <p>Where AI belongs in that day, and where it should stay out of the way.</p>
-          </section>
-          <section className="m-card">
-            <h3>The read</h3>
-            <p>
-              An assessment. What to do first. What to leave alone. A walkthrough with Joe. Judgment,
-              in his operation — that is the proof.
-            </p>
-          </section>
-        </div>
-
-        <div className="m-cta">
-          <BookDave />
-          <Link className="m-textlink" href="/#casey">
-            Talk to Casey
+          <Link className="talk m-talk work-open" href={DESK}>
+            Explore the demo →
           </Link>
-        </div>
-      </article>
+          <p className="work-try">Nothing sends for real.</p>
+
+          <div className="work-watch">
+            <h3 id="watch-heading">Watch how Morning Desk works</h3>
+            <video
+              className="work-video"
+              controls
+              playsInline
+              preload="metadata"
+              src="/videos/morning-desk.mp4"
+              aria-labelledby="watch-heading"
+            >
+              Your browser can’t play this video.
+            </video>
+          </div>
+        </article>
+
+        <article className="m-card work-card">
+          <h2>Freight brokerage assessment</h2>
+          <p className="work-sub">
+            The automation they thought they needed wasn’t the one worth building.
+          </p>
+          <p>
+            We mapped the operation, followed the actual workflow, and recommended against
+            unnecessary technical work in favor of simpler priorities.
+          </p>
+          <Link className="m-textlink" href="#freight-story">
+            Read the story →
+          </Link>
+        </article>
+      </div>
+
+      <section className="m-case" id="freight-story" aria-labelledby="freight-heading">
+        <h2 className="m-kicker" id="freight-heading">
+          Freight brokerage assessment
+        </h2>
+        <article className="m-card m-story">
+          <h3>What they thought they needed</h3>
+          <p>A bigger AI / automation build on top of the existing stack.</p>
+          <h3>What we found</h3>
+          <p>
+            The expensive idea wasn’t the highest-leverage fix. Time and attention were getting
+            lost in handoffs and follow-up long before a new system would help.
+          </p>
+          <h3>What we recommended</h3>
+          <p>
+            Clearer priorities first. Build only what the workflow actually justifies. Leave the
+            rest alone.
+          </p>
+        </article>
+      </section>
+
+      <div className="m-cta">
+        <Link className="talk m-talk" href="/#casey">
+          Talk to Casey
+        </Link>
+        <BookDave />
+      </div>
     </main>
   );
 }
