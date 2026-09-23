@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import BookDave from "../../BookDave";
 
 export const metadata: Metadata = {
@@ -40,12 +41,38 @@ const GAINS = [
 ] as const;
 
 const SAMPLE = [
-  ["Finding", "Follow-up lives in one person’s inbox."],
-  ["Why it matters", "Leads go quiet when that person is in a meeting."],
-  ["Recommendation", "A morning view of who is waiting, before anyone asks."],
-  ["Priority", "Do first"],
-  ["What not to do", "Don’t buy a new system to fix a reminder problem."],
+  [
+    "Finding 02",
+    "Follow-up depends on one person manually remembering who needs a response.",
+  ],
+  [
+    "Evidence",
+    "Customer and prospect conversations live across email with no single daily priority view.",
+  ],
+  [
+    "Recommendation",
+    "Create a morning review that surfaces unanswered inbound and dormant opportunities.",
+  ],
+  ["Priority", "High"],
+  ["Do not", "Replace the existing CRM solely to solve this issue."],
 ] as const;
+
+function AssessCta() {
+  return (
+    <>
+      <div className="m-cta">
+        <BookDave />
+        <Link className="m-textlink" href="/#casey">
+          Talk to Casey
+        </Link>
+      </div>
+      <p className="m-note">
+        Start with the free 15-minute fit call. If there is nothing worth assessing, we’ll know
+        quickly.
+      </p>
+    </>
+  );
+}
 
 export default function AiAssessmentPage() {
   return (
@@ -57,9 +84,7 @@ export default function AiAssessmentPage() {
         belongs, where it doesn’t, and what to do first.
       </p>
 
-      <div className="m-cta">
-        <BookDave />
-      </div>
+      <AssessCta />
       <p className="m-copy">No generic AI playbook. This is built around your actual business.</p>
 
       <section className="m-case" aria-labelledby="how-heading">
@@ -102,10 +127,9 @@ export default function AiAssessmentPage() {
 
       <section className="m-case" aria-labelledby="sample-heading">
         <h2 className="m-kicker" id="sample-heading">
-          This is what clarity looks like.
+          Sample from an assessment
         </h2>
         <article className="m-card assess-sample">
-          <p className="m-kicker">Sample</p>
           {SAMPLE.map(([label, value]) => (
             <p key={label} className="assess-row">
               <span className="work-label">{label}</span>
@@ -118,9 +142,7 @@ export default function AiAssessmentPage() {
       <p className="m-copy">
         Know where the leaks are before you spend money fixing the wrong ones.
       </p>
-      <div className="m-cta">
-        <BookDave />
-      </div>
+      <AssessCta />
     </main>
   );
 }

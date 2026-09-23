@@ -39,6 +39,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
   color: var(--paper);
 }
 
+/* Idle home can grow so the lines under Talk to Casey stay on the page. */
+.room--idle {
+  height: auto;
+  min-height: 100dvh;
+  overflow: visible;
+  grid-template-rows: auto minmax(min-content, 1fr) auto;
+}
+
 .top {
   display: flex;
   align-items: center;
@@ -163,6 +171,43 @@ button, a { -webkit-tap-highlight-color: transparent; }
   gap: 12px;
   z-index: 2;
   text-align: center;
+}
+
+.home-under {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: min(40rem, 100%);
+  margin-top: 4px;
+  text-align: center;
+}
+
+.home-frame {
+  margin: 0;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.08rem;
+  line-height: 1.4;
+  color: rgba(244, 244, 242, 0.72);
+}
+
+.home-under .m-labels {
+  justify-content: center;
+  margin: 0;
+}
+
+.home-proof {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0;
+  font-family: var(--font-mono), "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 244, 242, 0.48);
 }
 
 .status {
@@ -667,6 +712,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
   color: rgba(244, 244, 242, 0.82);
 }
 
+.m-card a {
+  color: inherit;
+}
+
+.m-card .m-textlink {
+  display: inline-block;
+  margin-top: 16px;
+  color: var(--paper);
+}
+
 .m-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -891,11 +946,35 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .desk-cue {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: 8px 18px;
-  padding: 12px 22px;
+  gap: 12px 18px;
+  padding: 14px 22px;
   border-bottom: 1px solid rgba(244, 244, 242, 0.14);
+}
+
+.desk-intro {
+  flex: 1 1 28rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.desk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+
+.desk-actions .m-talk {
+  width: auto;
+  min-width: 180px;
+}
+
+#desk-demo {
+  scroll-margin-top: 12px;
 }
 
 .desk-cue p {
@@ -914,7 +993,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.85fr);
   gap: 16px;
   margin-top: 36px;
-  align-items: stretch;
+  align-items: start;
 }
 
 .work-hero { margin-top: 28px; }
@@ -1112,3 +1191,24 @@ button, a { -webkit-tap-highlight-color: transparent; }
   margin: 0;
   color: rgba(244, 244, 242, 0.86);
 }
+
+.m-about .m-title,
+.m-work .m-title {
+  max-width: 16em;
+  line-height: 0.98;
+}
+
+.m-about .m-case { margin-top: 48px; }
+
+.m-about .m-case > .m-kicker { margin: 0 0 12px; }
+
+.m-about .m-case > .m-kicker + .m-copy,
+.m-about .m-case > .m-grid { margin-top: 0; }
+
+.m-work .m-case > .m-kicker { margin: 0 0 12px; }
+
+.m-work .m-case > .m-card { margin-top: 0; }
+
+.work-card .work-watch { margin-top: 8px; }
+
+.work-card .work-watch h3 { margin: 20px 0 12px; }

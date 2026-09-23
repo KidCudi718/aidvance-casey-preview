@@ -36,12 +36,21 @@ export default function WhatWeDoPage() {
           <span className="m-index">03</span>
           <h2>Recommend</h2>
           <p>What to fix first. What to leave alone. What needs a specialist to implement.</p>
+          <Link className="m-textlink" href="/work">
+            See how this played out in real work →
+          </Link>
         </li>
       </ol>
 
+      <p className="m-aside">
+        A business may think it needs a new AI tool. We may find that the real issue is a process
+        nobody owns, software they already pay for, or something that should not be automated at
+        all.
+      </p>
+
       <div className="m-after">
-        <Link className="talk m-talk" href="/work">
-          See the Work
+        <Link className="talk m-talk" href="/#casey">
+          Talk to Casey
         </Link>
       </div>
     </main>

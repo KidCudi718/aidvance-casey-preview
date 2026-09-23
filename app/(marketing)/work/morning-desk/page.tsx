@@ -14,9 +14,25 @@ export default function MorningDeskPage() {
         <Link className="m-textlink" href="/work">
           Back to Work
         </Link>
-        <p>This is a sample desk. Click around and try it. Nothing sends for real.</p>
+        <div className="desk-intro">
+          <p>Morning Desk turns an inbox into a working sales view.</p>
+          <p>
+            See who needs a reply, what you promised, which conversations went quiet, and what new
+            business is already sitting there.
+          </p>
+          <p>Nothing sends for real.</p>
+        </div>
+        <div className="desk-actions">
+          <a className="m-textlink" href="#desk-demo">
+            Open the demo
+          </a>
+          <Link className="talk m-talk" href="/#casey">
+            Talk to Casey
+          </Link>
+        </div>
       </div>
       <iframe
+        id="desk-demo"
         title="Morning Desk, a sales dashboard built on your email inbox"
         src="/work/morning-desk/app/index.html"
       />

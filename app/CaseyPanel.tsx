@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VoiceConversation } from "@spekoai/client";
+import Link from "next/link";
 import BookDave, { preloadDaveCalendly } from "./BookDave";
 import PresenceVisual, { type PresenceMode } from "./PresenceVisual";
 import SiteHeader from "./SiteHeader";
@@ -399,6 +400,30 @@ export default function CaseyPanel() {
           </button>
         ) : null}
 
+        {state === "idle" ? (
+          <div className="home-under">
+            <p className="home-frame">
+              Casey is Aidvance’s AI business concierge. Tell her how your business actually works
+              and she’ll help you figure out where AI or automation may actually be useful.
+            </p>
+            <ul className="m-labels">
+              <li>Talk about the business</li>
+              <li>Find the friction</li>
+              <li>Figure out what belongs</li>
+            </ul>
+            <p className="home-proof">
+              <span>See what this looks like in practice</span>
+              <span aria-hidden="true">·</span>
+              <Link className="m-textlink" href="/work/morning-desk">
+                Morning Desk
+              </Link>
+              <span aria-hidden="true">·</span>
+              <Link className="m-textlink" href="/ai-assessment">
+                AI Assessment
+              </Link>
+            </p>
+          </div>
+        ) : null}
       </div>
     </main>
   );
