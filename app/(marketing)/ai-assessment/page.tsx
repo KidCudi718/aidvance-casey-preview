@@ -40,23 +40,6 @@ const GAINS = [
   },
 ] as const;
 
-const SAMPLE = [
-  [
-    "Finding 02",
-    "Follow-up depends on one person manually remembering who needs a response.",
-  ],
-  [
-    "Evidence",
-    "Customer and prospect conversations live across email with no single daily priority view.",
-  ],
-  [
-    "Recommendation",
-    "Create a morning review that surfaces unanswered inbound and dormant opportunities.",
-  ],
-  ["Priority", "High"],
-  ["Do not", "Replace the existing CRM solely to solve this issue."],
-] as const;
-
 function AssessCta() {
   return (
     <>
@@ -114,20 +97,6 @@ export default function AiAssessmentPage() {
             </li>
           ))}
         </ul>
-      </section>
-
-      <section className="m-case" aria-labelledby="sample-heading">
-        <h2 className="m-kicker" id="sample-heading">
-          Sample from an assessment
-        </h2>
-        <article className="m-card assess-sample">
-          {SAMPLE.map(([label, value]) => (
-            <p key={label} className="assess-row">
-              <span className="work-label">{label}</span>
-              {value}
-            </p>
-          ))}
-        </article>
       </section>
 
       <AssessCta />

@@ -35,7 +35,6 @@ export default function WorkPage() {
           <Link className="talk m-talk work-open" href={DESK}>
             Explore the demo →
           </Link>
-          <p className="work-try">Nothing sends for real.</p>
 
           <div className="work-watch">
             <h3 id="watch-heading">Watch how Morning Desk works</h3>

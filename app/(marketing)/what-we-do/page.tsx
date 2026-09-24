@@ -48,11 +48,11 @@ export default function WhatWeDoPage() {
         all.
       </p>
 
-      <div className="m-after">
-        <Link className="talk m-talk" href="/#casey">
-          Talk to Casey
-        </Link>
-      </div>
+      <p className="m-after">
+        <a className="m-textlink" href="#footer-casey">
+          Talk to Casey ↓
+        </a>
+      </p>
     </main>
   );
 }
