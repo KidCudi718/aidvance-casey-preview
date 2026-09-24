@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans, Newsreader } from "next/font/google";
 import "./globals.css";
+import ClickSound from "./ClickSound";
 
 const sans = IBM_Plex_Sans({
   subsets: ["latin"],
@@ -33,7 +34,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable} ${serif.variable}`}>
-      <body style={{ fontFamily: "var(--font-sans), system-ui, sans-serif" }}>{children}</body>
+      <body style={{ fontFamily: "var(--font-sans), system-ui, sans-serif" }}>
+        <ClickSound />
+        {children}
+      </body>
     </html>
   );
 }

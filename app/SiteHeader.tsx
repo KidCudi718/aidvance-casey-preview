@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { SoundToggle } from "./ClickSound";
 
 const LINKS = [
   { href: "/", label: "Home" },
@@ -30,6 +31,7 @@ export default function SiteHeader({ variant = "page" }: { variant?: "page" | "r
           );
         })}
       </nav>
+      <SoundToggle />
       <Link className="site-cta" href="/#casey">
         Talk to Casey
       </Link>

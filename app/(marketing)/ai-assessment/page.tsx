@@ -62,7 +62,7 @@ function AssessCta() {
     <>
       <div className="m-cta">
         <BookDave />
-        <Link className="m-textlink" href="/#casey">
+        <Link className="talk m-talk" href="/#casey">
           Talk to Casey
         </Link>
       </div>
