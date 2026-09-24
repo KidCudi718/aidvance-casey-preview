@@ -1294,6 +1294,72 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .m-about .m-case > .m-kicker + .m-copy,
 .m-about .m-case > .m-grid { margin-top: 0; }
 
+.about-steps {
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-steps li + li { margin-top: var(--space-3); }
+
+.about-steps h3,
+.about-qa h4,
+.work-story h3 {
+  margin: 0;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-weight: 400;
+  font-size: 1.45rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.about-steps p,
+.about-qa p,
+.work-story > p {
+  margin: 8px 0 0;
+  max-width: 40rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: rgba(244, 244, 242, 0.82);
+}
+
+.about-group { margin-top: var(--space-4); }
+
+.about-group > h3 {
+  margin: 0;
+  font-family: var(--font-mono), "IBM Plex Mono", monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper);
+}
+
+.about-qa { margin-top: var(--space-3); }
+
+.about-book { margin-top: var(--space-5); }
+
+.m-work .work-preview { margin-top: var(--space-4); }
+
+.m-work .work-open {
+  width: min(100%, 280px);
+  margin-top: var(--space-3);
+}
+
+.m-work .work-watch { margin-top: var(--space-4); }
+
+.m-work .work-watch h2 {
+  margin: 0 0 16px;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.8rem, 3.4vw, 2.4rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.work-story h3 { margin-top: var(--space-3); }
+.work-story h3:first-of-type { margin-top: var(--space-3); }
+
 .m-work .m-case > .m-kicker { margin: 0 0 12px; }
 
 .m-work .m-case > .m-card { margin-top: 0; }

@@ -574,7 +574,6 @@ c23 0 25 1 24 10 0 3 -1 6 -1 7 0 0 -25 1 -56 1 l-56 0 0 -9z M2912 134 c-3 -5 -60
   <div class="dfoot">
     <button class="btn primary" id="sendBtn" type="button">Send</button>
     <button class="btn" id="tweakBtn" type="button">Make it shorter</button>
-    <span class="hint">Nothing sends in this demo.</span>
   </div>
 </aside>
 <div class="toast" id="toast"></div>
@@ -897,7 +896,7 @@ c23 0 25 1 24 10 0 3 -1 6 -1 7 0 0 -25 1 -56 1 l-56 0 0 -9z M2912 134 c-3 -5 -60
   $("#closeDrawer").addEventListener("click", closeDrawer);
   $("#scrim").addEventListener("click", closeDrawer);
   document.addEventListener("keydown", function(e){ if(e.key==="Escape") closeDrawer(); });
-  $("#sendBtn").addEventListener("click", function(){ closeDrawer(); toast("Demo only — nothing was sent."); });
+  $("#sendBtn").addEventListener("click", function(){ closeDrawer(); });
   $("#tweakBtn").addEventListener("click", function(){
     var t=$("#dbodytext").textContent.split("\n\n");
     $("#dbodytext").textContent = t.slice(0,2).join("\n\n")+"\n\nSammy";
