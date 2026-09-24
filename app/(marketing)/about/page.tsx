@@ -3,75 +3,75 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "About · Aidvance",
   description:
-    "Aidvance Consultancy helps small business owners figure out where AI actually saves them time or money, and where it doesn't.",
+    "Aidvance Consultancy helps small business owners figure out where AI actually saves them time or money, and where it doesn't. Before you spend a dollar on a tool.",
 };
 
 const BEFORE = [
-  {
-    q: "Why not just ask ChatGPT myself?",
-    a: "You can, and for some things you should. The hard part isn't the tool. It's knowing which of the fifty things in your week are worth handing to it, and which ones will create more work than they save. That's what we find.",
-  },
-  {
-    q: "What happens on the free call?",
-    a: "Fifteen minutes. You describe how your week goes, and you get an honest answer on whether an assessment would help. If it wouldn't, we'll tell you.",
-  },
-  {
-    q: "Do you work with businesses like mine?",
-    a: "If you run a service business with a small team (a practice, a trade, a firm, a shop), yes. If you're not sure, the free call is how to find out.",
-  },
-  {
-    q: "How much is the assessment?",
-    a: "A fixed fee, agreed in writing before anything starts. You'll get the number on the call. No hourly billing, no surprises.",
-  },
+  [
+    "Why not just ask ChatGPT myself?",
+    "You can, and for some things you should. The hard part isn't the tool. It's knowing which of the fifty things in your week are worth handing to it, and which ones will create more work than they save. That's what we find.",
+  ],
+  [
+    "What happens on the free call?",
+    "Fifteen minutes. You describe how your week goes, and you get an honest answer on whether an assessment would help. If it wouldn't, we'll tell you.",
+  ],
+  [
+    "Do you work with businesses like mine?",
+    "If you run a service business with a small team (a practice, a trade, a firm, a shop), yes. If you're not sure, the free call is how to find out.",
+  ],
+  [
+    "How much is the assessment?",
+    "A fixed fee, agreed in writing before anything starts. You'll get the number on the call. No hourly billing, no surprises.",
+  ],
 ] as const;
 
 const ASSESSMENT = [
-  {
-    q: "How much of my time does it take?",
-    a: "The 90-minute assessment, then the review call. We do everything in between.",
-  },
-  {
-    q: "What do I actually get?",
-    a: "A plan built around your goals, specific to your business, not a generic AI checklist. And a review call where we go through all of it together, so you understand every recommendation and can ask anything.",
-  },
-  {
-    q: "How long until I have it?",
-    a: "We're back with you on the review call within five business days of the assessment.",
-  },
-  {
-    q: "What if you find AI isn't worth it for me?",
-    a: "Then that's what the plan says. Plenty of problems are really a process nobody owns, or software you're already paying for. Knowing that saves you money too.",
-  },
+  [
+    "How much of my time does it take?",
+    "The 90-minute assessment, then the review call. We do everything in between.",
+  ],
+  [
+    "What do I actually get?",
+    "A plan built around your goals, specific to your business, not a generic AI checklist. And a review call where we go through all of it together, so you understand every recommendation and can ask anything.",
+  ],
+  [
+    "How long until I have it?",
+    "We're back with you on the review call within five business days of the assessment.",
+  ],
+  [
+    "What if you find AI isn't worth it for me?",
+    "Then that's what the plan says. Plenty of problems are really a process nobody owns, or software you're already paying for. Knowing that saves you money too.",
+  ],
 ] as const;
 
 const TRUST = [
-  {
-    q: "Are you going to sell me software?",
-    a: "No. We don't sell tools. We tell you what's worth using for your business, and what isn't.",
-  },
-  {
-    q: "Is my business information kept private?",
-    a: "Yes. What you share stays between you and us and is only used to build your plan.",
-  },
-  {
-    q: "Is AI going to replace my staff?",
-    a: "That's your call, not ours. For some owners the goal is taking busywork off a stretched team. For others it's running leaner. We start with what you want and show you what's realistic.",
-  },
+  [
+    "Are you going to sell me software?",
+    "No. We don't sell tools. We tell you what's worth using for your business, and what isn't.",
+  ],
+  [
+    "Is my business information kept private?",
+    "Yes. What you share stays between you and us and is only used to build your plan.",
+  ],
+  [
+    "Is AI going to replace my staff?",
+    "That's your call, not ours. For some owners the goal is taking busywork off a stretched team. For others it's running leaner. We start with what you want and show you what's realistic.",
+  ],
 ] as const;
 
 const AFTER = [
-  {
-    q: "What happens after the review call?",
-    a: "The plan is yours to act on, with us, with someone else, or on your own. Nothing more is required. But when your next AI question comes up, you'll have someone who already knows your business.",
-  },
-  {
-    q: "I've tried AI tools before and they didn't stick. Is this different?",
-    a: "Usually the tool wasn't the problem. It was aimed at the wrong job. We start with the job.",
-  },
-  {
-    q: "Is Casey a real person?",
-    a: "No. Casey is an AI that answers questions and can book your call. She'll always tell you so if you ask.",
-  },
+  [
+    "What happens after the review call?",
+    "The plan is yours to act on, with us, with someone else, or on your own. Nothing more is required. But when your next AI question comes up, you'll have someone who already knows your business.",
+  ],
+  [
+    "I've tried AI tools before and they didn't stick. Is this different?",
+    "Usually the tool wasn't the problem. It was aimed at the wrong job. We start with the job.",
+  ],
+  [
+    "Is Casey a real person?",
+    "No. Casey is an AI that answers questions and can book your call. She'll always tell you so if you ask.",
+  ],
 ] as const;
 
 function Questions({
@@ -79,15 +79,15 @@ function Questions({
   items,
 }: {
   title: string;
-  items: ReadonlyArray<{ q: string; a: string }>;
+  items: ReadonlyArray<readonly [string, string]>;
 }) {
   return (
     <div className="about-group">
       <h3>{title}</h3>
-      {items.map((item) => (
-        <div key={item.q} className="about-qa">
-          <h4>{item.q}</h4>
-          <p>{item.a}</p>
+      {items.map(([q, a]) => (
+        <div key={q} className="about-qa">
+          <h4>{q}</h4>
+          <p>{a}</p>
         </div>
       ))}
     </div>
@@ -97,7 +97,7 @@ function Questions({
 export default function AboutPage() {
   return (
     <main className="m-wrap m-about">
-      <p className="m-kicker">About</p>
+      <p className="m-kicker">ABOUT</p>
       <h1 className="m-title">One person. No software to sell you.</h1>
       <p className="m-lead">
         Aidvance Consultancy helps small business owners figure out where AI actually saves them
@@ -106,7 +106,7 @@ export default function AboutPage() {
 
       <section className="m-case" aria-labelledby="who-heading">
         <h2 className="m-kicker" id="who-heading">
-          Who it&apos;s for
+          WHO IT&apos;S FOR
         </h2>
         <p className="m-copy">
           Owners of small service businesses (practices, trades, firms, shops) who are doing real
@@ -117,12 +117,10 @@ export default function AboutPage() {
 
       <section className="m-case" aria-labelledby="starts-heading">
         <h2 className="m-kicker" id="starts-heading">
-          It starts with where you want to go
+          IT STARTS WITH WHERE YOU WANT TO GO
         </h2>
         <p className="m-copy">Before we talk about AI, we talk about you.</p>
-        <p className="m-copy">
-          Where are you now? How the work actually moves through your week.
-        </p>
+        <p className="m-copy">Where are you now? How the work actually moves through your week.</p>
         <p className="m-copy">
           Where do you want to be? More customers. Fewer hours. A real vacation with your family.
           Lower overhead. Whatever matters most to you.
@@ -131,14 +129,12 @@ export default function AboutPage() {
           What&apos;s in the way? The calls that don&apos;t get returned, the paperwork that eats
           your nights, the jobs that fall through the cracks.
         </p>
-        <p className="m-copy">
-          Then we look at whether AI can close that gap, and exactly where.
-        </p>
+        <p className="m-copy">Then we look at whether AI can close that gap, and exactly where.</p>
       </section>
 
       <section className="m-case" aria-labelledby="behind-heading">
         <h2 className="m-kicker" id="behind-heading">
-          Who&apos;s behind it
+          WHO&apos;S BEHIND IT
         </h2>
         <p className="m-copy">Aidvance Consultancy is run by David Choukroun.</p>
         <p className="m-copy">
@@ -155,7 +151,7 @@ export default function AboutPage() {
 
       <section className="m-case" aria-labelledby="how-heading">
         <h2 className="m-kicker" id="how-heading">
-          How it works
+          HOW IT WORKS
         </h2>
         <ol className="about-steps">
           <li>
@@ -190,12 +186,12 @@ export default function AboutPage() {
 
       <section className="m-case" aria-labelledby="questions-heading">
         <h2 className="m-kicker" id="questions-heading">
-          Questions
+          QUESTIONS
         </h2>
-        <Questions title="Before you book" items={BEFORE} />
-        <Questions title="The assessment itself" items={ASSESSMENT} />
-        <Questions title="Trust" items={TRUST} />
-        <Questions title="After" items={AFTER} />
+        <Questions title="BEFORE YOU BOOK" items={BEFORE} />
+        <Questions title="THE ASSESSMENT ITSELF" items={ASSESSMENT} />
+        <Questions title="TRUST" items={TRUST} />
+        <Questions title="AFTER" items={AFTER} />
       </section>
 
       <div className="about-book">
