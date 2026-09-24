@@ -47,12 +47,6 @@ export default function WhatWeDoPage() {
         nobody owns, software they already pay for, or something that should not be automated at
         all.
       </p>
-
-      <p className="m-after">
-        <a className="m-textlink" href="#footer-casey">
-          Talk to Casey ↓
-        </a>
-      </p>
     </main>
   );
 }

@@ -4,7 +4,7 @@ import BookDave from "../../BookDave";
 
 export const metadata: Metadata = {
   title: "Work · Aidvance",
-  description: "Morning Desk, and a freight brokerage assessment.",
+  description: "Have your inbox work for you.",
 };
 
 const DESK = "/work/morning-desk";
@@ -14,10 +14,7 @@ export default function WorkPage() {
     <main className="m-wrap m-work">
       <p className="m-kicker">Work</p>
       <h1 className="m-title">Morning Desk</h1>
-      <p className="m-lead">
-        Surfaces who needs a reply, promises you made, conversations going quiet, and new
-        opportunities already sitting in email.
-      </p>
+      <p className="m-lead">Have your inbox work for you.</p>
 
       <div className="work-preview">
         <iframe
@@ -45,24 +42,6 @@ export default function WorkPage() {
           Your browser can’t play this video.
         </video>
       </div>
-
-      <section className="m-case work-story" aria-labelledby="freight-heading">
-        <h2 className="m-kicker" id="freight-heading">
-          Freight brokerage assessment
-        </h2>
-        <h3>What they thought they needed</h3>
-        <p>A bigger AI / automation build on top of the existing stack.</p>
-        <h3>What we found</h3>
-        <p>
-          The expensive idea wasn’t the highest-leverage fix. Time and attention were getting lost
-          in handoffs and follow-up long before a new system would help.
-        </p>
-        <h3>What we recommended</h3>
-        <p>
-          Clearer priorities first. Build only what the workflow actually justifies. Leave the rest
-          alone.
-        </p>
-      </section>
 
       <div className="m-cta">
         <Link className="talk m-talk" href="/#casey">
