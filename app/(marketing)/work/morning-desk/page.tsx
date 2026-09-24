@@ -27,7 +27,7 @@ export default function MorningDeskPage() {
       <iframe
         id="desk-demo"
         title="Morning Desk, a sales dashboard built on your email inbox"
-        src="/work/morning-desk/app/index.html"
+        src="/work/morning-desk/app/index.html?embed=1"
       />
     </div>
   );

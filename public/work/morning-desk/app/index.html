@@ -284,7 +284,24 @@ button{font:inherit; cursor:pointer}
 .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
 footer{margin-top:30px; padding-top:22px; border-top:1px solid var(--line); font-size:12.5px; color:var(--muted); text-align:center; font-weight:400; line-height:1.65}
 footer .fmark{display:block; margin:0 auto 12px; width:112px; color:var(--faint)}
+/* Embedded on an Aidvance page: the site header already carries the wordmark. */
+html.is-embed .mhtop .logo{display:none}
+html.is-embed .mhtools{margin-left:auto}
+/* Work-card thumbnail on a phone: the card already names Morning Desk. Show the inbox. */
+@media (max-width:800px){
+  html.is-preview .mhtitle,
+  html.is-preview .mhsub,
+  html.is-preview .mhmeta{display:none}
+  html.is-preview .mh{padding-block:12px 14px}
+}
 </style>
+<script>
+(function(){try{
+  var q=new URLSearchParams(location.search);
+  if(q.get("embed")==="1") document.documentElement.classList.add("is-embed");
+  if(q.get("preview")==="1") document.documentElement.classList.add("is-preview");
+}catch(e){}})();
+</script>
 </head>
 <body>
 

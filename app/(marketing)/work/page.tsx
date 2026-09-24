@@ -26,7 +26,7 @@ export default function WorkPage() {
           <div className="work-preview">
             <iframe
               title="Preview of Morning Desk"
-              src="/work/morning-desk/app/index.html"
+              src="/work/morning-desk/app/index.html?embed=1&preview=1"
               tabIndex={-1}
               aria-hidden="true"
             />
