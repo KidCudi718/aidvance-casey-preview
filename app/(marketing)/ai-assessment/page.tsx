@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import BookDave from "../../BookDave";
 
 export const metadata: Metadata = {
@@ -39,17 +40,26 @@ const GAINS = [
   },
 ] as const;
 
-const SAMPLE = [
-  ["Finding", "Follow-up lives in one person’s inbox."],
-  ["Why it matters", "Leads go quiet when that person is in a meeting."],
-  ["Recommendation", "A morning view of who is waiting, before anyone asks."],
-  ["Priority", "Do first"],
-  ["What not to do", "Don’t buy a new system to fix a reminder problem."],
-] as const;
+function AssessCta() {
+  return (
+    <>
+      <div className="m-cta">
+        <BookDave />
+        <Link className="talk m-talk" href="/#casey">
+          Talk to Casey
+        </Link>
+      </div>
+      <p className="m-note">
+        Start with the free 15-minute fit call. If there is nothing worth assessing, we’ll know
+        quickly.
+      </p>
+    </>
+  );
+}
 
 export default function AiAssessmentPage() {
   return (
-    <main className="m-wrap">
+    <main className="m-wrap m-assess">
       <p className="m-kicker">AI Assessment</p>
       <h1 className="m-title">What actually is an AI Assessment?</h1>
       <p className="m-lead">
@@ -57,13 +67,11 @@ export default function AiAssessmentPage() {
         belongs, where it doesn’t, and what to do first.
       </p>
 
-      <div className="m-cta">
-        <BookDave />
-      </div>
+      <AssessCta />
       <p className="m-copy">No generic AI playbook. This is built around your actual business.</p>
 
       <section className="m-case" aria-labelledby="how-heading">
-        <h2 className="m-headline" id="how-heading">
+        <h2 className="m-kicker" id="how-heading">
           How it works
         </h2>
         <ol className="m-grid m-deliver">
@@ -78,7 +86,7 @@ export default function AiAssessmentPage() {
       </section>
 
       <section className="m-case" aria-labelledby="get-heading">
-        <h2 className="m-headline" id="get-heading">
+        <h2 className="m-kicker" id="get-heading">
           What you get
         </h2>
         <ul className="m-grid m-deliver">
@@ -91,37 +99,7 @@ export default function AiAssessmentPage() {
         </ul>
       </section>
 
-      <p className="m-aside">
-        Sometimes the answer is AI. Sometimes it’s automation. Sometimes the smartest move is to
-        leave it alone.
-      </p>
-      <p className="m-copy">
-        The goal is not to sell you more technology. The goal is to show you what is actually worth
-        fixing.
-      </p>
-
-      <section className="m-case" aria-labelledby="sample-heading">
-        <h2 className="m-headline" id="sample-heading">
-          This is what clarity looks like.
-        </h2>
-        <article className="m-card">
-          <p className="m-kicker">Sample</p>
-          {SAMPLE.map(([label, value]) => (
-            <p key={label}>
-              <span className="work-label">{label}</span>
-              <br />
-              {value}
-            </p>
-          ))}
-        </article>
-      </section>
-
-      <p className="m-aside">
-        Know where the leaks are before you spend money fixing the wrong ones.
-      </p>
-      <div className="m-cta">
-        <BookDave />
-      </div>
+      <AssessCta />
     </main>
   );
 }

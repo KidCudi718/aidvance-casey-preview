@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { VoiceConversation } from "@spekoai/client";
+import Link from "next/link";
 import BookDave, { preloadDaveCalendly } from "./BookDave";
 import PresenceVisual, { type PresenceMode } from "./PresenceVisual";
 import SiteHeader from "./SiteHeader";
@@ -22,9 +23,9 @@ const STATUS: Record<State, string> = {
 const BTN: Record<State, string> = {
   idle: "Talk to Casey",
   requesting_mic: "Allow microphone…",
-  listening: "Stop",
-  thinking: "Stop",
-  speaking: "Stop",
+  listening: "End",
+  thinking: "End",
+  speaking: "End",
   done: "Talk again",
   error: "Try again",
 };
@@ -395,10 +396,26 @@ export default function CaseyPanel() {
 
         {needsUnmute ? (
           <button type="button" className="quiet" onClick={() => void startCall()}>
-            Stop
+            End
           </button>
         ) : null}
 
+        {state === "idle" ? (
+          <div className="home-under">
+            <p className="home-frame">Casey is Aidvance’s AI business concierge.</p>
+            <p className="home-proof">
+              <span>See what this looks like in practice</span>
+              <span aria-hidden="true">·</span>
+              <Link className="m-textlink" href="/work/morning-desk">
+                Morning Desk
+              </Link>
+              <span aria-hidden="true">·</span>
+              <Link className="m-textlink" href="/ai-assessment">
+                AI Assessment
+              </Link>
+            </p>
+          </div>
+        ) : null}
       </div>
     </main>
   );

@@ -2,6 +2,27 @@
   --ink: #050505;
   --paper: #f4f4f2;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --cta-h: 48px;
+  --cta-radius: 13px;
+  --cta-px: 18px;
+  --space-2: 16px;
+  --space-3: 24px;
+  --space-4: 40px;
+  --space-5: 64px;
+  --cta-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 1px 0 rgba(255, 255, 255, 0.08),
+    0 2px 3px rgba(0, 0, 0, 0.45),
+    0 10px 22px rgba(0, 0, 0, 0.42);
+  --cta-shadow-line:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 2px 3px rgba(0, 0, 0, 0.4),
+    0 10px 22px rgba(0, 0, 0, 0.38);
+  --cta-shadow-press:
+    inset 0 3px 6px rgba(0, 0, 0, 0.42),
+    0 1px 0 rgba(0, 0, 0, 0.28);
 }
 
 * { box-sizing: border-box; }
@@ -37,6 +58,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
   background:
     radial-gradient(ellipse 58% 46% at 50% 42%, #141414 0%, #000 68%);
   color: var(--paper);
+}
+
+/* Idle home can grow so the lines under Talk to Casey stay on the page. */
+.room--idle {
+  height: auto;
+  min-height: 100dvh;
+  overflow: visible;
+  grid-template-rows: auto minmax(min-content, 1fr) auto;
 }
 
 .top {
@@ -165,6 +194,49 @@ button, a { -webkit-tap-highlight-color: transparent; }
   text-align: center;
 }
 
+.dock .talk,
+.dock .book,
+.dock .again {
+  width: min(100%, 320px);
+}
+
+.home-under {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: min(40rem, 100%);
+  margin-top: 4px;
+  text-align: center;
+}
+
+.home-frame {
+  margin: 0;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-size: 1.08rem;
+  line-height: 1.4;
+  color: rgba(244, 244, 242, 0.72);
+}
+
+.home-under .m-labels {
+  justify-content: center;
+  margin: 0;
+}
+
+.home-proof {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 6px 10px;
+  margin: 0;
+  font-family: var(--font-mono), "IBM Plex Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(244, 244, 242, 0.48);
+}
+
 .status {
   margin: 0;
   min-height: 1.3em;
@@ -196,34 +268,39 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .talk {
   appearance: none;
   border: 1px solid var(--paper);
+  border-radius: var(--cta-radius);
   background: var(--paper);
   color: var(--ink);
-  min-height: 54px;
+  min-height: var(--cta-h);
   width: min(100%, 280px);
-  padding: 0 28px;
+  padding: 0 var(--cta-px);
   cursor: pointer;
   font-family: var(--font-mono), "IBM Plex Mono", monospace;
   font-size: 12px;
-  letter-spacing: 0.16em;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
+  box-shadow: var(--cta-shadow);
   touch-action: manipulation;
   transition:
     background 0.2s var(--ease),
     color 0.2s var(--ease),
-    transform 0.15s var(--ease),
-    box-shadow 0.2s var(--ease);
+    transform 0.12s var(--ease),
+    box-shadow 0.12s var(--ease);
 }
 
 .talk-label {
   display: inline-block;
   animation: fade 0.16s var(--ease) both;
 }
-.talk:hover { background: transparent; color: var(--paper); }
-.talk:active {
-  transform: scale(0.97);
-  background: #000;
+.talk:hover {
+  background: transparent;
   color: var(--paper);
-  box-shadow: 0 0 0 1px var(--paper);
+  box-shadow: var(--cta-shadow-line);
+}
+.talk:active {
+  transform: translateY(2px);
+  box-shadow: var(--cta-shadow-press);
 }
 .talk:focus { outline: none; }
 .talk:focus-visible { outline: 1px solid var(--paper); outline-offset: 4px; }
@@ -237,22 +314,28 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .room[data-state="speaking"] .talk {
   background: #000;
   color: var(--paper);
-  border: 1px solid rgba(244, 244, 242, 0.45);
-  box-shadow: none;
+  border: 1px solid rgba(244, 244, 242, 0.55);
+  box-shadow: var(--cta-shadow);
   font-weight: 500;
   font-size: 14px;
   letter-spacing: 0.12em;
 }
 .room[data-state="listening"] .talk:hover,
 .room[data-state="thinking"] .talk:hover,
-.room[data-state="speaking"] .talk:hover,
+.room[data-state="speaking"] .talk:hover {
+  background: #000;
+  color: var(--paper);
+  border: 1px solid rgba(244, 244, 242, 0.7);
+  box-shadow: var(--cta-shadow);
+}
 .room[data-state="listening"] .talk:active,
 .room[data-state="thinking"] .talk:active,
 .room[data-state="speaking"] .talk:active {
   background: #000;
   color: var(--paper);
   border: 1px solid rgba(244, 244, 242, 0.7);
-  box-shadow: none;
+  transform: translateY(2px);
+  box-shadow: var(--cta-shadow-press);
 }
 
 .trust {
@@ -286,14 +369,14 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .book {
   appearance: none;
   display: flex;
-  font: inherit;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
   width: min(100%, 420px);
-  min-height: 56px;
-  padding: 14px 22px;
+  min-height: var(--cta-h);
+  padding: 10px var(--cta-px);
   border: 1px solid var(--paper);
+  border-radius: var(--cta-radius);
   background: var(--paper);
   color: var(--ink);
   text-decoration: none;
@@ -303,24 +386,27 @@ button, a { -webkit-tap-highlight-color: transparent; }
   font-size: 15px;
   font-weight: 500;
   font-style: normal;
-  line-height: 1.35;
+  line-height: 1.3;
   letter-spacing: 0.01em;
   text-transform: none;
+  box-shadow: var(--cta-shadow);
   cursor: pointer;
   touch-action: manipulation;
   animation: fade 0.16s var(--ease) both;
   transition:
     background 0.2s var(--ease),
     color 0.2s var(--ease),
-    transform 0.15s var(--ease),
-    box-shadow 0.2s var(--ease);
+    transform 0.12s var(--ease),
+    box-shadow 0.12s var(--ease);
 }
-.book:hover { background: transparent; color: var(--paper); }
-.book:active {
-  transform: scale(0.97);
-  background: #000;
+.book:hover {
+  background: transparent;
   color: var(--paper);
-  box-shadow: 0 0 0 1px var(--paper);
+  box-shadow: var(--cta-shadow-line);
+}
+.book:active {
+  transform: translateY(2px);
+  box-shadow: var(--cta-shadow-press);
 }
 .book:focus { outline: none; }
 .book:focus-visible { outline: 1px solid var(--paper); outline-offset: 4px; }
@@ -371,23 +457,38 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .again {
   appearance: none;
-  border: 1px solid rgba(244, 244, 242, 0.45);
+  border: 1px solid rgba(244, 244, 242, 0.55);
+  border-radius: var(--cta-radius);
   background: transparent;
   color: var(--paper);
-  min-height: 44px;
+  min-height: var(--cta-h);
   width: min(100%, 280px);
-  padding: 0 22px;
+  padding: 0 var(--cta-px);
   cursor: pointer;
   font-family: var(--font-mono), "IBM Plex Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.16em;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  opacity: 0.72;
+  box-shadow: var(--cta-shadow-line);
   touch-action: manipulation;
-  transition: opacity 0.2s var(--ease), border-color 0.2s var(--ease), transform 0.15s var(--ease);
+  transition:
+    background 0.2s var(--ease),
+    color 0.2s var(--ease),
+    border-color 0.2s var(--ease),
+    transform 0.12s var(--ease),
+    box-shadow 0.12s var(--ease);
 }
-.again:hover { opacity: 1; border-color: var(--paper); }
-.again:active { transform: scale(0.97); }
+.again:hover {
+  background: var(--paper);
+  color: var(--ink);
+  border-color: var(--paper);
+  box-shadow: var(--cta-shadow);
+}
+.again:active {
+  transform: translateY(2px);
+  box-shadow: var(--cta-shadow-press);
+}
 .again:focus { outline: none; }
 .again:focus-visible { outline: 1px solid var(--paper); outline-offset: 4px; }
 
@@ -450,13 +551,20 @@ button, a { -webkit-tap-highlight-color: transparent; }
   background: var(--paper);
   color: var(--ink);
   border: 1px solid var(--paper);
+  box-shadow: var(--cta-shadow);
 }
-.book--live:hover,
+.book--live:hover {
+  background: #dededc;
+  color: var(--ink);
+  border-color: var(--paper);
+  box-shadow: var(--cta-shadow);
+}
 .book--live:active {
   background: #dededc;
   color: var(--ink);
-  border: 1px solid var(--paper);
-  box-shadow: none;
+  border-color: var(--paper);
+  transform: translateY(2px);
+  box-shadow: var(--cta-shadow-press);
 }
 
 /* Shared site chrome — room variant lives inside the Casey header row */
@@ -518,23 +626,36 @@ button, a { -webkit-tap-highlight-color: transparent; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 36px;
-  padding: 0 14px;
+  min-height: var(--cta-h);
+  padding: 0 var(--cta-px);
   border: 1px solid var(--paper);
+  border-radius: var(--cta-radius);
   color: var(--paper);
   background: transparent;
   text-decoration: none;
   font-family: var(--font-mono), "IBM Plex Mono", monospace;
-  font-size: 11px;
+  font-size: 12px;
+  font-weight: 500;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   white-space: nowrap;
-  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  box-shadow: var(--cta-shadow-line);
+  transition:
+    background 0.2s var(--ease),
+    color 0.2s var(--ease),
+    transform 0.12s var(--ease),
+    box-shadow 0.12s var(--ease);
 }
 
 .site-cta:hover {
   background: var(--paper);
   color: var(--ink);
+  box-shadow: var(--cta-shadow);
+}
+
+.site-cta:active {
+  transform: translateY(2px);
+  box-shadow: var(--cta-shadow-press);
 }
 
 .m-page {
@@ -564,7 +685,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .m-wrap {
   width: min(1120px, 100%);
   margin: 0 auto;
-  padding: 72px 22px 40px;
+  padding: var(--space-5) 22px var(--space-4);
 }
 
 .m-kicker,
@@ -589,7 +710,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .m-lead {
-  margin: 28px 0 0;
+  margin: var(--space-3) 0 0;
   max-width: 38rem;
   font-family: var(--font-serif), "Newsreader", Georgia, serif;
   font-size: clamp(1.25rem, 2.2vw, 1.55rem);
@@ -599,8 +720,8 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .m-grid {
   display: grid;
-  gap: 16px;
-  margin: 56px 0 0;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
   padding: 0;
   list-style: none;
 }
@@ -667,6 +788,16 @@ button, a { -webkit-tap-highlight-color: transparent; }
   color: rgba(244, 244, 242, 0.82);
 }
 
+.m-card a:not(.talk):not(.book):not(.site-cta):not(.again) {
+  color: inherit;
+}
+
+.m-card .m-textlink {
+  display: inline-block;
+  margin-top: 16px;
+  color: var(--paper);
+}
+
 .m-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -685,19 +816,28 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .m-cta {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: 18px 28px;
-  margin-top: 48px;
+  align-items: stretch;
+  gap: 12px;
+  margin-top: var(--space-4);
 }
 
-.m-cta-early { margin-top: 36px; }
+.m-cta > .talk,
+.m-cta > .book {
+  flex: 1 1 17rem;
+  width: auto;
+  max-width: none;
+  min-width: 0;
+}
 
-.m-talk {
+.m-cta-early { margin-top: var(--space-4); }
+
+.m-talk,
+.m-foot-talk {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: auto;
-  min-width: 220px;
+  min-width: 0;
   text-decoration: none;
 }
 
@@ -712,7 +852,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .m-textlink:hover { color: var(--paper); }
 
-.m-case { margin-top: 72px; }
+.m-case { margin-top: var(--space-5); }
 
 .m-case-head {
   display: grid;
@@ -754,7 +894,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .m-copy {
-  margin: 18px 0 0;
+  margin: var(--space-3) 0 0;
   max-width: 40rem;
   font-size: 1.05rem;
   line-height: 1.5;
@@ -790,7 +930,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 
 .m-aside,
 .m-note {
-  margin: 28px 0 0;
+  margin: var(--space-3) 0 0;
   max-width: 38rem;
   font-family: var(--font-serif), "Newsreader", Georgia, serif;
   font-size: 1.25rem;
@@ -858,18 +998,12 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 
 .m-foot-talk {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: auto;
-  min-width: 220px;
   flex: none;
-  text-decoration: none;
 }
 
 .m-after {
   display: flex;
-  margin-top: 28px;
+  margin-top: var(--space-4);
 }
 
 .m-page:has(.desk-host) .m-foot { display: none; }
@@ -891,11 +1025,35 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .desk-cue {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  gap: 8px 18px;
-  padding: 12px 22px;
+  gap: 12px 18px;
+  padding: 14px 22px;
   border-bottom: 1px solid rgba(244, 244, 242, 0.14);
+}
+
+.desk-intro {
+  flex: 1 1 28rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.desk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+
+.desk-actions .m-talk {
+  width: auto;
+  min-width: 180px;
+}
+
+#desk-demo {
+  scroll-margin-top: 12px;
 }
 
 .desk-cue p {
@@ -912,9 +1070,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .work-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.85fr);
-  gap: 16px;
-  margin-top: 36px;
-  align-items: stretch;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  align-items: start;
 }
 
 .work-hero { margin-top: 28px; }
@@ -1039,9 +1197,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   min-width: 0;
   margin-top: auto;
   height: auto;
-  padding: 14px 12px;
   white-space: normal;
-  line-height: 1.35;
   text-align: center;
 }
 
@@ -1070,12 +1226,144 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .m-facts-side { grid-template-rows: none; }
   .m-show .m-frame iframe,
   .m-frame iframe { height: 560px; min-height: 0; }
-  .m-wrap { padding-top: 48px; }
+  .m-wrap { padding-top: var(--space-4); }
   .m-title { max-width: 14ch; }
   .m-card { padding: 22px 18px 26px; }
 }
 
 @media (max-width: 640px) {
-  .site-cta { min-height: 34px; padding: 0 10px; }
+  .room-bar,
+  .m-bar-inner { gap: 8px 10px; }
+  .site-cta { padding: 0 12px; }
   .brand img { height: 36px; }
+
+  /* One scrolling row. "AI Assessment" stays with the other links. */
+  .site-links {
+    flex-wrap: nowrap;
+    gap: 4px 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .site-links::-webkit-scrollbar { display: none; }
+  .site-links a {
+    flex: none;
+    white-space: nowrap;
+    letter-spacing: 0.1em;
+  }
+
+  /* The header already has Talk to Casey. The demo is the next thing on the page. */
+  .desk-actions { display: none; }
+  .desk-cue {
+    gap: 4px 16px;
+    padding: 8px 16px 10px;
+  }
+  .desk-intro { flex: 0 1 auto; }
+  .desk-cue .desk-intro { white-space: nowrap; }
+
+  .work-preview { height: 320px; }
+  .work-preview iframe {
+    width: 100%;
+    height: 100%;
+    transform: none;
+  }
 }
+
+/* Assessment only. What We Do and Work keep the shared measures. */
+.m-assess .m-title {
+  max-width: 100%;
+  line-height: 0.98;
+}
+
+.m-assess .m-case > .m-kicker {
+  margin: 0 0 12px;
+  font-weight: 400;
+}
+
+.m-assess .m-case > .m-grid,
+.m-assess .m-case > .m-card { margin-top: 0; }
+
+.m-about .m-title,
+.m-work .m-title {
+  max-width: 16em;
+  line-height: 0.98;
+}
+
+.m-about .m-case > .m-kicker { margin: 0 0 12px; }
+
+.m-about .m-case > .m-kicker + .m-copy,
+.m-about .m-case > .m-grid { margin-top: 0; }
+
+.about-steps {
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.about-steps li + li { margin-top: var(--space-3); }
+
+.about-steps h3,
+.about-qa h4,
+.work-story h3 {
+  margin: 0;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-weight: 400;
+  font-size: 1.45rem;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.about-steps p,
+.about-qa p,
+.work-story > p {
+  margin: 8px 0 0;
+  max-width: 40rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: rgba(244, 244, 242, 0.82);
+}
+
+.about-group { margin-top: var(--space-4); }
+
+.about-group > h3 {
+  margin: 0;
+  font-family: var(--font-mono), "IBM Plex Mono", monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper);
+}
+
+.about-qa { margin-top: var(--space-3); }
+
+.about-book { margin-top: var(--space-5); }
+
+.m-work .work-preview { margin-top: var(--space-4); }
+
+.m-work .work-open {
+  width: min(100%, 280px);
+  margin-top: var(--space-3);
+}
+
+.m-work .work-watch { margin-top: var(--space-4); }
+
+.m-work .work-watch h2 {
+  margin: 0 0 16px;
+  font-family: var(--font-serif), "Newsreader", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(1.8rem, 3.4vw, 2.4rem);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.work-story h3 { margin-top: var(--space-3); }
+.work-story h3:first-of-type { margin-top: var(--space-3); }
+
+.m-work .m-case > .m-kicker { margin: 0 0 12px; }
+
+.m-work .m-case > .m-card { margin-top: 0; }
+
+.work-card .work-watch { margin-top: 8px; }
+
+.work-card .work-watch h3 { margin: 20px 0 12px; }
