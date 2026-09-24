@@ -1441,7 +1441,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
   .desk-actions {
     flex: 1 0 100%;
     flex-direction: column;
-    align-items: stretch;
+    align-items: flex-start;
   }
 
   .desk-actions .m-talk {
