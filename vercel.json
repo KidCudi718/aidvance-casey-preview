@@ -1,3 +1,3 @@
 {
-  "ignoreCommand": "case $VERCEL_GIT_COMMIT_REF in preview/site-ia-work-proof|go-live/2026-09-22|cursor/work-clarity-pass-40e3|cursor/assessment-type-hierarchy-cb3a|cursor/auditor-content-pass-f6d6) exit 1;; *) exit 0;; esac"
+  "ignoreCommand": "case $VERCEL_GIT_COMMIT_REF in preview/site-ia-work-proof|go-live/2026-09-22|cursor/work-clarity-pass-40e3|cursor/assessment-type-hierarchy-cb3a|cursor/auditor-content-pass-f6d6|cursor/desk-mobile-chrome-9129) exit 1;; *) exit 0;; esac"
 }

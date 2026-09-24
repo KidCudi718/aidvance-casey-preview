@@ -3,8 +3,7 @@ import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Morning Desk · Aidvance",
-  description:
-    "A sales dashboard built on your email inbox. Sample data. Click around. Nothing sends for real.",
+  description: "A sales dashboard built on your email inbox. Sample data. Click around.",
 };
 
 export default function MorningDeskPage() {
@@ -14,7 +13,6 @@ export default function MorningDeskPage() {
         <Link className="m-textlink" href="/work">
           Back to Work
         </Link>
-        <p className="desk-intro">Nothing sends for real.</p>
         <div className="desk-actions">
           <a className="m-textlink" href="#desk-demo">
             Open the demo
@@ -27,7 +25,7 @@ export default function MorningDeskPage() {
       <iframe
         id="desk-demo"
         title="Morning Desk, a sales dashboard built on your email inbox"
-        src="/work/morning-desk/app/index.html"
+        src="/work/morning-desk/app/index.html?embed=1"
       />
     </div>
   );

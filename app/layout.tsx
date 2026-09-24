@@ -33,7 +33,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable} ${serif.variable}`}>
-      <body style={{ fontFamily: "var(--font-sans), system-ui, sans-serif" }}>{children}</body>
+      <body style={{ fontFamily: "var(--font-sans), system-ui, sans-serif" }}>
+        {children}
+      </body>
     </html>
   );
 }

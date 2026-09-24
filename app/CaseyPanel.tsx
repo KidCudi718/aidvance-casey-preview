@@ -23,9 +23,9 @@ const STATUS: Record<State, string> = {
 const BTN: Record<State, string> = {
   idle: "Talk to Casey",
   requesting_mic: "Allow microphone…",
-  listening: "Stop",
-  thinking: "Stop",
-  speaking: "Stop",
+  listening: "End",
+  thinking: "End",
+  speaking: "End",
   done: "Talk again",
   error: "Try again",
 };
@@ -396,7 +396,7 @@ export default function CaseyPanel() {
 
         {needsUnmute ? (
           <button type="button" className="quiet" onClick={() => void startCall()}>
-            Stop
+            End
           </button>
         ) : null}
 
